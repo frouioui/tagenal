@@ -3,3 +3,6 @@
 
 # MacOS
 .DS_Store
+
+# Test folder
+/test

@@ -20,19 +20,19 @@ Must have installed docker-compose before hand. To run:
 
 `docker-compose up`
 
-It will show a bunch of logs, if it is the first time, the cluster must be initialized with the Makefile.
+It will show a bunch of logs. If it is the first time starting the cluster, then it must be initialized with the Makefile.
 
-The Makefile has several commands, here are the most important one to do after starting the cluster with docker-compose:
+The Makefile has several commands, here are the most important ones to do after starting the cluster with docker-compose:
 
 - `make init_all` this command will init all the shards, router, and config servers. This command run multiple shell commands, but the last shell command, which will setup the router, is likely to fail: in case the shards and config servers did not have enough time to initialize. To check if this command worked, use the following one.
 
-- `make router_status`, this command should output the state of the whole cluster. If the command fails then the router hasn't been initialize correctly. To initiliaze it correctly, use the following command.
+- `make router_status`, this command should output the state of the whole cluster. If the command fails then the router hasn't been initialized correctly. To initiliaze it correctly, use the following command.
 
 - `make init_router`, this will simply initialize the router only.
 
 - `make router_setup_shard_tags`, this command will setup the zone tags for the shards, it will define the geographical areas of the different shards. This command will also create our test database called `tagenal`, and a collection `users`. This collection will be set up to automatically split the users depending on their region: users with region "Beijing" will be sotred in the shard #1, and users from "Hong Kong" in the shard #2.
 
-After running these above commands, our test cluster should be set up.
+After running these commands, our test cluster should be set up.
 
 ## How to test
 

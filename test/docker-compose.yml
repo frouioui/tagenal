@@ -1,0 +1,132 @@
+version: '3'
+
+services:
+## ----- Router -----
+  mongo-router-01:
+    image: mongo:4.0
+    container_name: tagenal-mongo-router-01
+    command: mongos --port 27017 --configdb rs-config-server/mongo-config-01:27017,mongo-config-02:27017,mongo-config-03:27017 --bind_ip_all
+    ports:
+      - 27117:27017
+    volumes:
+      - ./scripts:/scripts
+
+## ----- Config ------
+  mongo-config-01:
+    image: mongo:4.0
+    container_name: tagenal-mongo-config-01 
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --dbpath /data/db
+    volumes:
+      - ./scripts:/scripts 
+      - mongo_config_01:/data/db
+    ports:
+      - 27119:27017
+    links:
+      - mongo-01-a
+      - mongo-02-a
+
+  mongo-config-02:
+    image: mongo:4.0
+    container_name: tagenal-mongo-config-02 
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --dbpath /data/db
+    volumes:
+      - ./scripts:/scripts
+      - mongo_config_02:/data/db
+    ports:
+      - 27120:27017
+    links:
+      - mongo-config-01
+  
+  mongo-config-03:
+    image: mongo:4.0
+    container_name: tagenal-mongo-config-03
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --dbpath /data/db
+    volumes:
+      - ./scripts:/scripts
+      - mongo_config_03:/data/db
+    ports:
+      - 27121:27017
+    links:
+      - mongo-config-02
+
+## ----- Shards -----
+  mongo-01-a:
+    image: mongo:4.0
+    container_name: tagenal-shard-01-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_01_a:/data/db
+    ports:
+      - 27122:27017
+    links:
+      - mongo-01-b
+      - mongo-01-c
+
+  mongo-01-b:
+    image: mongo:4.0
+    container_name: tagenal-shard-01-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_01_b:/data/db
+    ports:
+      - 27123:27017
+
+  mongo-01-c:
+    image: mongo:4.0
+    container_name: tagenal-shard-01-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_01_c:/data/db
+    ports:
+      - 27124:27017
+
+
+  mongo-02-a:
+    image: mongo:4.0
+    container_name: tagenal-shard-02-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_02_a:/data/db
+    ports:
+      - 27125:27017
+    links:  
+      - mongo-02-b
+      - mongo-02-c
+
+  mongo-02-b:
+    image: mongo:4.0
+    container_name: tagenal-shard-02-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_02_b:/data/db
+    ports:
+      - 27126:27017
+
+  mongo-02-c:
+    image: mongo:4.0
+    container_name: tagenal-shard-02-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+      - mongo_shard_02_c:/data/db
+    ports:
+      - 27127:27017
+
+
+volumes:
+  mongo_router_01:
+  mongo_config_01:
+  mongo_config_02:
+  mongo_config_03:
+  mongo_shard_01_a:
+  mongo_shard_01_b:
+  mongo_shard_01_c:
+  mongo_shard_02_a:
+  mongo_shard_02_b:
+  mongo_shard_02_c:
+      

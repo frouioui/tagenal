@@ -5,4 +5,5 @@
 .DS_Store
 
 # Test folder
-/test
+# /test
+/test/gridfs_main.go

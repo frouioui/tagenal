@@ -1,0 +1,19 @@
+global:
+  scrape_interval:     5s
+  evaluation_interval: 5s
+
+  external_labels:
+    monitor: 'tagenal'
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['prometheus:9090']
+        labels:
+          alias: prometheus
+
+  - job_name: 'mongodb_cluster'
+    static_configs:
+      - targets: ['mongo-metrics-exporter:9216']
+        labels:
+          alias: mongodb_cluster

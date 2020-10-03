@@ -1,6 +1,51 @@
 version: '3'
 
 services:
+## ----- Monitoring -----
+  mongo-metrics-exporter:
+    image: pandry/mongodb-exporter
+    container_name: mongo-metrics-exporter
+    restart: unless-stopped
+    ports:
+      - "9216:9216/tcp"
+    command:
+      - "--collect.database"
+      - "--collect.collection"
+      - "--collect.connpoolstats"
+      - "--mongodb.uri=mongodb://mongo-router-01:27017"
+    links:
+      - mongo-router-01
+
+  # TODO: We should place these two services (Grafana and Prometheus)
+  # into another containerized environment. Keep it away from our DB Cluster.
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    links:
+      - mongo-metrics-exporter
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+    links:
+      - prometheus
+      - mongo-metrics-exporter
+    ports: 
+      - 3000:3000
+
 ## ----- Router -----
   mongo-router-01:
     image: mongo:4.0
@@ -119,14 +164,21 @@ services:
 
 
 volumes:
+  # Cluster router
   mongo_router_01:
+  # Cluster Config
   mongo_config_01:
   mongo_config_02:
   mongo_config_03:
+  # Shard 01
   mongo_shard_01_a:
   mongo_shard_01_b:
   mongo_shard_01_c:
+  # Shard 02
   mongo_shard_02_a:
   mongo_shard_02_b:
   mongo_shard_02_c:
+  # Monitoring
+  prometheus_data:
+  grafana_data:
       

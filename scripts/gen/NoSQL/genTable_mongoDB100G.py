@@ -86,9 +86,9 @@ def gen_an_article (i):
         #has one video
         article["video"] = "video_a"+str(i)+'_video.flv'
         if random()<0.5:
-            copyfile('./video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('../video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
         else:
-            copyfile('./video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('../video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
     else:
         article["video"] = ""
 

@@ -7,3 +7,4 @@
 # Test folder
 # /test
 /test/gridfs_main.go
+/test_mysql

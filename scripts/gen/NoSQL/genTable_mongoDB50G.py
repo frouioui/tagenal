@@ -82,11 +82,11 @@ def gen_an_article (i):
         img.save(path+'/image_a'+str(i)+'_'+str(j)+'.jpg')
 
     # create video
-    if random() < 0.05:
+    if random() < 0.5:
         #has one video
         article["video"] = "video_a"+str(i)+'_video.flv'
         if random()<0.5:
-            copyfile('./video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('../video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
         else:
             copyfile('./video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
     else:
@@ -127,37 +127,21 @@ def gen_an_read (i):
         read["commentDetail"] = "comments to this article: (" + read["uid"] + "," + read["aid"] + ")" 
     return read
 
-with open("user.json", "w+") as f:
-    f.write("[")
+with open("user.dat", "w+") as f:
     for i in range (USERS_NUM):
         json.dump(gen_an_user(i), f)
-        if i == (USERS_NUM - 1):
-            f.write("\n")
-        else:
-            f.write(",\n")
-    f.write("]")
+        f.write("\n")
 
 if not os.path.exists('./articles'):
     os.makedirs('./articles')
-with open("article.json", "w+") as f:
-    f.write("[")
+with open("article.dat", "w+") as f:
     for i in range(ARTICLES_NUM):
         json.dump(gen_an_article(i), f)
-        if i == (ARTICLES_NUM - 1):
-            f.write("\n")
-        else:
-            f.write(",\n")
-    f.write("]")
+        f.write("\n")
 
 
-with open("read.json", "w+") as f:
-    f.write("[")
+with open("read.dat", "w+") as f:
     for i in range(READS_NUM):
         json.dump(gen_an_read(i), f)
-        f.write(",\n")
-        if i == (READS_NUM - 1):
-            f.write("\n")
-        else:
-            f.write(",\n")
-    f.write("]")
+        f.write("\n")
 

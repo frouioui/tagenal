@@ -1,7 +1,7 @@
 apiVersion: planetscale.com/v2
 kind: VitessCluster
 metadata:
-  name: tagenal-vitess
+  name: vitess
   labels:
     app: tagenal
 spec:
@@ -15,13 +15,13 @@ spec:
     mysqldExporter: prom/mysqld-exporter:v0.11.0
   cells:
     - name: zone1
-      gateway:
+      gateway: # VtGate
         authentication:
           static:
             secret:
               name: tagenal-vitess-config
               key: users.json
-        replicas: 1
+        replicas: 2
         resources:
           requests:
             cpu: 100m
@@ -42,7 +42,7 @@ spec:
         memory: 128Mi
 
   keyspaces:
-    - name: users
+    - name: usersdb
       turndownPolicy: Immediate
       partitionings:
         - equal:

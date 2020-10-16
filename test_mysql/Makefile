@@ -19,6 +19,9 @@ init_VSchema_usersdb	= $(vtctl_client_alias) ApplyVSchema -vschema="$(cat databa
 
 .PHONY: set_aliases
 
+dashboard_minikube:
+	minikube dashboard &
+
 start_minikube:
 	$(start_minikube)
 

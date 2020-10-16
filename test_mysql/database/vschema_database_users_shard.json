@@ -1,0 +1,22 @@
+{
+    "sharded": true,
+    "vindexes": {
+        "hash": {
+            "type": "hash"
+        }
+    },
+    "tables": {
+        "customer": {
+            "column_vindexes": [
+                {
+                    "column": "_id",
+                    "name": "hash"
+                }
+            ],
+            "auto_increment": {
+                "column": "_id",
+                "sequence": "users_seq"
+            }
+        }
+    }
+}

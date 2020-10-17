@@ -2,8 +2,6 @@ apiVersion: planetscale.com/v2
 kind: VitessCluster
 metadata:
   name: vitess
-  labels:
-    app: tagenal
 spec:
   images:
     vtctld: vitess/lite:v6.0.20-20200429
@@ -19,9 +17,9 @@ spec:
         authentication:
           static:
             secret:
-              name: tagenal-vitess-config
+              name: vitess-cluster-config
               key: users.json
-        replicas: 2
+        replicas: 1
         resources:
           requests:
             cpu: 100m
@@ -42,14 +40,14 @@ spec:
         memory: 128Mi
 
   keyspaces:
-    - name: usersdb
+    - name: users
       turndownPolicy: Immediate
       partitionings:
         - equal:
             parts: 1
             shardTemplate:
               databaseInitScriptSecret:
-                name: tagenal-vitess-config
+                name: vitess-cluster-config
                 key: init_db.sql
               replication:
                 enforceSemiSync: false
@@ -74,13 +72,46 @@ spec:
                     resources:
                       requests:
                         storage: 10Gi
+    - name: config
+      turndownPolicy: Immediate
+      partitionings:
+        - equal:
+            parts: 1
+            shardTemplate:
+              databaseInitScriptSecret:
+                name: vitess-cluster-config
+                key: init_db.sql
+              replication:
+                enforceSemiSync: false
+              tabletPools:
+                - cell: zone1
+                  type: replica
+                  replicas: 2
+                  vttablet:
+                    extraFlags:
+                      db_charset: utf8mb4
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  mysqld:
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  dataVolumeClaimTemplate:
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+
   updateStrategy:
     type: Immediate
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: tagenal-vitess-config
+  name: vitess-cluster-config
 type: Opaque
 stringData:
   users.json: |

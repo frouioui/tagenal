@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
-  '_id' BIGINT NOT NULL,
+  `_id` BIGINT NOT NULL auto_increment,
   `timestamp` CHAR(14) DEFAULT NULL,
   `id` CHAR(5) DEFAULT NULL,
   `uid` CHAR(5) DEFAULT NULL,

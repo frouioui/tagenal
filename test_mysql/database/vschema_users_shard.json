@@ -6,7 +6,7 @@
         }
     },
     "tables": {
-        "customer": {
+        "user": {
             "column_vindexes": [
                 {
                     "column": "_id",

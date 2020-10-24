@@ -30,6 +30,9 @@ SHARD_SWITCH_READ_REPLICA_USERS				= $(VTCTL_CLIENT) SwitchReads -tablet_type=re
 SHARD_SWITCH_WRITE_USERS					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_USERS).user2user
 
 
+list_vtctld:
+	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
+
 start_minikube:
 	minikube start --cpus=12 --memory=14000 --disk-size=80g
 
@@ -50,6 +53,11 @@ port_forwarding_vitess:
 
 init_unsharded_database:
 	$(INIT_USERS_TABLES)
+	$(INIT_USERS_VSCHEMA)
+
+init_users_increment_sequence:
+	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_SQL)
+	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_VSCHEMA)
 	$(INIT_USERS_VSCHEMA)
 
 init_sharded_database:

@@ -30,6 +30,12 @@ SHARD_SWITCH_READ_REPLICA_USERS				= $(VTCTL_CLIENT) SwitchReads -tablet_type=re
 SHARD_SWITCH_READ_RDONLY_USERS				= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdonly $(V_KEYSPACE_USERS).user2user
 SHARD_SWITCH_WRITE_USERS					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_USERS).user2user
 
+# Region sharding commands
+REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/vschema/region/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
+REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) CreateLookupVindex -tablet_types=REPLICA $(V_KEYSPACE_USERS) '$(shell cat $(DATABASE_FOLDER_PATH)/vschema/region/vschema_users_shard_lookup_vindex.json)'
+REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) ExternalizeVindex $(V_KEYSPACE_USERS).user_region_lookup
+
+GET_USERS_VSCHEMA	= $(VTCTL_CLIENT) GetVSchema $(V_KEYSPACE_USERS)
 
 list_vtctld:
 	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
@@ -68,6 +74,21 @@ init_sharded_database:
 	$(SHARD_INIT_USERS_VSCHEMA)
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml
 
+init_region_sharding_users: copy_locations_json_to_k8s
+	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3724453505-5a510085:/tmp/countries.json
+	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3774659171-51411321:/tmp/countries.json
+	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3890619061-d6d202c2:/tmp/countries.json
+	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-0808196278-480a1110:/tmp/countries.json
+	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-1651728703-a7361ca4:/tmp/countries.json
+	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-1929229597-af5a9c25:/tmp/countries.json
+	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-4109238961-30b1e68c:/tmp/countries.json
+	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-4224402714-96c8f9a7:/tmp/countries.json
+	$(REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA)
+	$(REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX)
+	@echo Wait ...
+	@sleep 5
+	$(REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX)
+
 resharding_process_users:
 	$(SHARD_INIT_RESHARD_USERS)
 	$(SHARD_VERIFY_USERS_SHARDING_PROCESS)
@@ -77,6 +98,13 @@ resharding_process_users:
 
 reshard_users_db:
 	$(SHARD_INIT_RESHARD_USERS)
+
+copy_locations_json_to_k8s:
+	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json
+	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtgate" -o custom-columns=":metadata.name"):/tmp/countries.json
+
+show_vttablets:
+	kubectl get pods --selector="planetscale.com/component=vttablet" -o custom-columns=":metadata.name" 
 
 show_vitess_tablets:
 	echo "show vitess_tablets;" | $(MYSQL_CLIENT) --table

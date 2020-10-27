@@ -19,7 +19,11 @@
           ],
           "name": "region_vdx"
         }
-      ]
+      ],
+      "auto_increment": {
+        "column": "_id",
+        "sequence": "users_seq"
+      }
     }
   }
 }

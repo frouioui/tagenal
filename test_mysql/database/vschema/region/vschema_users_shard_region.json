@@ -4,7 +4,7 @@
     "region_vdx": {
       "type": "region_json",
       "params": {
-        "region_map": "/tmp/locations.json",
+        "region_map": "/tmp/countries.json",
         "region_bytes": "1"
       }
     }

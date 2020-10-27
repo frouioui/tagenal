@@ -12,8 +12,8 @@ spec:
       mysql56Compatible: us.gcr.io/planetscale-vitess/lite:2020-04-24.228e6fe
     mysqldExporter: prom/mysqld-exporter:v0.11.0
   cells:
-    - name: zone1
-      gateway: # VtGate
+    - name: zone1 # VTGATE
+      gateway:
         authentication:
           static:
             secret:
@@ -26,7 +26,7 @@ spec:
             memory: 256Mi
           limits:
             memory: 256Mi
-  vitessDashboard:
+  vitessDashboard: # VTCTLD
     cells:
       - zone1
     extraFlags:
@@ -101,6 +101,14 @@ spec:
                     resources:
                       requests:
                         storage: 10Gi
+                  extraVolumes:
+                    - name: location-volume
+                      hostPath:
+                        path: /locations.json
+                        type: FileOrCreate
+                  extraVolumeMounts:
+                    - mountPath: /data/locations/locations.json
+                      name: location-volume
     - name: config
       turndownPolicy: Immediate
       partitionings:

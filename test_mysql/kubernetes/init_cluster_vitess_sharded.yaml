@@ -74,6 +74,14 @@ spec:
                       requests:
                         cpu: 100m
                         memory: 256Mi
+                  extraVolumeMounts:
+                    - name: vitess-region-config-volume
+                      mountPath: /tmp/countries.json
+                      subPath: countries.json
+                  extraVolumes:
+                    - name: vitess-region-config-volume
+                      configMap:
+                        name: vitess-cluster-config-sharding
                   dataVolumeClaimTemplate:
                     accessModes: ["ReadWriteOnce"]
                     resources:
@@ -108,14 +116,14 @@ spec:
                     resources:
                       requests:
                         storage: 10Gi
-                  extraVolumes:
-                    - name: location-volume
-                      hostPath:
-                        path: /locations.json
-                        type: FileOrCreate
                   extraVolumeMounts:
-                    - mountPath: /data/locations/locations.json
-                      name: location-volume
+                    - name: vitess-region-config-volume
+                      mountPath: /tmp/countries.json
+                      subPath: countries.json
+                  extraVolumes:
+                    - name: vitess-region-config-volume
+                      configMap:
+                        name: vitess-cluster-config-sharding
     - name: config
       turndownPolicy: Immediate
       partitionings:

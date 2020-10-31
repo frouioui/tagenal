@@ -17,7 +17,7 @@ spec:
         authentication:
           static:
             secret:
-              name: vitess-cluster-config
+              name: vitess-cluster-secret
               key: users.json
         replicas: 1
         resources:
@@ -38,7 +38,14 @@ spec:
       requests:
         cpu: 100m
         memory: 128Mi
-
+    extraVolumeMounts:
+      - name: vitess-region-config-volume
+        mountPath: /tmp/countries.json
+        subPath: countries.json
+    extraVolumes:
+      - name: vitess-region-config-volume
+        configMap:
+          name: vitess-cluster-config-sharding
   keyspaces:
     - name: users
       turndownPolicy: Immediate
@@ -47,7 +54,7 @@ spec:
             parts: 1
             shardTemplate:
               databaseInitScriptSecret:
-                name: vitess-cluster-config
+                name: vitess-cluster-secret
                 key: init_db.sql
               replication:
                 enforceSemiSync: false
@@ -76,7 +83,7 @@ spec:
             parts: 2
             shardTemplate:
               databaseInitScriptSecret:
-                name: vitess-cluster-config
+                name: vitess-cluster-secret
                 key: init_db.sql
               replication:
                 enforceSemiSync: false
@@ -116,7 +123,7 @@ spec:
             parts: 1
             shardTemplate:
               databaseInitScriptSecret:
-                name: vitess-cluster-config
+                name: vitess-cluster-secret
                 key: init_db.sql
               replication:
                 enforceSemiSync: false

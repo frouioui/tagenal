@@ -53,6 +53,7 @@ install_vitess_operator:
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/operator.yaml
 
 init_kubernetes_unsharded_database:
+	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
 	kubectl apply -f kubernetes/init_cluster_vitess.yaml
 
 port_forwarding_vitess:
@@ -68,21 +69,16 @@ init_users_increment_sequence:
 	$(INIT_USERS_VSCHEMA)
 
 init_sharded_database:
-	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_SQL)
-	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_VSCHEMA)
+	# $(SHARD_INIT_CONFIG_USERS_SEQUENCES_SQL)
+	# $(SHARD_INIT_CONFIG_USERS_SEQUENCES_VSCHEMA)
+	# $(INIT_USERS_VSCHEMA)
 	$(SHARD_ALTER_USERS_TABLES_SQL)
 	$(SHARD_INIT_USERS_VSCHEMA)
+	@echo Wait ...
+	@sleep 5
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml
 
-init_region_sharding_users: copy_locations_json_to_k8s
-	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3724453505-5a510085:/tmp/countries.json
-	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3774659171-51411321:/tmp/countries.json
-	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-3890619061-d6d202c2:/tmp/countries.json
-	# kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-0808196278-480a1110:/tmp/countries.json
-	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-1651728703-a7361ca4:/tmp/countries.json
-	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-1929229597-af5a9c25:/tmp/countries.json
-	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-4109238961-30b1e68c:/tmp/countries.json
-	kubectl cp ./database/locations/locations.json vitess-vttablet-zone1-4224402714-96c8f9a7:/tmp/countries.json
+init_region_sharding_users:
 	$(REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA)
 	$(REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX)
 	@echo Wait ...

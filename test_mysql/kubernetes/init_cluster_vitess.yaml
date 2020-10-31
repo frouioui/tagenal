@@ -17,7 +17,7 @@ spec:
         authentication:
           static:
             secret:
-              name: vitess-cluster-config
+              name: vitess-cluster-secret
               key: users.json
         replicas: 1
         resources:
@@ -47,7 +47,7 @@ spec:
             parts: 1
             shardTemplate:
               databaseInitScriptSecret:
-                name: vitess-cluster-config
+                name: vitess-cluster-secret
                 key: init_db.sql
               replication:
                 enforceSemiSync: false
@@ -79,7 +79,7 @@ spec:
             parts: 1
             shardTemplate:
               databaseInitScriptSecret:
-                name: vitess-cluster-config
+                name: vitess-cluster-secret
                 key: init_db.sql
               replication:
                 enforceSemiSync: false
@@ -107,80 +107,3 @@ spec:
 
   updateStrategy:
     type: Immediate
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: vitess-cluster-config
-type: Opaque
-stringData:
-  users.json: |
-    {
-      "user": [{
-        "UserData": "user",
-        "Password": ""
-      }]
-    }
-  init_db.sql: |
-    SET sql_log_bin = 0;
-    DELETE FROM mysql.user WHERE User = '';
-    DELETE FROM mysql.user WHERE User = 'root' AND Host != 'localhost';
-    DROP DATABASE IF EXISTS users;
-
-    ###############################################################################
-    # Vitess defaults
-    ###############################################################################
-    CREATE DATABASE IF NOT EXISTS _vt;
-    CREATE TABLE IF NOT EXISTS _vt.local_metadata (
-      name VARCHAR(255) NOT NULL,
-      value VARCHAR(255) NOT NULL,
-      db_name VARBINARY(255) NOT NULL,
-      PRIMARY KEY (db_name, name)
-      ) ENGINE=InnoDB;
-    CREATE TABLE IF NOT EXISTS _vt.shard_metadata (
-      name VARCHAR(255) NOT NULL,
-      value MEDIUMBLOB NOT NULL,
-      db_name VARBINARY(255) NOT NULL,
-      PRIMARY KEY (db_name, name)
-      ) ENGINE=InnoDB;
-
-    # Admin user with all privileges.
-    CREATE USER 'vt_dba'@'localhost';
-    GRANT ALL ON *.* TO 'vt_dba'@'localhost';
-    GRANT GRANT OPTION ON *.* TO 'vt_dba'@'localhost';
-
-    # User for app traffic, with global read-write access.
-    CREATE USER 'vt_app'@'localhost';
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, FILE,
-      REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES,
-      LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW,
-      SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER
-      ON *.* TO 'vt_app'@'localhost';
-
-    # User for app debug traffic, with global read access.
-    CREATE USER 'vt_appdebug'@'localhost';
-    GRANT SELECT, SHOW DATABASES, PROCESS ON *.* TO 'vt_appdebug'@'localhost';
-
-    # User for administrative operations that need to be executed as non-SUPER.
-    # Same permissions as vt_app here.
-    CREATE USER 'vt_allprivs'@'localhost';
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, FILE,
-      REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES,
-      LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW,
-      SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER
-      ON *.* TO 'vt_allprivs'@'localhost';
-
-    CREATE USER 'vt_repl'@'%';
-    GRANT REPLICATION SLAVE ON *.* TO 'vt_repl'@'%';
-
-    CREATE USER 'vt_filtered'@'localhost';
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, FILE,
-      REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES,
-      LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW,
-      SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER
-      ON *.* TO 'vt_filtered'@'localhost';
-
-    FLUSH PRIVILEGES;
-
-    RESET SLAVE ALL;
-    RESET MASTER;

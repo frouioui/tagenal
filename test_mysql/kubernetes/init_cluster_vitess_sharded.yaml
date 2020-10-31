@@ -26,6 +26,14 @@ spec:
             memory: 256Mi
           limits:
             memory: 256Mi
+        extraVolumeMounts:
+          - name: vitess-region-config-volume
+            mountPath: /tmp/countries.json
+            subPath: countries.json
+        extraVolumes:
+          - name: vitess-region-config-volume
+            configMap:
+              name: vitess-cluster-config-sharding
   vitessDashboard: # VTCTLD
     cells:
       - zone1

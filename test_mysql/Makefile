@@ -54,6 +54,7 @@ install_vitess_operator:
 
 init_kubernetes_unsharded_database:
 	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
+	kubectl apply -f kubernetes/vitess_cluster_config.yaml
 	kubectl apply -f kubernetes/init_cluster_vitess.yaml
 
 port_forwarding_vitess:
@@ -67,13 +68,10 @@ init_users_increment_sequence:
 	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_SQL)
 	$(SHARD_INIT_CONFIG_USERS_SEQUENCES_VSCHEMA)
 	$(INIT_USERS_VSCHEMA)
-
-init_sharded_database:
-	# $(SHARD_INIT_CONFIG_USERS_SEQUENCES_SQL)
-	# $(SHARD_INIT_CONFIG_USERS_SEQUENCES_VSCHEMA)
-	# $(INIT_USERS_VSCHEMA)
 	$(SHARD_ALTER_USERS_TABLES_SQL)
 	$(SHARD_INIT_USERS_VSCHEMA)
+
+init_sharded_database: init_users_increment_sequence
 	@echo Wait ...
 	@sleep 5
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml

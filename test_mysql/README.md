@@ -16,11 +16,11 @@ This command should be run in second terminal.
 
 ### **3.** Install vitess operator in kubernetes
 
-`make install_vitess_operator``
+`make install_vitess_operator`
 
 Expected output:
 
-```shell
+```
 kubectl apply -f ./vitess/examples/operator/operator.yaml
 customresourcedefinition.apiextensions.k8s.io/etcdlockservers.planetscale.com created
 customresourcedefinition.apiextensions.k8s.io/vitessbackups.planetscale.com created
@@ -43,7 +43,7 @@ deployment.apps/vitess-operator created
 
 Expected output:
 
-```shell
+```
 kubectl apply -f kubernetes/vitess_cluster_secret.yaml
 secret/vitess-cluster-secret created
 kubectl apply -f kubernetes/vitess_cluster_config.yaml
@@ -60,7 +60,7 @@ This command should be run in a third terminal.
 
 Expected output:
 
-```shell
+```
 ./script/port_forwarding.sh
 Forwarding from 127.0.0.1:15000 -> 15000
 Forwarding from [::1]:15000 -> 15000
@@ -79,7 +79,7 @@ After this command, Vitess cluster dashboard (vtctld) should be accessible at ht
 
 Expected output:
 
-```shell
+```
 vtctlclient -server=localhost:15999 ApplySchema -sql="DROP TABLE IF EXISTS user;  CREATE TABLE user (   _id INT NOT NULL auto_increment,   timestamp CHAR(14) DEFAULT NULL,   id CHAR(5) DEFAULT NULL,   uid CHAR(5) DEFAULT NULL,   name CHAR(9) DEFAULT NULL,   gender CHAR(7) DEFAULT NULL,   email CHAR(10) DEFAULT NULL,   phone CHAR(10) DEFAULT NULL,   dept CHAR(9) DEFAULT NULL,   grade CHAR(7) DEFAULT NULL,   language CHAR(3) DEFAULT NULL,   region VARBINARY(256),   role CHAR(6) DEFAULT NULL,   preferTags CHAR(7) DEFAULT NULL,   obtainedCredits CHAR(3) DEFAULT NULL,   PRIMARY KEY(_id) ) ENGINE=InnoDB DEFAULT CHARSET=utf8;" users
 vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{     "tables": {         "user": {}     } }' users
 New VSchema object:
@@ -99,7 +99,7 @@ If this is not what you expected, check the input data (as JSON parsing will ski
 
 Expected output:
 
-```shell
+```
 vtctlclient -server=localhost:15999 ApplySchema -sql="CREATE TABLE users_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence'; INSERT INTO users_seq(id, next_id, cache) VALUES(0, 1, 100);" config
 vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{     "tables": {         "users_seq": {             "type": "sequence"         }     } }' config
 New VSchema object:
@@ -155,7 +155,7 @@ If this is not what you expected, check the input data (as JSON parsing will ski
 
 Expected output:
 
-```shell
+```
 Wait ...
 kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml
 vitesscluster.planetscale.com/vitess configured
@@ -169,7 +169,7 @@ In the third terminal, where the `make port_forwarding_vitess` was run, we will 
 
 And expect at least these two lines in the output, (the content of the lines can slightly differ):
 
-```shell
+```
 38950 ttys000    0:00.52 kubectl port-forward service/vitess-vtctld-047eb1a6 15000 15999
 38951 ttys000    0:00.42 kubectl port-forward service/vitess-vtgate-e05d80f4 15306:3306
 ```
@@ -186,7 +186,7 @@ Finally, we can run the `make port_forwarding_vitess` again.
 
 Expected output:
 
-```shell
+```
 mysql -h 127.0.0.1 -P 15306 -u user < ./database/insert/insert_data_users.sql
 ```
 
@@ -196,7 +196,7 @@ mysql -h 127.0.0.1 -P 15306 -u user < ./database/insert/insert_data_users.sql
 
 Expected output:
 
-```shell
+```
 vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{   "sharded": true,   "vindexes": {     "region_vdx": {       "type": "region_json",       "params": {         "region_map": "/tmp/countries.json",         "region_bytes": "1"       }     }   },   "tables": {     "user": {       "column_vindexes": [         {           "columns": [             "_id",             "region"           ],           "name": "region_vdx"         }       ],       "auto_increment": {         "column": "_id",         "sequence": "users_seq"       }     }   } }' users
 New VSchema object:
 {
@@ -240,7 +240,7 @@ vtctlclient -server=localhost:15999 ExternalizeVindex users.user_region_lookup
 
 Expected output:
 
-```shell
+```
 vtctlclient -server=localhost:15999 Reshard users.user2user '-' '-80,80-'
 vtctlclient -server=localhost:15999 VDiff users.user2user
 Summary for user: {ProcessedRows:5 MatchingRows:5 MismatchedRows:0 ExtraRowsSource:0 ExtraRowsTarget:0}
@@ -257,7 +257,7 @@ vtctlclient -server=localhost:15999 SwitchWrites users.user2user
 
 Expected output:
 
-```shell
+```
 Users
 +-----+---------------+------+------+-------+--------+--------+--------+--------+--------+----------+-----------+-------+------------+-----------------+
 | _id | timestamp     | id   | uid  | name  | gender | email  | phone  | dept   | grade  | language | region    | role  | preferTags | obtainedCredits |

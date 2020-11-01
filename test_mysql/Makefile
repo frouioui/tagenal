@@ -71,7 +71,7 @@ init_users_increment_sequence:
 	$(SHARD_ALTER_USERS_TABLES_SQL)
 	$(SHARD_INIT_USERS_VSCHEMA)
 
-init_sharded_database: init_users_increment_sequence
+init_sharded_database:
 	@echo Wait ...
 	@sleep 5
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml

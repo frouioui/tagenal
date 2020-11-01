@@ -1,0 +1,24 @@
+{
+  "sharded": true,
+  "vindexes": {
+    "user_region_lookup": {
+      "type": "consistent_lookup_unique",
+      "params": {
+        "table": "users.user_lookup",
+        "from": "_id",
+        "to": "keyspace_id"
+      },
+      "owner": "user"
+    }
+  },
+  "tables": {
+    "user": {
+      "column_vindexes": [
+        {
+          "column": "_id",
+          "name": "user_region_lookup"
+        }
+      ]
+    }
+  }
+}

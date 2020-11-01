@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vitess-cluster-config-sharding
+  namespace: default
+data:
+  countries.json: |
+    {
+      "Beijing": 1,
+      "Hong Kong": 200
+    }

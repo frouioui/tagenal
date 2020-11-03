@@ -8,3 +8,4 @@
 # /test
 /test/gridfs_main.go
 /mysql/vitess
+/mysql/vitess-operator

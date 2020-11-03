@@ -4,10 +4,11 @@ metadata:
   name: vitess
 spec:
   images:
-    vtctld: vitess/lite:v6.0.20-20200429
-    vtgate: vitess/lite:v6.0.20-20200429
-    vttablet: vitess/lite:v6.0.20-20200429
-    vtbackup: vitess/lite:v6.0.20-20200429
+    vtctld: vitess/orctest:v1
+    vtgate: vitess/orctest:v1
+    vttablet: vitess/orctest:v1
+    vtorc: vitess/orctest:v1
+    vtbackup: vitess/orctest:v1
     mysqld:
       mysql56Compatible: vitess/lite:v6.0.20-20200429
     mysqldExporter: prom/mysqld-exporter:v0.11.0
@@ -38,7 +39,19 @@ spec:
       requests:
         cpu: 100m
         memory: 128Mi
-
+  vitessOrchestrator:
+    cells:
+      - zone1
+    configSecret:
+      name: vitess-cluster-secret
+      key: orc_config.json
+    replicas: 1
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
   keyspaces:
     - name: users
       turndownPolicy: Immediate

@@ -1,6 +1,6 @@
 USE articles;
 
-INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,authors,grade,language,text,image,video) VALUES
+INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,authors,language,text,image,video) VALUES
   ("1506000000007", "a7", "7", "title7", "technology", "abstract of article 7", "tags11", "author697", "en", "text_a7.txt", "image_a7_0.jpg,image_a7_1.jpg,image_a7_2.jpg,image_a7_3.jpg,", ""),
   ("1506000000008", "a8", "8", "title8", "technology", "abstract of article 8", "tags14", "author1882", "en", "text_a8.txt", "image_a8_0.jpg,image_a8_1.jpg,image_a8_2.jpg,", ""),
   ("1506000000009", "a9", "9", "title9", "technology", "abstract of article 9", "tags27", "author314", "zh", "text_a9.txt", "image_a9_0.jpg,image_a9_1.jpg,image_a9_2.jpg,", ""),
@@ -37,4 +37,4 @@ INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,author
   ("1506000000040", "a40", "40", "title40", "technology", "abstract of article 40", "tags28", "author825", "en", "text_a40.txt", "image_a40_0.jpg,", ""),
   ("1506000000041", "a41", "41", "title41", "science", "abstract of article 41", "tags20", "author895", "en", "text_a41.txt", "image_a41_0.jpg,image_a41_1.jpg,", ""),
   ("1506000000042", "a42", "42", "title42", "science", "abstract of article 42", "tags16", "author1669", "en", "text_a42.txt", "image_a42_0.jpg,", ""),
-  ("1506000000043", "a43", "43", "title43", "technology", "abstract of article 43", "tags38", "author1059", "en", "text_a43.txt", "image_a43_0.jpg,image_a43_1.jpg,image_a43_2.jpg,image_a43_3.jpg,image_a43_4.jpg,", "")
+  ("1506000000043", "a43", "43", "title43", "technology", "abstract of article 43", "tags38", "author1059", "en", "text_a43.txt", "image_a43_0.jpg,image_a43_1.jpg,image_a43_2.jpg,image_a43_3.jpg,image_a43_4.jpg,", "");

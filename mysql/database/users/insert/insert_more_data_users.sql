@@ -1,4 +1,5 @@
 USE users;
+
 INSERT INTO user (timestamp,id,uid,name,gender,email,phone,dept,grade,language,region,role,preferTags,obtainedCredits) VALUES
   ("1506328859005", "u5", "5", "user5", "male", "email5", "phone5", "dept16", "grade4", "zh", "Beijing", "role2", "tags11", "16"),
   ("1506328859006", "u6", "6", "user6", "female", "email6", "phone6", "dept9", "grade2", "en", "Beijing", "role0", "tags4", "49"),

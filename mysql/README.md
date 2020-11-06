@@ -93,30 +93,24 @@ New VSchema object:
 If this is not what you expected, check the input data (as JSON parsing will skip unexpected fields).
 ```
 
-### **7.** Initialize the incrementation sequence of the user table in the config keyspace
+### **7.** Initialize the incrementation sequences in the config keyspace
 
-`make init_users_increment_sequence`
+`make init_config_increment_sequence`
 
 Expected output:
 
 ```
-vtctlclient -server=localhost:15999 ApplySchema -sql="CREATE TABLE users_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence'; INSERT INTO users_seq(id, next_id, cache) VALUES(0, 1, 100);" config
-vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{     "tables": {         "users_seq": {             "type": "sequence"         }     } }' config
+cat: ./database/users/init/alter_users_tables_sharding.sql: No such file or directory
+vtctlclient -server=localhost:15999 ApplySchema -sql="CREATE TABLE users_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence'; INSERT INTO users_seq(id, next_id, cache) VALUES(0, 1, 100);  CREATE TABLE articles_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence'; INSERT INTO articles_seq(id, next_id, cache) VALUES(0, 1, 100);" config
+vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{     "tables": {         "users_seq": {             "type": "sequence"         },         "articles_seq": {             "type": "sequence"         }     } }' config
 New VSchema object:
 {
   "tables": {
+    "articles_seq": {
+      "type": "sequence"
+    },
     "users_seq": {
       "type": "sequence"
-    }
-  }
-}
-If this is not what you expected, check the input data (as JSON parsing will skip unexpected fields).
-vtctlclient -server=localhost:15999 ApplyVSchema -vschema='{     "tables": {         "user": {}     } }' users
-New VSchema object:
-{
-  "tables": {
-    "user": {
-
     }
   }
 }

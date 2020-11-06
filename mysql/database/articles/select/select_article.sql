@@ -2,4 +2,4 @@
 
 USE articles;
 
-SELECT * FROM user LIMIT 20;
+SELECT * FROM article LIMIT 20;

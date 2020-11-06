@@ -20,6 +20,9 @@ VTCTL_CLIENT	=	vtctlclient -server=localhost:15999
 INIT_USERS_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)
 INIT_USERS_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_initial.json)' $(V_KEYSPACE_USERS)
 
+INIT_ARTICLES_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/articles/init/init_articles.sql)" $(V_KEYSPACE_ARTICLES)
+INIT_ARTICLES_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_initial.json)' $(V_KEYSPACE_ARTICLES)
+
 # Sharded commands
 ## Config
 SHARD_INIT_CONFIG_SEQUENCES_SQL		= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/config/init/init_increment_seq.sql)" $(V_KEYSPACE_CONFIG)
@@ -35,7 +38,14 @@ SHARD_SWITCH_READ_RDONLY_USERS				= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdo
 SHARD_SWITCH_WRITE_USERS					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_USERS).user2user
 
 ## Articles
-### TODO: add articles commands
+SHARD_ALTER_ARTICLES_TABLES_SQL				= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/articles/init/alter_articles_auto_increment.sql)" $(V_KEYSPACE_ARTICLES)
+SHARD_INIT_ARTICLES_VSCHEMA					= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_shard.json)' $(V_KEYSPACE_ARTICLES)
+SHARD_INIT_RESHARD_ARTICLES					= $(VTCTL_CLIENT) Reshard $(V_KEYSPACE_ARTICLES).article2article '-' '-80,80-'
+SHARD_VERIFY_ARTICLES_SHARDING_PROCESS		= $(VTCTL_CLIENT) VDiff $(V_KEYSPACE_ARTICLES).article2article
+SHARD_SWITCH_READ_REPLICA_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=replica $(V_KEYSPACE_ARTICLES).article2article
+SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdonly $(V_KEYSPACE_ARTICLES).article2article
+SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
+
 
 # Region sharding commands
 REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/region/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
@@ -70,12 +80,17 @@ port_forwarding_vitess:
 init_unsharded_database:
 	$(INIT_USERS_TABLES)
 	$(INIT_USERS_VSCHEMA)
-
+	$(INIT_ARTICLES_TABLES)
+	$(INIT_ARTICLES_VSCHEMA)
 init_config_increment_sequence:
 	$(SHARD_INIT_CONFIG_SEQUENCES_SQL)
 	$(SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA)
+
 	$(SHARD_ALTER_USERS_TABLES_SQL)
 	$(SHARD_INIT_USERS_VSCHEMA)
+	
+	$(SHARD_ALTER_ARTICLES_TABLES_SQL)
+	$(SHARD_INIT_ARTICLES_VSCHEMA)
 
 init_sharded_database:
 	@echo Wait ...
@@ -112,9 +127,18 @@ show_vitess_tablets:
 insert_few_user_row:
 	$(MYSQL_CLIENT) < ./database/users/insert/insert_data_users.sql
 
+insert_few_article_row:
+	$(MYSQL_CLIENT) < ./database/articles/insert/insert_data_articles.sql
+
 show_user_table:
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user.sql
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_shard_1.sql
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_shard_2.sql
+
+show_article_table:
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article.sql
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_1.sql
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_2.sql
+
 
 .PHONY: set_aliases

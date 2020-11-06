@@ -30,6 +30,9 @@ spec:
           - name: vitess-region-config-volume
             mountPath: /tmp/countries.json
             subPath: countries.json
+          - name: vitess-region-config-volume
+            mountPath: /tmp/categories.json
+            subPath: categories.json
         extraVolumes:
           - name: vitess-region-config-volume
             configMap:
@@ -50,11 +53,92 @@ spec:
       - name: vitess-region-config-volume
         mountPath: /tmp/countries.json
         subPath: countries.json
+      - name: vitess-region-config-volume
+        mountPath: /tmp/categories.json
+        subPath: categories.json
     extraVolumes:
       - name: vitess-region-config-volume
         configMap:
           name: vitess-cluster-config-sharding
   keyspaces:
+    - name: articles
+      turndownPolicy: Immediate
+      partitionings:
+        - equal:
+            parts: 1
+            shardTemplate:
+              databaseInitScriptSecret:
+                name: vitess-cluster-secret
+                key: init_db.sql
+              replication:
+                enforceSemiSync: false
+              tabletPools:
+                - cell: zone1
+                  type: replica
+                  replicas: 2
+                  vttablet:
+                    extraFlags:
+                      db_charset: utf8mb4
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  mysqld:
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  extraVolumeMounts:
+                    - name: vitess-region-config-volume
+                      mountPath: /tmp/categories.json
+                      subPath: categories.json
+                  extraVolumes:
+                    - name: vitess-region-config-volume
+                      configMap:
+                        name: vitess-cluster-config-sharding
+                  dataVolumeClaimTemplate:
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+        - equal:
+            parts: 2
+            shardTemplate:
+              databaseInitScriptSecret:
+                name: vitess-cluster-secret
+                key: init_db.sql
+              replication:
+                enforceSemiSync: false
+              tabletPools:
+                - cell: zone1
+                  type: replica
+                  replicas: 2
+                  vttablet:
+                    extraFlags:
+                      db_charset: utf8mb4
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  mysqld:
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  dataVolumeClaimTemplate:
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+                  extraVolumeMounts:
+                    - name: vitess-region-config-volume
+                      mountPath: /tmp/categories.json
+                      subPath: categories.json
+                  extraVolumes:
+                    - name: vitess-region-config-volume
+                      configMap:
+                        name: vitess-cluster-config-sharding
+
     - name: users
       turndownPolicy: Immediate
       partitionings:
@@ -132,6 +216,7 @@ spec:
                     - name: vitess-region-config-volume
                       configMap:
                         name: vitess-cluster-config-sharding
+
     - name: config
       turndownPolicy: Immediate
       partitionings:

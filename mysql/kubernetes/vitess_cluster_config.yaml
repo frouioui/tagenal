@@ -9,3 +9,8 @@ data:
       "Beijing": 1,
       "Hong Kong": 200
     }
+  categories.json: |
+    {
+      "science": 1,
+      "technology": 200 
+    }

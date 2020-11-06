@@ -1,5 +1,5 @@
 \! echo 'Articles -80'
 
-USE articles;
+USE articles/-80;
 
-SELECT * FROM article/-80 LIMIT 20;
+SELECT * FROM article LIMIT 20;

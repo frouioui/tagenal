@@ -48,9 +48,15 @@ SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTI
 
 
 # Region sharding commands
+## Users
 REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/region/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
 REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) CreateLookupVindex -tablet_types=REPLICA $(V_KEYSPACE_USERS) '$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/region/vschema_users_shard_lookup_vindex.json)'
 REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) ExternalizeVindex $(V_KEYSPACE_USERS).user_region_lookup
+
+## Articles
+REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/region/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
+REGION_SHARD_INIT_CONFIG_ARTICLE_LOOKUP_VINDEX		= $(VTCTL_CLIENT) CreateLookupVindex -tablet_types=REPLICA $(V_KEYSPACE_ARTICLES) '$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/region/vschema_articles_shard_lookup_vindex.json)'
+REGION_SHARD_EXTERNALIZE_ARTICLE_LOOKUP_VINDEX		= $(VTCTL_CLIENT) ExternalizeVindex $(V_KEYSPACE_ARTICLES).article_region_lookup
 
 GET_USERS_VSCHEMA	= $(VTCTL_CLIENT) GetVSchema $(V_KEYSPACE_USERS)
 
@@ -104,6 +110,17 @@ init_region_sharding_users:
 	@sleep 5
 	$(REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX)
 
+init_region_sharding_articles:
+	$(REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA)
+	$(REGION_SHARD_INIT_CONFIG_ARTICLE_LOOKUP_VINDEX)
+	@echo Wait ...
+	@sleep 5
+	$(REGION_SHARD_EXTERNALIZE_ARTICLE_LOOKUP_VINDEX)
+
+init_region_sharding:
+	$(init_region_sharding_users)
+	$(init_region_sharding_articles)
+
 resharding_process_users:
 	$(SHARD_INIT_RESHARD_USERS)
 	$(SHARD_VERIFY_USERS_SHARDING_PROCESS)
@@ -111,8 +128,16 @@ resharding_process_users:
 	$(SHARD_SWITCH_READ_RDONLY_USERS)
 	$(SHARD_SWITCH_WRITE_USERS)
 
-reshard_users_db:
-	$(SHARD_INIT_RESHARD_USERS)
+resharding_process_articles:
+	$(SHARD_INIT_RESHARD_ARTICLES)
+	$(SHARD_VERIFY_ARTICLES_SHARDING_PROCESS)
+	$(SHARD_SWITCH_READ_REPLICA_ARTICLES)
+	$(SHARD_SWITCH_READ_RDONLY_ARTICLES)
+	$(SHARD_SWITCH_WRITE_ARTICLES)
+
+resharding_process:
+	$(resharding_process_users)
+	$(resharding_process_articles)
 
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json
@@ -128,7 +153,7 @@ insert_few_user_row:
 	$(MYSQL_CLIENT) < ./database/users/insert/insert_data_users.sql
 
 insert_few_article_row:
-	$(MYSQL_CLIENT) < ./database/articles/insert/insert_data_articles.sql
+	$(MYSQL_CLIENT) < ./database/articles/insert/insert_data_article.sql
 
 show_user_table:
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user.sql

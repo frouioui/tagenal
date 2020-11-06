@@ -1,0 +1,29 @@
+{
+  "sharded": true,
+  "vindexes": {
+    "region_vdx": {
+      "type": "region_json",
+      "params": {
+        "region_map": "/tmp/categories.json",
+        "region_bytes": "1"
+      }
+    }
+  },
+  "tables": {
+    "article": {
+      "column_vindexes": [
+        {
+          "columns": [
+            "_id",
+            "category"
+          ],
+          "name": "region_vdx"
+        }
+      ],
+      "auto_increment": {
+        "column": "_id",
+        "sequence": "articles_seq"
+      }
+    }
+  }
+}

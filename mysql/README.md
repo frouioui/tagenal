@@ -245,7 +245,19 @@ vtctlclient -server=localhost:15999 SwitchReads -tablet_type=rdonly users.user2u
 vtctlclient -server=localhost:15999 SwitchWrites users.user2user
 ```
 
-### **13.** Test, display the user table
+### **13.** Start the VReplication of the article table from shard -80 to shard 80-
+
+`make init_vreplication_articles`
+
+Expected output:
+
+```
+vtctlclient -server=localhost:15999 VReplicationExec zone1-136547469 'insert into _vt.vreplication (db_name, source, pos, max_tps, max_replication_lag, tablet_types, time_updated, transaction_timestamp, state) values('"'"'articles'"'"', '"'"'keyspace:\"articles\" shard:\"-80\" filter:<rules:<match:\"article\" filter:\"select * from article where category=\'"'"'science\'"'"'\" > > '"'"', '"'"''"'"', 9999, 9999, '"'"'master'"'"', 0, 0, '"'"'Running'"'"')' 
++
++
+```
+
+### Test, display the user table
 
 `make show_user_table`
 

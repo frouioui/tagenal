@@ -45,7 +45,7 @@ SHARD_VERIFY_ARTICLES_SHARDING_PROCESS		= $(VTCTL_CLIENT) VDiff $(V_KEYSPACE_ART
 SHARD_SWITCH_READ_REPLICA_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=replica $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdonly $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
-
+SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run script/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 # Region sharding commands
 ## Users
@@ -99,8 +99,6 @@ init_config_increment_sequence:
 	$(SHARD_INIT_ARTICLES_VSCHEMA)
 
 init_sharded_database:
-	@echo Wait ...
-	@sleep 5
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml
 
 init_region_sharding_users:
@@ -138,6 +136,9 @@ resharding_process_articles:
 resharding_process:
 	$(resharding_process_users)
 	$(resharding_process_articles)
+
+init_vreplication_articles:
+	$(SHARD_REPLICATION_CATEGORY_ARTICLE)
 
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json

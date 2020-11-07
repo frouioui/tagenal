@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: traefik-ingress-controller
+  labels:
+    k8s-app: traefik-ingress-lb
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - image: traefik:v2.1.1
+          name: traefik-ingress-lb
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
+          args:
+            - --providers.kubernetescrd
+            - --entrypoints.web.address=:80
+            - --api.insecure
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+    app: traefik-ingress-lb
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: api
+    - port: 80
+      targetPort: 80
+      name: web
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-web-ui-ir
+spec:
+  entryPoints:
+    - traefik
+  routes:
+    - kind: Rule
+      match: Host(`tagenal`) && PathPrefix(`/`)
+      services:
+        - name: traefik-web-ui
+          port: 8080

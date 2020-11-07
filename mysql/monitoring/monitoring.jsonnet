@@ -32,6 +32,14 @@ local kp =
         },
       },
     },
+    grafanaDashboards+:: {
+      'mysql-overview.json': (import '../../grafana-dashboards/dashboards/MySQL_Overview_mod.json'),
+    },
+    grafana+:: {
+      dashboards+:: {
+        'mysql-overview.json': (import '../../grafana-dashboards/dashboards/MySQL_Overview_mod.json'),
+      },
+    },
   };
 
 { ['setup/0namespace-' + name]: kp.kubePrometheus[name] for name in std.objectFields(kp.kubePrometheus) } +

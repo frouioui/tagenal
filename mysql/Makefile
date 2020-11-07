@@ -9,6 +9,8 @@ V_KEYSPACE_CONFIG	= config
 
 DATABASE_FOLDER_PATH	= ./database
 
+KUBE_PROMETHEUS_PATH	= ./lib/kube-prometheus
+
 VITESS_OPERATOR_PATH	= ./lib/vitess/examples/operator
 VITESS_COMMON_PATH		= ./lib/vitess/examples/common
 
@@ -143,6 +145,14 @@ init_vreplication_articles:
 
 final_vitess_cluster:
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml
+
+build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
+	./monitoring/build.sh
+
+run_monitoring: build_monitoring_manifests
+	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/setup
+	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
 
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json

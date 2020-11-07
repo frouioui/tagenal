@@ -140,6 +140,9 @@ resharding_process:
 init_vreplication_articles:
 	$(SHARD_REPLICATION_CATEGORY_ARTICLE)
 
+final_vitess_cluster:
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml
+
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtgate" -o custom-columns=":metadata.name"):/tmp/countries.json

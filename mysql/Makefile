@@ -9,8 +9,10 @@ V_KEYSPACE_CONFIG	= config
 
 DATABASE_FOLDER_PATH	= ./database
 
-VITESS_OPERATOR_PATH	= ./vitess/examples/operator
-VITESS_COMMON_PATH		= ./vitess/examples/common
+KUBE_PROMETHEUS_PATH	= ./lib/kube-prometheus
+
+VITESS_OPERATOR_PATH	= ./lib/vitess/examples/operator
+VITESS_COMMON_PATH		= ./lib/vitess/examples/common
 
 # Aliases
 MYSQL_CLIENT	=	mysql -h 127.0.0.1 -P 15306 -u user
@@ -64,13 +66,14 @@ list_vtctld:
 	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
 
 start_minikube:
-	minikube start --cpus=12 --memory=10000 --disk-size=80g
+	minikube start --kubernetes-version=v1.19.2 --cpus=12 --memory=10000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
+	minikube addons disable metrics-server
 
 start_minikube_dashboard:
 	minikube dashboard
 
 clone_vitess_github:
-	git clone git@github.com:vitessio/vitess.git
+	./lib/script/get-vitess.sh
 
 install_vitess_operator:
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/operator.yaml
@@ -142,6 +145,14 @@ init_vreplication_articles:
 
 final_vitess_cluster:
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml
+
+build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
+	./monitoring/build.sh
+
+run_monitoring: build_monitoring_manifests
+	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/setup
+	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
 
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json

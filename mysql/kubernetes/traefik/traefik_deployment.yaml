@@ -33,6 +33,7 @@ spec:
           args:
             - --providers.kubernetescrd
             - --entrypoints.web.address=:80
+            - --entrypoints.grpc.address=:8000
             - --api.insecure
 ---
 apiVersion: v1

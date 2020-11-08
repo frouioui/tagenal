@@ -36,6 +36,9 @@ spec:
             - --entrypoints.grpc.address=:8000
             - --entrypoints.mysql.address=:3000
             - --api.insecure
+            - --api
+            - --log.level=DEBUG
+            - --accesslog=true
 ---
 apiVersion: v1
 kind: Service

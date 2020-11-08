@@ -1,11 +1,13 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
-  name: traefik-ingress-controller
+  name: traefik
   labels:
+    app: traefik
     k8s-app: traefik-ingress-lb
     kubernetes.io/cluster-service: "true"
 spec:
+  replicas: 1
   selector:
     matchLabels:
       k8s-app: traefik-ingress-lb
@@ -35,19 +37,33 @@ spec:
             - --entrypoints.web.address=:80
             - --entrypoints.grpc.address=:8000
             - --entrypoints.mysql.address=:3000
+            - --entryPoints.metrics.address=:8082
             - --api.insecure
             - --api
             - --log.level=DEBUG
             - --accesslog=true
+            - --metrics.prometheus=true
+            - --metrics.prometheus.entryPoint=metrics
+            - --metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
+          ports:
+            - name: web
+              containerPort: 8000
+            - name: metrics
+              containerPort: 8082
+            - name: admin
+              containerPort: 8080
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: traefik-web-ui
+  name: traefik
+  labels:
+    k8s-app: traefik-ingress-lb
+    app: traefik
 spec:
   selector:
     k8s-app: traefik-ingress-lb
-    app: traefik-ingress-lb
   ports:
     - port: 8080
       targetPort: 8080
@@ -55,17 +71,6 @@ spec:
     - port: 80
       targetPort: 80
       name: web
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: traefik-web-ui-ir
-spec:
-  entryPoints:
-    - traefik
-  routes:
-    - kind: Rule
-      match: Host(`tagenal`) && PathPrefix(`/`)
-      services:
-        - name: traefik-web-ui
-          port: 8080
+    - port: 8082
+      targetPort: 8082
+      name: metrics

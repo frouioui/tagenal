@@ -10,6 +10,27 @@ local kp =
       },
     },
     prometheus+:: {
+      serviceMonitorTraefik: {
+        apiVersion: 'monitoring.coreos.com/v1',
+        kind: 'ServiceMonitor',
+        metadata: {
+          name: 'traefik-monitor-service',
+          namespace: 'default',
+        },
+        spec: {
+          jobLabel: 'traefik',
+          endpoints: [
+            {
+              port: 'metrics',
+            },
+          ],
+          selector: {
+            matchLabels: {
+              'app': 'traefik',
+            },
+          },
+        },
+      },
       serviceMonitorDefault: {
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'ServiceMonitor',

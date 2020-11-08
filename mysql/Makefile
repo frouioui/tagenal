@@ -15,8 +15,8 @@ VITESS_OPERATOR_PATH	= ./lib/vitess/examples/operator
 VITESS_COMMON_PATH		= ./lib/vitess/examples/common
 
 # Aliases
-MYSQL_CLIENT	=	mysql -h 127.0.0.1 -P 15306 -u user
-VTCTL_CLIENT	=	vtctlclient -server=localhost:15999
+MYSQL_CLIENT	=	mysql -h tagenal -P 3000 -u user
+VTCTL_CLIENT	=	vtctlclient -server=tagenal:8000
 
 # Unsharded commands
 INIT_USERS_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)

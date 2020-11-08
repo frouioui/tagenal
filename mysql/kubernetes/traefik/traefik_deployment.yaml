@@ -34,6 +34,7 @@ spec:
             - --providers.kubernetescrd
             - --entrypoints.web.address=:80
             - --entrypoints.grpc.address=:8000
+            - --entrypoints.mysql.address=:3000
             - --api.insecure
 ---
 apiVersion: v1

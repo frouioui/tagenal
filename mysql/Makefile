@@ -154,6 +154,16 @@ run_monitoring: build_monitoring_manifests
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
 
+setup_traefik:
+	kubectl create -f kubernetes/traefik/traefik_crd.yaml
+	kubectl create -f kubernetes/traefik/traefik_rbac.yaml
+	@echo Wait 5s
+	@sleep 5
+	kubectl create -f kubernetes/traefik/traefik_deployment.yaml
+	./kubernetes/traefik/vitess/build.sh
+	kubectl create -f kubernetes/traefik/vitess/
+	kubectl create -f kubernetes/traefik/monitoring/
+
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtgate" -o custom-columns=":metadata.name"):/tmp/countries.json

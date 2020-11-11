@@ -160,8 +160,12 @@ setup_traefik:
 	@echo Wait 5s
 	@sleep 5
 	kubectl create -f kubernetes/traefik/traefik_deployment.yaml
+
+setup_traefik_vitess:
 	./kubernetes/traefik/vitess/build.sh
 	kubectl create -f kubernetes/traefik/vitess/
+
+setup_traefik_monitoring:
 	kubectl create -f kubernetes/traefik/monitoring/
 
 copy_locations_json_to_k8s:

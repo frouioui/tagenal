@@ -35,7 +35,7 @@ func main() {
 	}
 
 	tabletID := fmt.Sprintf("%s-%d", shardInfo.MasterAlias.Cell, shardInfo.MasterAlias.UID)
-	vtctl := "vtctlclient -server=localhost:15999"
+	vtctl := "vtctlclient -server=tagenal:8000"
 	dbName := "articles"
 
 	filter := &binlogdatapb.Filter{

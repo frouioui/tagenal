@@ -15,8 +15,8 @@ VITESS_OPERATOR_PATH	= ./lib/vitess/examples/operator
 VITESS_COMMON_PATH		= ./lib/vitess/examples/common
 
 # Aliases
-MYSQL_CLIENT	=	mysql -h 127.0.0.1 -P 15306 -u user
-VTCTL_CLIENT	=	vtctlclient -server=localhost:15999
+MYSQL_CLIENT	=	mysql -h tagenal -P 3000 -u user
+VTCTL_CLIENT	=	vtctlclient -server=tagenal:8000
 
 # Unsharded commands
 INIT_USERS_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)
@@ -66,7 +66,7 @@ list_vtctld:
 	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
 
 start_minikube:
-	minikube start --kubernetes-version=v1.19.2 --cpus=12 --memory=10000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
+	minikube start --kubernetes-version=v1.19.2 --cpus=14 --memory=12000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
 	minikube addons disable metrics-server
 
 start_minikube_dashboard:
@@ -153,6 +153,20 @@ run_monitoring: build_monitoring_manifests
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/setup
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
+
+setup_traefik:
+	kubectl create -f kubernetes/traefik/traefik_crd.yaml
+	kubectl create -f kubernetes/traefik/traefik_rbac.yaml
+	@echo Wait 5s
+	@sleep 5
+	kubectl create -f kubernetes/traefik/traefik_deployment.yaml
+
+setup_traefik_vitess:
+	./kubernetes/traefik/vitess/build.sh
+	kubectl create -f kubernetes/traefik/vitess/
+
+setup_traefik_monitoring:
+	kubectl create -f kubernetes/traefik/monitoring/
 
 copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json

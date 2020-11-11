@@ -45,10 +45,10 @@ spec:
     replicas: 1
     resources:
       limits:
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     extraVolumeMounts:
       - name: vitess-region-config-volume
         mountPath: /tmp/countries.json
@@ -86,7 +86,7 @@ spec:
                   mysqld:
                     resources:
                       requests:
-                        cpu: 100m
+                        cpu: 200m
                         memory: 256Mi
                   dataVolumeClaimTemplate:
                     accessModes: ["ReadWriteOnce"]
@@ -127,7 +127,7 @@ spec:
                   mysqld:
                     resources:
                       requests:
-                        cpu: 100m
+                        cpu: 200m
                         memory: 256Mi
                   dataVolumeClaimTemplate:
                     accessModes: ["ReadWriteOnce"]

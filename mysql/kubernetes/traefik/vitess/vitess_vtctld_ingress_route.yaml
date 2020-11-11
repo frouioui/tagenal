@@ -1,0 +1,24 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vtctld-web
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`tagenal`) && PathPrefix(`/vtctld`)
+      services:
+        - name: vitess-vtctld-047eb1a6
+          port: 15000
+      middlewares:
+        - name: vtctld-web-stripprefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: vtctld-web-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /vtctld

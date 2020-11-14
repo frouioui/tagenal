@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api-deployment
+  labels:
+    app: users-api
+spec:
+  selector:
+    matchLabels:
+      app: users-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+        - name: users-api-server
+          image: frouioui/tagenal-users-service:v1.0
+          resources:
+            limits:
+              cpu: 50m
+              memory: 128Mi
+          ports:
+            - name: users-service
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec:
+  selector:
+    app: users-api
+  ports:
+    - port: 8080
+      targetPort: users-service

@@ -1,0 +1,25 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: users-client-web
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`tagenal`) && PathPrefix(`/users`)
+      services:
+        - name: users-client-service
+          port: 8080
+      middlewares:
+        - name: users-client-web-stripprefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: users-client-web-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /users
+      - /users/

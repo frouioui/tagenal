@@ -1,8 +1,3 @@
-##
-## Tagenal
-## Tsinghua Univeristy
-##
-
 V_KEYSPACE_USERS	= users
 V_KEYSPACE_ARTICLES	= articles
 V_KEYSPACE_CONFIG	= config

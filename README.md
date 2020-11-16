@@ -194,7 +194,7 @@ In addition to creating the sequences, we will modify the VSchema of the users a
 `make init_config_increment_sequence`
 
 
-### 6. Initialize sharded database in kubernetes
+### 7. Initialize sharded database in kubernetes
 
 We will now create new pods to prepare for the sharding. This new kubernetes configuration of the vitess cluster will create new vttablets.
 
@@ -213,7 +213,7 @@ This command will take a little while to fully finish. The status can be checked
 
 Additionally, the `make show_vitess_tablets` command should show only tablets with a running state `SERVING`.
 
-### 7. Insert a first few rows
+### 8. Insert a first few rows
 
 Once the previous step is fully completed, simply add a few rows:
 
@@ -221,7 +221,7 @@ Once the previous step is fully completed, simply add a few rows:
 
 `make insert_few_user_row`
 
-### 8. Setup the region-based sharding
+### 9. Setup the region-based sharding
 
 We are now going to setup the region-based sharding on the keyspaces users and articles.
 
@@ -229,7 +229,7 @@ We are now going to setup the region-based sharding on the keyspaces users and a
 
 `make init_region_sharding_articles`
 
-### 9. Start the resharding process of the cluster
+### 10. Start the resharding process of the cluster
 
 Now we are complete the resharding process of our keyspaces.
 
@@ -262,7 +262,7 @@ vtctlclient -server=tagenal:8000 SwitchWrites users.user2user
 
 *Note: replace `user` and `users` by whichever table / keyspace is failing.*
 
-### 10. Shutdown the old shards and add replicas
+### 11. Shutdown the old shards and add replicas
 
 We are going to shutdown the shard `-` from keyspace users and articles.
 
@@ -270,7 +270,7 @@ We are going to shutdown the shard `-` from keyspace users and articles.
 
 This command will also increase the count of replica to 2 instead of 1.
 
-### 11. Start the VReplication of the article table from shard -80 to shard 80-
+### 12. Start the VReplication of the article table from shard -80 to shard 80-
 
 We are now going to create a VRep stream in order to duplicate the articles with the science category, from shard `-80` to shard `80-`. To do so, use the following command:
 
@@ -284,7 +284,7 @@ vtctlclient -server=localhost:15999 VReplicationExec zone1-136547469 'insert int
 +
 ```
 
-### Test
+### 13. Test
 
 We are now going to display our two tables `user` and `article`.
 

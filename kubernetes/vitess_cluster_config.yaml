@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: vitess-cluster-config-sharding
-  namespace: default
+  namespace: vitess
 data:
   countries.json: |
     {

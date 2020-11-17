@@ -2,6 +2,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRouteTCP
 metadata:
   name: vtgate-mysql
+  namespace: vitess
 spec:
   entryPoints:
     - mysql
@@ -9,5 +10,6 @@ spec:
     - kind: Rule
       match: HostSNI(`*`)
       services:
-        - name: vitess-vtgate-e05d80f4
+        - namespace: vitess
+          name: vitess-vtgate-e05d80f4
           port: 3306

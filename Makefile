@@ -71,7 +71,10 @@ clone_vitess_github:
 	./lib/script/get-vitess.sh
 
 install_vitess_operator:
+	kubectl apply -f kubernetes/vitess_namespace.yaml
+	kubectl config set-context $(shell kubectl config current-context) --namespace=vitess
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/operator.yaml
+	kubectl config set-context $(shell kubectl config current-context) --namespace=default
 
 init_kubernetes_unsharded_database:
 	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
@@ -157,7 +160,7 @@ setup_traefik:
 	@sleep 5
 	kubectl create -f kubernetes/traefik/traefik_deployment.yaml
 
-setup_traefik_vitess:
+setup_traefik_vitess: $(shell chmod +x ./kubernetes/traefik/vitess/build.sh)
 	./kubernetes/traefik/vitess/build.sh
 	kubectl create -f kubernetes/traefik/vitess/
 
@@ -169,7 +172,7 @@ copy_locations_json_to_k8s:
 	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtgate" -o custom-columns=":metadata.name"):/tmp/countries.json
 
 show_vttablets:
-	kubectl get pods --selector="planetscale.com/component=vttablet" -o custom-columns=":metadata.name" 
+	kubectl get pods --namespace=vitess --selector="planetscale.com/component=vttablet" -o custom-columns=":metadata.name" 
 
 show_vitess_tablets:
 	echo "show vitess_tablets;" | $(MYSQL_CLIENT) --table

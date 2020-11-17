@@ -370,3 +370,35 @@ Articles 80-
 |   7 | 1506000000006 | a6   | 6    | title6 | technology | abstract of article 6 | tags19      | author916  | en       | text_a6.txt | image_a6_0.jpg,image_a6_1.jpg,image_a6_2.jpg,image_a6_3.jpg,image_a6_4.jpg, |       |
 +-----+---------------+------+------+--------+------------+-----------------------+-------------+------------+----------+-------------+-----------------------------------------------------------------------------+-------+
 ```
+
+## Setup monitoring
+
+The following set of commands will allow us to setup a fully monitored cluster using Grafana, Prometheus, and Alertmanager.
+
+### 1. Run kube-prometheus
+
+We are going to use the library kube-prometheus (https://github.com/prometheus-operator/kube-prometheus). This libary gives us a good interface to the prometheus Kubernetes operator, and allow us to quickly add and modify Grafana dashboards using jsonnet.
+
+To build the operator's manifest, and create all the Kubernetes CRD in our cluster use the following command:
+
+`make run_monitoring`
+
+It will also instantiate the whole `monitoring` keyspace inside Kubernetes, with it, the pods and deployment of Prometheus, Grafana, Alertmanager.
+
+### 2. Setup ingress routes
+
+To access our newly created services we are going to create 3 ingress routes with Traefik.
+
+`make setup_traefik_monitoring`
+
+Now we can access our services:
+
+- http://grafana.tagenal
+- http://prometheus.tagenal
+- http://alertmanager.tagenal
+
+> Note: this step requires you to run [Setup Traefik proxy](###4.-setup-traefik-proxy)
+
+We can login on http://grafana.tagenal with the following credentials:
+- User: admin
+- Password: admin

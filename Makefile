@@ -42,7 +42,7 @@ SHARD_VERIFY_ARTICLES_SHARDING_PROCESS		= $(VTCTL_CLIENT) VDiff $(V_KEYSPACE_ART
 SHARD_SWITCH_READ_REPLICA_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=replica $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdonly $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
-SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run script/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
+SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run scripts/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 # Region sharding commands
 ## Users

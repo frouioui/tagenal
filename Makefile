@@ -1,8 +1,3 @@
-##
-## Tagenal
-## Tsinghua Univeristy
-##
-
 V_KEYSPACE_USERS	= users
 V_KEYSPACE_ARTICLES	= articles
 V_KEYSPACE_CONFIG	= config
@@ -47,7 +42,7 @@ SHARD_VERIFY_ARTICLES_SHARDING_PROCESS		= $(VTCTL_CLIENT) VDiff $(V_KEYSPACE_ART
 SHARD_SWITCH_READ_REPLICA_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=replica $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=rdonly $(V_KEYSPACE_ARTICLES).article2article
 SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
-SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run script/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
+SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run scripts/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 # Region sharding commands
 ## Users
@@ -66,7 +61,7 @@ list_vtctld:
 	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
 
 start_minikube:
-	minikube start --kubernetes-version=v1.19.2 --cpus=14 --memory=12000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
+	minikube start --driver=hyperkit --kubernetes-version=v1.19.2 --cpus=14 --memory=12000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
 	minikube addons disable metrics-server
 
 start_minikube_dashboard:
@@ -91,6 +86,7 @@ init_unsharded_database:
 	$(INIT_USERS_VSCHEMA)
 	$(INIT_ARTICLES_TABLES)
 	$(INIT_ARTICLES_VSCHEMA)
+
 init_config_increment_sequence:
 	$(SHARD_INIT_CONFIG_SEQUENCES_SQL)
 	$(SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA)

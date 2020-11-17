@@ -1,4 +1,4 @@
-module github.com/frouioui/tagenal/users/pb
+module github.com/frouioui/tagenal/api/users/pb
 
 go 1.15
 

@@ -1,44 +1,40 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
-	"net"
 
-	"github.com/frouioui/tagenal/mysql/api/users/pb"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/frouioui/tagenal/api/users/server"
 )
 
-const (
-	port = ":8080"
-)
+// func (s *server) Compute(cxt context.Context, r *pb.UserRequest) (*pb.UserResponse, error) {
+// 	result := &pb.UserResponse{}
+// 	result.Result = r.A + r.B
 
-type server struct {
-	pb.UnimplementedUserServiceServer
-}
+// 	logMessage := fmt.Sprintf("A: %d   B: %d     sum: %d", r.A, r.B, result.Result)
+// 	log.Println(logMessage)
 
-func (s *server) Compute(cxt context.Context, r *pb.UserRequest) (*pb.UserResponse, error) {
-	result := &pb.UserResponse{}
-	result.Result = r.A + r.B
-
-	logMessage := fmt.Sprintf("A: %d   B: %d     sum: %d", r.A, r.B, result.Result)
-	log.Println(logMessage)
-
-	return result, nil
-}
+// 	return result, nil
+// }
 
 func main() {
-	lis, err := net.Listen("tcp", port)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile)
+
+	usersrv, err := server.NewUserServerAPI()
 	if err != nil {
-		log.Fatalf("Failed to listen:  %v", err)
+		log.Fatal(err.Error())
 	}
 
-	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, &server{})
-	reflection.Register(s)
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
+	waiter := make(chan error)
+
+	go func() {
+		err := usersrv.RunServerGRPC()
+		waiter <- err
+	}()
+
+	err = <-waiter
+	if err != nil {
+		log.Fatal(err.Error())
 	}
+
+	log.Println("server shutdown")
 }

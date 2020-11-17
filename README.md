@@ -71,6 +71,11 @@ Tagenal uses Kubernetes and Vitess as main components, it is therefore necessary
 ### Prerequisite
 
 - At least 12Gb of available RAM on the host
+- Install yq a YAML processor https://github.com/mikefarah/yq
+- Install jsonnet-bundler (jb) allowing us to deal with jsonnet files https://github.com/jsonnet-bundler/jsonnet-bundler
+- Have kubernetes
+- Have golang version 1.15.x
+- Run the scripts in `./lib/*.sh` to download a few repositories
 
 ### 1. Start minikube
 

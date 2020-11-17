@@ -2,10 +2,12 @@ package server
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
 	"github.com/frouioui/tagenal/api/users/pb"
+	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -20,11 +22,16 @@ const (
 type UserServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
+	// TODO: add mysql client
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {
+	// TODO: httpService instead, and give copy of the mysql client
+	r := mux.NewRouter()
+	assignRoutesHTTP(r)
 	usersrv.ServerHTTP = &http.Server{
 		Addr:         fmt.Sprintf(":%d", httpPort),
+		Handler:      r,
 		IdleTimeout:  10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -34,7 +41,8 @@ func (usersrv *UserServerAPI) setServerHTTP() (err error) {
 
 func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 	usersrv.ServerGRPC = grpc.NewServer()
-	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &grpcServer{})
+	// TODO: give a copy of mysql client to the new grpcService below
+	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &grpcService{})
 	reflection.Register(usersrv.ServerGRPC)
 	return nil
 }
@@ -52,4 +60,24 @@ func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 		return usersrv, err
 	}
 	return usersrv, nil
+}
+
+func (usersrv *UserServerAPI) RunServerHTTP() (err error) {
+	err = usersrv.ServerHTTP.ListenAndServe()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (usersrv *UserServerAPI) RunServerGRPC() (err error) {
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	if err != nil {
+		return err
+	}
+	err = usersrv.ServerGRPC.Serve(listener)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -36,7 +36,7 @@ local kp =
         kind: 'ServiceMonitor',
         metadata: {
           name: 'vitess-monitor-service',
-          namespace: 'default',
+          namespace: 'vitess',
         },
         spec: {
           jobLabel: 'vitess-cluster',

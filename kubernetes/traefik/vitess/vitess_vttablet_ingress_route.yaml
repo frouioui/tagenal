@@ -2,6 +2,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: vttablet-web
+  namespace: vitess
 spec:
   entryPoints:
     - web
@@ -9,15 +10,18 @@ spec:
     - kind: Rule
       match: Host(`tagenal`) && PathPrefix(`/vttablet`)
       services:
-        - name: vitess-vttablet-5613eb8f
+        - namespace: vitess
+          name: vitess-vttablet-5613eb8f
           port: 9104
       middlewares:
-        - name: vttablet-web-stripprefix
+        - namespace: vitess
+          name: vttablet-web-stripprefix
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: vttablet-web-stripprefix
+  namespace: vitess
 spec:
   stripPrefix:
     prefixes:

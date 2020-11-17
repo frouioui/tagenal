@@ -2,6 +2,7 @@ apiVersion: planetscale.com/v2
 kind: VitessCluster
 metadata:
   name: vitess
+  namespace: vitess
 spec:
   images:
     vtctld: vitess/lite:v6.0.20-20200429

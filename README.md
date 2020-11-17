@@ -73,6 +73,8 @@ Tagenal uses Kubernetes and Vitess as main components, it is therefore necessary
 - At least 12Gb of available RAM on the host
 - Install yq a YAML processor https://github.com/mikefarah/yq
 - Install jsonnet-bundler (jb) allowing us to deal with jsonnet files https://github.com/jsonnet-bundler/jsonnet-bundler
+- Install vtctlclient `go get vitess.io/vitess/go/cmd/vtctlclient`
+- Install `mysql` and `mysql-client` using your system's packet manager
 - Have kubernetes
 - Have golang version 1.15.x
 - Run the scripts in `./lib/*.sh` to download a few repositories

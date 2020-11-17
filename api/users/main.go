@@ -6,16 +6,6 @@ import (
 	"github.com/frouioui/tagenal/api/users/server"
 )
 
-// func (s *server) Compute(cxt context.Context, r *pb.UserRequest) (*pb.UserResponse, error) {
-// 	result := &pb.UserResponse{}
-// 	result.Result = r.A + r.B
-
-// 	logMessage := fmt.Sprintf("A: %d   B: %d     sum: %d", r.A, r.B, result.Result)
-// 	log.Println(logMessage)
-
-// 	return result, nil
-// }
-
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile)
 
@@ -28,6 +18,11 @@ func main() {
 
 	go func() {
 		err := usersrv.RunServerGRPC()
+		waiter <- err
+	}()
+
+	go func() {
+		err := usersrv.RunServerHTTP()
 		waiter <- err
 	}()
 

@@ -4,15 +4,15 @@ option go_package = "github.com/frouioui/tagenal/api/users/pb";
 
 package pb;
 
-message UserRequest {
-    uint64 a = 1;
-    uint64 b = 2;
+message UserHomeRequest {
+
 }
 
-message UserResponse {
-    uint64 result = 1;
+message UserHomeResponse {
+    string IP = 1;
+    string Host = 2;
 }
 
 service UserService {
-    rpc Compute (UserRequest) returns (UserResponse);
+    rpc Home (UserHomeRequest) returns (UserHomeResponse);
 }

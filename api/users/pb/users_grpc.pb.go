@@ -17,7 +17,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	Compute(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	Home(ctx context.Context, in *UserHomeRequest, opts ...grpc.CallOption) (*UserHomeResponse, error)
 }
 
 type userServiceClient struct {
@@ -28,9 +28,9 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) Compute(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
-	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, "/pb.UserService/Compute", in, out, opts...)
+func (c *userServiceClient) Home(ctx context.Context, in *UserHomeRequest, opts ...grpc.CallOption) (*UserHomeResponse, error) {
+	out := new(UserHomeResponse)
+	err := c.cc.Invoke(ctx, "/pb.UserService/Home", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *userServiceClient) Compute(ctx context.Context, in *UserRequest, opts .
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	Compute(context.Context, *UserRequest) (*UserResponse, error)
+	Home(context.Context, *UserHomeRequest) (*UserHomeResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -49,8 +49,8 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) Compute(context.Context, *UserRequest) (*UserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Compute not implemented")
+func (UnimplementedUserServiceServer) Home(context.Context, *UserHomeRequest) (*UserHomeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Home not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -65,20 +65,20 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&_UserService_serviceDesc, srv)
 }
 
-func _UserService_Compute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserRequest)
+func _UserService_Home_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserHomeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Compute(ctx, in)
+		return srv.(UserServiceServer).Home(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.UserService/Compute",
+		FullMethod: "/pb.UserService/Home",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Compute(ctx, req.(*UserRequest))
+		return srv.(UserServiceServer).Home(ctx, req.(*UserHomeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -88,8 +88,8 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Compute",
-			Handler:    _UserService_Compute_Handler,
+			MethodName: "Home",
+			Handler:    _UserService_Home_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

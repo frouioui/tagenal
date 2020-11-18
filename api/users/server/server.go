@@ -59,6 +59,7 @@ func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 	return usersrv, nil
 }
 
+// RunServerHTTP starts the http service.
 func (usersrv *UserServerAPI) RunServerHTTP() (err error) {
 	err = usersrv.ServerHTTP.ListenAndServe()
 	if err != nil {
@@ -67,6 +68,7 @@ func (usersrv *UserServerAPI) RunServerHTTP() (err error) {
 	return nil
 }
 
+// RunServerGRPC starts the grpc service.
 func (usersrv *UserServerAPI) RunServerGRPC() (err error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {

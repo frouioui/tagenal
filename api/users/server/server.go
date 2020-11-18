@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/frouioui/tagenal/api/users/pb"
-	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -26,12 +25,10 @@ type UserServerAPI struct {
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {
-	// TODO: httpService instead, and give copy of the mysql client
-	r := mux.NewRouter()
-	assignRoutesHTTP(r)
+	httpservice := newServiceHTTP()
 	usersrv.ServerHTTP = &http.Server{
 		Addr:         fmt.Sprintf(":%d", httpPort),
-		Handler:      r,
+		Handler:      httpservice.getRouter(),
 		IdleTimeout:  10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

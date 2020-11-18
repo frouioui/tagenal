@@ -15,8 +15,7 @@ type httpService struct {
 	// TODO: add copy of mysql client
 }
 
-// TODO: add to httpService
-func httpHomeRoute(w http.ResponseWriter, r *http.Request) {
+func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 	host, _ := os.Hostname()
 	ipList, _ := net.LookupHost(host)
 	var ip string = "0.0.0.0"
@@ -40,7 +39,16 @@ func httpHomeRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(ipDataJSON))
 }
 
-// TODO: add to httpService
-func assignRoutesHTTP(r *mux.Router) {
-	r.HandleFunc("/", httpHomeRoute).Methods(http.MethodGet)
+func (httpsrv *httpService) assignRoutesToService() {
+	httpsrv.r.HandleFunc("/", httpsrv.homeRoute).Methods(http.MethodGet)
+}
+
+func (httpsrv *httpService) getRouter() *mux.Router {
+	return httpsrv.r
+}
+
+func newServiceHTTP() (httpsrv httpService) {
+	httpsrv.r = mux.NewRouter()
+	httpsrv.assignRoutesToService()
+	return httpsrv
 }

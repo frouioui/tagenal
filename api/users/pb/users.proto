@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/frouioui/tagenal/api/users/pb";
-
 package pb;
+
+option go_package = "github.com/frouioui/tagenal/api/users/server/pb";
 
 message UserHomeRequest {
 
@@ -14,5 +14,5 @@ message UserHomeResponse {
 }
 
 service UserService {
-    rpc Home (UserHomeRequest) returns (UserHomeResponse);
+    rpc Home(UserHomeRequest) returns (UserHomeResponse) {}
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"time"
@@ -39,8 +40,9 @@ func (usersrv *UserServerAPI) setServerHTTP() (err error) {
 func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 	usersrv.ServerGRPC = grpc.NewServer()
 	// TODO: give a copy of mysql client to the new grpcService below
-	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &grpcService{})
+	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &server{})
 	reflection.Register(usersrv.ServerGRPC)
+	log.Println("setup grpc finishing")
 	return nil
 }
 
@@ -53,6 +55,7 @@ func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 	}
 
 	err = usersrv.setServerGRPC()
+	log.Println("setup grpc done")
 	if err != nil {
 		return usersrv, err
 	}

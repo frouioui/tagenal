@@ -14,7 +14,7 @@ WORKDIR /root/
 
 COPY --from=builder /go/src/github.com/frouioui/tagenal/api/users/main .
 
-EXPOSE 8080
+EXPOSE 8080 9090
 
 ENV PORT=8080
 

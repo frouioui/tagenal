@@ -14,5 +14,5 @@ message UserHomeResponse {
 }
 
 service UserService {
-    rpc Home(UserHomeRequest) returns (UserHomeResponse) {}
+    rpc ServiceInformation(UserHomeRequest) returns (UserHomeResponse) {}
 }

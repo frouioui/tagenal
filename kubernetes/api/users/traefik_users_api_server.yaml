@@ -10,7 +10,7 @@ spec:
       match: Host(`tagenal`) && PathPrefix(`/users`)
       services:
         - name: users-api-service
-          port: 8080
+          port: 10000
       middlewares:
         - name: users-api-http-route-stripprefix
 ---

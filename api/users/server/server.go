@@ -14,7 +14,7 @@ import (
 
 const (
 	grpcPort = 9090
-	httpPort = 8080
+	httpPort = 10000
 )
 
 // UserServerAPI contains the HTTP and GRPC servers which will
@@ -40,9 +40,8 @@ func (usersrv *UserServerAPI) setServerHTTP() (err error) {
 func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 	usersrv.ServerGRPC = grpc.NewServer()
 	// TODO: give a copy of mysql client to the new grpcService below
-	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &server{})
+	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &userServiceGRPC{})
 	reflection.Register(usersrv.ServerGRPC)
-	log.Println("setup grpc finishing")
 	return nil
 }
 
@@ -55,7 +54,6 @@ func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 	}
 
 	err = usersrv.setServerGRPC()
-	log.Println("setup grpc done")
 	if err != nil {
 		return usersrv, err
 	}
@@ -73,11 +71,13 @@ func (usersrv *UserServerAPI) RunServerHTTP() (err error) {
 
 // RunServerGRPC starts the grpc service.
 func (usersrv *UserServerAPI) RunServerGRPC() (err error) {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
 		return err
 	}
-	err = usersrv.ServerGRPC.Serve(listener)
+	info := usersrv.ServerGRPC.GetServiceInfo()
+	log.Printf("%+v\n", info["pb.UserService"])
+	err = usersrv.ServerGRPC.Serve(lis)
 	if err != nil {
 		return err
 	}

@@ -17,12 +17,12 @@ func main() {
 	waiter := make(chan error)
 
 	go func() {
-		err := usersrv.RunServerGRPC()
+		err := usersrv.RunServerHTTP()
 		waiter <- err
 	}()
 
 	go func() {
-		err := usersrv.RunServerHTTP()
+		err := usersrv.RunServerGRPC()
 		waiter <- err
 	}()
 

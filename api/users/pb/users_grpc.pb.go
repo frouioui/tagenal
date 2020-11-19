@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	ServiceInformation(ctx context.Context, in *UserHomeRequest, opts ...grpc.CallOption) (*UserHomeResponse, error)
+	GetSingleUser(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error)
 }
 
 type userServiceClient struct {
@@ -37,11 +38,21 @@ func (c *userServiceClient) ServiceInformation(ctx context.Context, in *UserHome
 	return out, nil
 }
 
+func (c *userServiceClient) GetSingleUser(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/pb.UserService/GetSingleUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
 	ServiceInformation(context.Context, *UserHomeRequest) (*UserHomeResponse, error)
+	GetSingleUser(context.Context, *RequestID) (*User, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -51,6 +62,9 @@ type UnimplementedUserServiceServer struct {
 
 func (UnimplementedUserServiceServer) ServiceInformation(context.Context, *UserHomeRequest) (*UserHomeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ServiceInformation not implemented")
+}
+func (UnimplementedUserServiceServer) GetSingleUser(context.Context, *RequestID) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSingleUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -83,6 +97,24 @@ func _UserService_ServiceInformation_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetSingleUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetSingleUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.UserService/GetSingleUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetSingleUser(ctx, req.(*RequestID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _UserService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.UserService",
 	HandlerType: (*UserServiceServer)(nil),
@@ -90,6 +122,10 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ServiceInformation",
 			Handler:    _UserService_ServiceInformation_Handler,
+		},
+		{
+			MethodName: "GetSingleUser",
+			Handler:    _UserService_GetSingleUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

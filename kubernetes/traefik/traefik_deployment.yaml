@@ -59,7 +59,8 @@ spec:
               containerPort: 8080
             - name: grpc
               containerPort: 8000
-
+            - name: mysql
+              containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -69,7 +70,7 @@ metadata:
     k8s-app: traefik-ingress-lb
     app: traefik
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     k8s-app: traefik-ingress-lb
   ports:
@@ -85,3 +86,6 @@ spec:
     - port: 8000
       targetPort: 8000
       name: grpc
+    - port: 3000
+      targetPort: 3000
+      name: mysql

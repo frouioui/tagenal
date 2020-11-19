@@ -26,7 +26,10 @@ type UserServerAPI struct {
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {
-	httpservice := newServiceHTTP()
+	httpservice, err := newServiceHTTP()
+	if err != nil {
+		return err
+	}
 	usersrv.ServerHTTP = &http.Server{
 		Addr:         fmt.Sprintf(":%d", httpPort),
 		Handler:      httpservice.getRouter(),
@@ -38,9 +41,12 @@ func (usersrv *UserServerAPI) setServerHTTP() (err error) {
 }
 
 func (usersrv *UserServerAPI) setServerGRPC() (err error) {
+	grpcService, err := newServiceGRPC()
+	if err != nil {
+		return err
+	}
 	usersrv.ServerGRPC = grpc.NewServer()
-	// TODO: give a copy of mysql client to the new grpcService below
-	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &userServiceGRPC{})
+	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &grpcService)
 	reflection.Register(usersrv.ServerGRPC)
 	return nil
 }

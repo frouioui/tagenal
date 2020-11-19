@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/frouioui/tagenal/api/users/server/pb";
+
+message RequestID {
+    int64 ID = 1;
+}
+
+message RequestRegion {
+    string Region = 1;
+}
+
+message User {
+    int64 ID = 1;
+    string Timestamp = 2;
+    string ID2 = 3;
+    string UID = 4;
+    string Name = 5;
+    string Gender = 6;
+    string Email = 7;
+    string Phone = 8;
+    string Dept = 9;
+    string Grade = 10;
+    string Language = 11;
+    string Region = 12;
+    string Role = 13;
+    string PreferTags = 14;
+    string ObtainedCredits = 15;
+}
+
+message Users {
+    repeated User Users = 1;
+}
+
+message UserHomeRequest {
+
+}
+
+message UserHomeResponse {
+    string IP = 1;
+    string Host = 2;
+}
+
+service UserService {
+    rpc ServiceInformation(UserHomeRequest) returns (UserHomeResponse) {}
+    rpc GetSingleUser(RequestID) returns (User) {}
+}

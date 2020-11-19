@@ -52,12 +52,15 @@ spec:
             - --metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
           ports:
             - name: web
-              containerPort: 8000
+              containerPort: 80
             - name: metrics
               containerPort: 8082
             - name: admin
               containerPort: 8080
-
+            - name: grpc
+              containerPort: 8000
+            - name: mysql
+              containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -67,7 +70,7 @@ metadata:
     k8s-app: traefik-ingress-lb
     app: traefik
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     k8s-app: traefik-ingress-lb
   ports:
@@ -80,3 +83,9 @@ spec:
     - port: 8082
       targetPort: 8082
       name: metrics
+    - port: 8000
+      targetPort: 8000
+      name: grpc
+    - port: 3000
+      targetPort: 3000
+      name: mysql

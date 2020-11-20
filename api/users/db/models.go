@@ -41,3 +41,11 @@ func (u *User) ProtoUser() *pb.User {
 		ObtainedCredits: u.ObtainedCredits,
 	}
 }
+
+func UsersToProtoUsers(users []User) *pb.Users {
+	pbusers := &pb.Users{Users: make([]*pb.User, len(users))}
+	for i, u := range users {
+		pbusers.Users[i] = u.ProtoUser()
+	}
+	return pbusers
+}

@@ -63,9 +63,33 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
+func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	region := vars["region"]
+
+	users, err := httpsrv.dbm.GetUsersOfRegion(region)
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+	log.Println(users)
+
+	respJSON, err := json.Marshal(users)
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
+		return
+	}
+	w.WriteHeader(200)
+	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
+}
+
 func (httpsrv *httpService) assignRoutesToService() {
 	httpsrv.r.HandleFunc("/", httpsrv.homeRoute).Methods(http.MethodGet)
-	httpsrv.r.HandleFunc("/{id}", httpsrv.getUserByIDRoute).Methods(http.MethodGet)
+	httpsrv.r.HandleFunc("/id/{id}", httpsrv.getUserByIDRoute).Methods(http.MethodGet)
+	httpsrv.r.HandleFunc("/region/{region}", httpsrv.getUsersOfRegionRoute).Methods(http.MethodGet)
 }
 
 func (httpsrv *httpService) getRouter() *mux.Router {

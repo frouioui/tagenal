@@ -37,3 +37,12 @@ func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*
 	resp := user.ProtoUser()
 	return resp, nil
 }
+
+func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.RequestRegion) (*pb.Users, error) {
+	users, err := s.dbm.GetUsersOfRegion(r.Region)
+	if err != nil {
+		return nil, err
+	}
+	resp := db.UsersToProtoUsers(users)
+	return resp, nil
+}

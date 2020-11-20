@@ -45,6 +45,6 @@ message UserHomeResponse {
 
 service UserService {
     rpc ServiceInformation(UserHomeRequest) returns (UserHomeResponse) {}
-    rpc GetSingleUserByID(RequestID) returns (User) {}
-    rpc GetSingleUserByRegion(RequestRegion) returns (User) {}
+    rpc GetSingleUser(RequestID) returns (User) {}
+    rpc GetRegionUsers(RequestRegion) returns (Users) {}
 }

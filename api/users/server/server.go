@@ -22,7 +22,6 @@ const (
 type UserServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
-	// TODO: add mysql client
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {

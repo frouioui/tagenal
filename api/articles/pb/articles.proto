@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/frouioui/tagenal/api/articles/pb";
+
+message ID {
+    int64 ID = 1;
+}
+
+message IDs {
+    repeated ID IDs = 1;
+}
+
+message Category {
+    string Category = 1;
+}
+
+message Article {
+    int64 ID = 1;
+    string Timestamp = 2;
+    string ID2 = 3;
+    string AID = 4;
+    string Title = 5;
+    string Category = 6;
+    string Abstract = 7;
+    string ArticleTags = 8;
+    string Authors = 9;
+    string Language = 10;
+    string Text = 11;
+    string Image = 12;
+    string Video = 13;
+}
+
+message Articles {
+    repeated Article Articles = 1;
+}
+
+message ArticleHomeRequest {
+
+}
+
+message ArticleHomeResponse {
+    string IP = 1;
+    string Host = 2;
+}
+
+service ArticleService {
+    rpc ServiceInformation(ArticleHomeRequest) returns (ArticleHomeResponse) {}
+    rpc GetSingleArticle(ID) returns (Article) {}
+    rpc GetCategoryArticles(Category) returns (Articles) {}
+    rpc NewArticle(Article) returns (ID) {}
+    rpc NewArticles(Articles) returns (IDs) {}
+}

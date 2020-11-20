@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: articles-api
+  labels:
+    api: articles
+    app: articles-api
+spec:
+  selector:
+    matchLabels:
+      app: articles-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: articles-api
+    spec:
+      containers:
+        - name: articles-api-server
+          image: frouioui/tagenal-articles-service:latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          ports:
+            - name: grpc
+              containerPort: 9090
+            - name: http
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: articles-api-service
+  labels:
+    api: articles
+spec:
+  type: ClusterIP
+  selector:
+    app: articles-api
+  ports:
+    - port: 9090
+      targetPort: 9090
+      name: grpc
+    - port: 8080
+      targetPort: 8080
+      name: http

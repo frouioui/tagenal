@@ -18,7 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	ServiceInformation(ctx context.Context, in *UserHomeRequest, opts ...grpc.CallOption) (*UserHomeResponse, error)
-	GetSingleUser(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error)
+	GetSingleUserByID(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error)
+	GetSingleUserByRegion(ctx context.Context, in *RequestRegion, opts ...grpc.CallOption) (*User, error)
 }
 
 type userServiceClient struct {
@@ -38,9 +39,18 @@ func (c *userServiceClient) ServiceInformation(ctx context.Context, in *UserHome
 	return out, nil
 }
 
-func (c *userServiceClient) GetSingleUser(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) GetSingleUserByID(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/pb.UserService/GetSingleUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.UserService/GetSingleUserByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetSingleUserByRegion(ctx context.Context, in *RequestRegion, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/pb.UserService/GetSingleUserByRegion", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +62,8 @@ func (c *userServiceClient) GetSingleUser(ctx context.Context, in *RequestID, op
 // for forward compatibility
 type UserServiceServer interface {
 	ServiceInformation(context.Context, *UserHomeRequest) (*UserHomeResponse, error)
-	GetSingleUser(context.Context, *RequestID) (*User, error)
+	GetSingleUserByID(context.Context, *RequestID) (*User, error)
+	GetSingleUserByRegion(context.Context, *RequestRegion) (*User, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -63,8 +74,11 @@ type UnimplementedUserServiceServer struct {
 func (UnimplementedUserServiceServer) ServiceInformation(context.Context, *UserHomeRequest) (*UserHomeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ServiceInformation not implemented")
 }
-func (UnimplementedUserServiceServer) GetSingleUser(context.Context, *RequestID) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSingleUser not implemented")
+func (UnimplementedUserServiceServer) GetSingleUserByID(context.Context, *RequestID) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSingleUserByID not implemented")
+}
+func (UnimplementedUserServiceServer) GetSingleUserByRegion(context.Context, *RequestRegion) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSingleUserByRegion not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -97,20 +111,38 @@ func _UserService_ServiceInformation_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetSingleUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetSingleUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RequestID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetSingleUser(ctx, in)
+		return srv.(UserServiceServer).GetSingleUserByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.UserService/GetSingleUser",
+		FullMethod: "/pb.UserService/GetSingleUserByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetSingleUser(ctx, req.(*RequestID))
+		return srv.(UserServiceServer).GetSingleUserByID(ctx, req.(*RequestID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetSingleUserByRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestRegion)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetSingleUserByRegion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.UserService/GetSingleUserByRegion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetSingleUserByRegion(ctx, req.(*RequestRegion))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,8 +156,12 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_ServiceInformation_Handler,
 		},
 		{
-			MethodName: "GetSingleUser",
-			Handler:    _UserService_GetSingleUser_Handler,
+			MethodName: "GetSingleUserByID",
+			Handler:    _UserService_GetSingleUserByID_Handler,
+		},
+		{
+			MethodName: "GetSingleUserByRegion",
+			Handler:    _UserService_GetSingleUserByRegion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

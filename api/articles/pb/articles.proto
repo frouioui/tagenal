@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/frouioui/tagenal/api/articles/pb";
+
+message ArticleHomeRequest {
+
+}
+
+message ArticleHomeResponse {
+    string IP = 1;
+    string Host = 2;
+}
+
+service ArticleService {
+    rpc ServiceInformation(ArticleHomeRequest) returns (ArticleHomeResponse) {}
+}

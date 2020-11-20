@@ -1,6 +1,6 @@
 export GO111MODULE=on
 
-all: dockerbuild dockerpush
+all: protobuild dockerbuild dockerpush
 
 dockerpush:
 	docker push frouioui/tagenal-articles-service:latest

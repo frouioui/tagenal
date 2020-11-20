@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
@@ -22,7 +21,6 @@ const (
 type UserServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
-	// TODO: add mysql client
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {
@@ -81,8 +79,6 @@ func (usersrv *UserServerAPI) RunServerGRPC() (err error) {
 	if err != nil {
 		return err
 	}
-	info := usersrv.ServerGRPC.GetServiceInfo()
-	log.Printf("%+v\n", info["pb.UserService"])
 	err = usersrv.ServerGRPC.Serve(lis)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ FROM golang:1.15.5 AS builder
 WORKDIR /go/src/github.com/frouioui/tagenal/api/articles
 COPY go.mod go.sum ./
 COPY pb/go.mod pb/go.sum ./pb/
+COPY db/go.mod db/go.sum ./db/
 COPY server/go.mod server/go.sum ./server/
 RUN go mod download
 COPY . .

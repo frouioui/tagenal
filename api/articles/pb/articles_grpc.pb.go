@@ -18,6 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ArticleServiceClient interface {
 	ServiceInformation(ctx context.Context, in *ArticleHomeRequest, opts ...grpc.CallOption) (*ArticleHomeResponse, error)
+	GetSingleArticle(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Article, error)
+	GetCategoryArticles(ctx context.Context, in *Category, opts ...grpc.CallOption) (*Articles, error)
 }
 
 type articleServiceClient struct {
@@ -37,11 +39,31 @@ func (c *articleServiceClient) ServiceInformation(ctx context.Context, in *Artic
 	return out, nil
 }
 
+func (c *articleServiceClient) GetSingleArticle(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Article, error) {
+	out := new(Article)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/GetSingleArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *articleServiceClient) GetCategoryArticles(ctx context.Context, in *Category, opts ...grpc.CallOption) (*Articles, error) {
+	out := new(Articles)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/GetCategoryArticles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility
 type ArticleServiceServer interface {
 	ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error)
+	GetSingleArticle(context.Context, *ID) (*Article, error)
+	GetCategoryArticles(context.Context, *Category) (*Articles, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }
 
@@ -51,6 +73,12 @@ type UnimplementedArticleServiceServer struct {
 
 func (UnimplementedArticleServiceServer) ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ServiceInformation not implemented")
+}
+func (UnimplementedArticleServiceServer) GetSingleArticle(context.Context, *ID) (*Article, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSingleArticle not implemented")
+}
+func (UnimplementedArticleServiceServer) GetCategoryArticles(context.Context, *Category) (*Articles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryArticles not implemented")
 }
 func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
 
@@ -83,6 +111,42 @@ func _ArticleService_ServiceInformation_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_GetSingleArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).GetSingleArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/GetSingleArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).GetSingleArticle(ctx, req.(*ID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArticleService_GetCategoryArticles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Category)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).GetCategoryArticles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/GetCategoryArticles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).GetCategoryArticles(ctx, req.(*Category))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ArticleService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.ArticleService",
 	HandlerType: (*ArticleServiceServer)(nil),
@@ -90,6 +154,14 @@ var _ArticleService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ServiceInformation",
 			Handler:    _ArticleService_ServiceInformation_Handler,
+		},
+		{
+			MethodName: "GetSingleArticle",
+			Handler:    _ArticleService_GetSingleArticle_Handler,
+		},
+		{
+			MethodName: "GetCategoryArticles",
+			Handler:    _ArticleService_GetCategoryArticles_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

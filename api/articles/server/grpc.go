@@ -32,7 +32,7 @@ func (s *articleServiceGRPC) GetSingleArticle(cxt context.Context, r *pb.ID) (*p
 }
 
 func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Category) (*pb.Articles, error) {
-	articles, err := s.dbm.GetArticlesOfRegion(r.Category)
+	articles, err := s.dbm.GetArticlesOfCategory(r.Category)
 	if err != nil {
 		return nil, err
 	}
@@ -45,4 +45,27 @@ func (s *articleServiceGRPC) ServiceInformation(cxt context.Context, r *pb.Artic
 	resp.IP = getHostIP()
 	resp.Host = getHostName()
 	return resp, nil
+}
+
+func (s *articleServiceGRPC) NewArticle(cxt context.Context, r *pb.Article) (*pb.ID, error) {
+	user := db.ProtoArticleToArticle(r)
+	id, err := s.dbm.InsertArticle(user)
+	if err != nil {
+		return nil, err
+	}
+	pbid := &pb.ID{ID: int64(id)}
+	return pbid, nil
+}
+
+func (s *articleServiceGRPC) NewArticles(cxt context.Context, r *pb.Articles) (*pb.IDs, error) {
+	ids := &pb.IDs{IDs: make([]*pb.ID, 0)}
+	for _, u := range r.Articles {
+		user := db.ProtoArticleToArticle(u)
+		id, err := s.dbm.InsertArticle(user)
+		if err != nil {
+			return nil, err
+		}
+		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})
+	}
+	return ids, nil
 }

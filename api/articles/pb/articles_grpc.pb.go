@@ -20,6 +20,8 @@ type ArticleServiceClient interface {
 	ServiceInformation(ctx context.Context, in *ArticleHomeRequest, opts ...grpc.CallOption) (*ArticleHomeResponse, error)
 	GetSingleArticle(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Article, error)
 	GetCategoryArticles(ctx context.Context, in *Category, opts ...grpc.CallOption) (*Articles, error)
+	NewArticle(ctx context.Context, in *Article, opts ...grpc.CallOption) (*ID, error)
+	NewArticles(ctx context.Context, in *Articles, opts ...grpc.CallOption) (*IDs, error)
 }
 
 type articleServiceClient struct {
@@ -57,6 +59,24 @@ func (c *articleServiceClient) GetCategoryArticles(ctx context.Context, in *Cate
 	return out, nil
 }
 
+func (c *articleServiceClient) NewArticle(ctx context.Context, in *Article, opts ...grpc.CallOption) (*ID, error) {
+	out := new(ID)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/NewArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *articleServiceClient) NewArticles(ctx context.Context, in *Articles, opts ...grpc.CallOption) (*IDs, error) {
+	out := new(IDs)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/NewArticles", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility
@@ -64,6 +84,8 @@ type ArticleServiceServer interface {
 	ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error)
 	GetSingleArticle(context.Context, *ID) (*Article, error)
 	GetCategoryArticles(context.Context, *Category) (*Articles, error)
+	NewArticle(context.Context, *Article) (*ID, error)
+	NewArticles(context.Context, *Articles) (*IDs, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }
 
@@ -79,6 +101,12 @@ func (UnimplementedArticleServiceServer) GetSingleArticle(context.Context, *ID) 
 }
 func (UnimplementedArticleServiceServer) GetCategoryArticles(context.Context, *Category) (*Articles, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryArticles not implemented")
+}
+func (UnimplementedArticleServiceServer) NewArticle(context.Context, *Article) (*ID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewArticle not implemented")
+}
+func (UnimplementedArticleServiceServer) NewArticles(context.Context, *Articles) (*IDs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewArticles not implemented")
 }
 func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
 
@@ -147,6 +175,42 @@ func _ArticleService_GetCategoryArticles_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_NewArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Article)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).NewArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/NewArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).NewArticle(ctx, req.(*Article))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArticleService_NewArticles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Articles)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).NewArticles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/NewArticles",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).NewArticles(ctx, req.(*Articles))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ArticleService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.ArticleService",
 	HandlerType: (*ArticleServiceServer)(nil),
@@ -162,6 +226,14 @@ var _ArticleService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCategoryArticles",
 			Handler:    _ArticleService_GetCategoryArticles_Handler,
+		},
+		{
+			MethodName: "NewArticle",
+			Handler:    _ArticleService_NewArticle_Handler,
+		},
+		{
+			MethodName: "NewArticles",
+			Handler:    _ArticleService_NewArticles_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

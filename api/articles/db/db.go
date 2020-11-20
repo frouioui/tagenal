@@ -36,8 +36,8 @@ func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err erro
 	return article, nil
 }
 
-func (dbm *DatabaseManager) GetArticlesOfRegion(region string) (articles []Article, err error) {
-	qc := `WHERE region=?`
+func (dbm *DatabaseManager) GetArticlesOfCategory(region string) (articles []Article, err error) {
+	qc := `WHERE category=?`
 	articles, err = dbm.fetchArticles(qc, region)
 	if err != nil {
 		return nil, err
@@ -70,4 +70,31 @@ func (dbm *DatabaseManager) fetchArticles(qc string, args ...interface{}) (artic
 		articles = append(articles, article)
 	}
 	return articles, nil
+}
+
+func (dbm *DatabaseManager) InsertArticle(article Article) (newID int, err error) {
+	sql := `INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,authors,language,text,image,video) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
+
+	id, err := dbm.insertArticle(sql, article)
+	if err != nil {
+		return 0, err
+	}
+	newID = int(id)
+	return newID, nil
+}
+
+func (dbm *DatabaseManager) insertArticle(sql string, article Article) (newID int64, err error) {
+	query, err := dbm.db.Prepare(sql)
+	if err != nil {
+		return 0, err
+	}
+	defer query.Close()
+
+	res, err := query.Exec(article.Timestamp, article.ID2, article.AID, article.Title, article.Category,
+		article.Abstract, article.ArticleTags, article.Authors, article.Language, article.Text,
+		article.Image, article.Video)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
 }

@@ -8,6 +8,10 @@ message ID {
     int64 ID = 1;
 }
 
+message IDs {
+    repeated ID IDs = 1;
+}
+
 message Category {
     string Category = 1;
 }
@@ -45,4 +49,6 @@ service ArticleService {
     rpc ServiceInformation(ArticleHomeRequest) returns (ArticleHomeResponse) {}
     rpc GetSingleArticle(ID) returns (Article) {}
     rpc GetCategoryArticles(Category) returns (Articles) {}
+    rpc NewArticle(Article) returns (ID) {}
+    rpc NewArticles(Articles) returns (IDs) {}
 }

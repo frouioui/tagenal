@@ -4,6 +4,14 @@ package pb;
 
 option go_package = "github.com/frouioui/tagenal/api/users/server/pb";
 
+message ID {
+    int64 ID = 1;
+}
+
+message IDs {
+    repeated ID IDs = 1;
+}
+
 message RequestID {
     int64 ID = 1;
 }
@@ -47,4 +55,6 @@ service UserService {
     rpc ServiceInformation(UserHomeRequest) returns (UserHomeResponse) {}
     rpc GetSingleUser(RequestID) returns (User) {}
     rpc GetRegionUsers(RequestRegion) returns (Users) {}
+    rpc NewUser(User) returns (ID) {}
+    rpc NewUsers(Users) returns (IDs) {}
 }

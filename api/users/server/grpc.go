@@ -46,3 +46,26 @@ func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.RequestRegio
 	resp := db.UsersToProtoUsers(users)
 	return resp, nil
 }
+
+func (s *userServiceGRPC) NewUser(cxt context.Context, r *pb.User) (*pb.ID, error) {
+	user := db.ProtoUserToUser(r)
+	id, err := s.dbm.InsertUser(user)
+	if err != nil {
+		return nil, err
+	}
+	pbid := &pb.ID{ID: int64(id)}
+	return pbid, nil
+}
+
+func (s *userServiceGRPC) NewUsers(cxt context.Context, r *pb.Users) (*pb.IDs, error) {
+	ids := &pb.IDs{IDs: make([]*pb.ID, 0)}
+	for _, u := range r.Users {
+		user := db.ProtoUserToUser(u)
+		id, err := s.dbm.InsertUser(user)
+		if err != nil {
+			return nil, err
+		}
+		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})
+	}
+	return ids, nil
+}

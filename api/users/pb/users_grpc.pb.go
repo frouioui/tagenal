@@ -20,6 +20,8 @@ type UserServiceClient interface {
 	ServiceInformation(ctx context.Context, in *UserHomeRequest, opts ...grpc.CallOption) (*UserHomeResponse, error)
 	GetSingleUser(ctx context.Context, in *RequestID, opts ...grpc.CallOption) (*User, error)
 	GetRegionUsers(ctx context.Context, in *RequestRegion, opts ...grpc.CallOption) (*Users, error)
+	NewUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*ID, error)
+	NewUsers(ctx context.Context, in *Users, opts ...grpc.CallOption) (*IDs, error)
 }
 
 type userServiceClient struct {
@@ -57,6 +59,24 @@ func (c *userServiceClient) GetRegionUsers(ctx context.Context, in *RequestRegio
 	return out, nil
 }
 
+func (c *userServiceClient) NewUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*ID, error) {
+	out := new(ID)
+	err := c.cc.Invoke(ctx, "/pb.UserService/NewUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) NewUsers(ctx context.Context, in *Users, opts ...grpc.CallOption) (*IDs, error) {
+	out := new(IDs)
+	err := c.cc.Invoke(ctx, "/pb.UserService/NewUsers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -64,6 +84,8 @@ type UserServiceServer interface {
 	ServiceInformation(context.Context, *UserHomeRequest) (*UserHomeResponse, error)
 	GetSingleUser(context.Context, *RequestID) (*User, error)
 	GetRegionUsers(context.Context, *RequestRegion) (*Users, error)
+	NewUser(context.Context, *User) (*ID, error)
+	NewUsers(context.Context, *Users) (*IDs, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -79,6 +101,12 @@ func (UnimplementedUserServiceServer) GetSingleUser(context.Context, *RequestID)
 }
 func (UnimplementedUserServiceServer) GetRegionUsers(context.Context, *RequestRegion) (*Users, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRegionUsers not implemented")
+}
+func (UnimplementedUserServiceServer) NewUser(context.Context, *User) (*ID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewUser not implemented")
+}
+func (UnimplementedUserServiceServer) NewUsers(context.Context, *Users) (*IDs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewUsers not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -147,6 +175,42 @@ func _UserService_GetRegionUsers_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_NewUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).NewUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.UserService/NewUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).NewUser(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_NewUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Users)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).NewUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.UserService/NewUsers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).NewUsers(ctx, req.(*Users))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _UserService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.UserService",
 	HandlerType: (*UserServiceServer)(nil),
@@ -162,6 +226,14 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRegionUsers",
 			Handler:    _UserService_GetRegionUsers_Handler,
+		},
+		{
+			MethodName: "NewUser",
+			Handler:    _UserService_NewUser_Handler,
+		},
+		{
+			MethodName: "NewUsers",
+			Handler:    _UserService_NewUsers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

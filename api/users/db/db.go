@@ -71,3 +71,30 @@ func (dbm *DatabaseManager) fetchUsers(qc string, args ...interface{}) (users []
 	}
 	return users, nil
 }
+
+func (dbm *DatabaseManager) InsertUser(user User) (newID int, err error) {
+	sql := `INSERT INTO user (timestamp,id,uid,name,gender,email,phone,dept,grade,language,region,role,preferTags,obtainedCredits) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+
+	id, err := dbm.insertUser(sql, user)
+	if err != nil {
+		return 0, err
+	}
+	newID = int(id)
+	return newID, nil
+}
+
+func (dbm *DatabaseManager) insertUser(sql string, user User) (newID int64, err error) {
+	query, err := dbm.db.Prepare(sql)
+	if err != nil {
+		return 0, err
+	}
+	defer query.Close()
+
+	res, err := query.Exec(user.Timestamp, user.ID2, user.UID, user.Name, user.Gender,
+		user.Email, user.Phone, user.Dept, user.Grade, user.Language, user.Region,
+		user.Role, user.PreferTags, user.ObtainedCredits)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}

@@ -42,6 +42,26 @@ func (u *User) ProtoUser() *pb.User {
 	}
 }
 
+func ProtoUserToUser(pbuser *pb.User) (user User) {
+	return User{
+		ID:              pbuser.ID,
+		Timestamp:       pbuser.Timestamp,
+		ID2:             pbuser.ID2,
+		UID:             pbuser.UID,
+		Name:            pbuser.Name,
+		Gender:          pbuser.Gender,
+		Email:           pbuser.Email,
+		Phone:           pbuser.Phone,
+		Dept:            pbuser.Dept,
+		Grade:           pbuser.Grade,
+		Language:        pbuser.Language,
+		Region:          pbuser.Region,
+		Role:            pbuser.Role,
+		PreferTags:      pbuser.PreferTags,
+		ObtainedCredits: pbuser.ObtainedCredits,
+	}
+}
+
 func UsersToProtoUsers(users []User) *pb.Users {
 	pbusers := &pb.Users{Users: make([]*pb.User, len(users))}
 	for i, u := range users {

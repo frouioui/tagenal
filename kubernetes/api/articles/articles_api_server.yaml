@@ -5,15 +5,18 @@ metadata:
   labels:
     api: articles
     app: articles-api
+    tier: backend
 spec:
   selector:
     matchLabels:
       app: articles-api
+      tier: backend
   replicas: 1
   template:
     metadata:
       labels:
         app: articles-api
+        tier: backend
     spec:
       containers:
         - name: articles-api-server
@@ -34,13 +37,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: articles-api-service
+  name: articles-api
   labels:
+    app: article-api
     api: articles
+    tier: backend
 spec:
-  type: ClusterIP
   selector:
     app: articles-api
+    tier: backend
   ports:
     - port: 9090
       targetPort: 9090

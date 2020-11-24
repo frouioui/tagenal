@@ -70,7 +70,7 @@ Tagenal uses Kubernetes and Vitess as main components, it is therefore necessary
 
 ### Prerequisite
 
-- At least 12Gb of available RAM on the host
+- At least 10Gb of available RAM on the host
 - Install yq a YAML processor https://github.com/mikefarah/yq
 - Install jsonnet-bundler (jb) allowing us to deal with jsonnet files https://github.com/jsonnet-bundler/jsonnet-bundler
 - Install vtctlclient `go get vitess.io/vitess/go/cmd/vtctlclient`

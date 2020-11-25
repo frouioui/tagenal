@@ -23,7 +23,7 @@ type responseArrayArticles struct {
 }
 
 func ArticleFromID(ID int) (article *models.Article, err error) {
-	url := fmt.Sprintf("http://articles-api-service:8080/id/%d", ID)
+	url := fmt.Sprintf("http://articles-api:8080/id/%d", ID)
 	method := "GET"
 
 	client := &http.Client{Timeout: time.Second * 2}

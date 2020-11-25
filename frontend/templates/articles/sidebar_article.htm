@@ -1,8 +1,14 @@
 {{define "sidebararticle"}}
 <div class="card my-4">
-    <h5 class="card-header">Author</h5>
+    <h5 class="card-header">Authors</h5>
     <div class="card-body">
-        Author name
+        {{.Authors}}
+    </div>
+</div>
+<div class="card my-4">
+    <h5 class="card-header">Tags</h5>
+    <div class="card-body">
+        {{.ArticleTags}}
     </div>
 </div>
 <div class="card my-4">
@@ -20,6 +26,12 @@
                 </ul>
             </div>
         </div>
+    </div>
+</div>
+<div class="card my-4">
+    <h5 class="card-header">Language</h5>
+    <div class="card-body">
+        {{.Language}}
     </div>
 </div>
 {{end}}

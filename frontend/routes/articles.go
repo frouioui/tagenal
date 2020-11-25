@@ -3,6 +3,7 @@ package routes
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/frouioui/tagenal/frontend/client"
 	"github.com/labstack/echo"
@@ -21,7 +22,7 @@ func articlesCategoryHandler(c echo.Context) error {
 	category := c.Param("category")
 	ars, err := client.ArticleFromCategory(category)
 	if err != nil {
-		return c.String(http.StatusOK, "hello")
+		return c.String(http.StatusOK, err.Error())
 	}
 	return c.Render(http.StatusOK, "articles_category.htm", map[string]interface{}{
 		"category": category,
@@ -30,5 +31,19 @@ func articlesCategoryHandler(c echo.Context) error {
 }
 
 func articleIDHandler(c echo.Context) error {
-	return c.String(http.StatusOK, "hello")
+	id := c.Param("id")
+	ID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Println(err.Error())
+		return c.String(http.StatusOK, err.Error())
+	}
+	art, err := client.ArticleFromID(ID)
+	if err != nil {
+		log.Println(err.Error())
+		return c.String(http.StatusOK, err.Error())
+	}
+	return c.Render(http.StatusOK, "article.htm", map[string]interface{}{
+		"id":      ID,
+		"article": art,
+	})
 }

@@ -40,6 +40,15 @@ func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Cate
 	return resp, nil
 }
 
+func (s *articleServiceGRPC) GetArticlesByRegion(cxt context.Context, r *pb.ID) (*pb.Articles, error) {
+	articles, err := s.dbm.GetArticlesFromRegion(int(r.ID))
+	if err != nil {
+		return nil, err
+	}
+	resp := db.ArticlesToProtoArticles(articles)
+	return resp, nil
+}
+
 func (s *articleServiceGRPC) ServiceInformation(cxt context.Context, r *pb.ArticleHomeRequest) (*pb.ArticleHomeResponse, error) {
 	resp := &pb.ArticleHomeResponse{}
 	resp.IP = getHostIP()

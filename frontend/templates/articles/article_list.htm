@@ -1,0 +1,14 @@
+{{define "article_list"}}
+<div class="card mb-4">
+    <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
+    <div class="card-body">
+        <h2 class="card-title">{{.Title}}</h2>
+        <p class="card-text">{{.Abstract}}</p>
+        <a href="/articles/id/{{.ID}}" class="btn btn-primary">Read More &rarr;</a>
+    </div>
+    <div class="card-footer text-muted">
+        Published by
+        <a href="#">{{.Authors}}</a>
+    </div>
+</div>
+{{end}}

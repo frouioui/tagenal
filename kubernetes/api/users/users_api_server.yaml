@@ -5,15 +5,18 @@ metadata:
   labels:
     api: users
     app: users-api
+    tier: backend
 spec:
   selector:
     matchLabels:
       app: users-api
+      tier: backend
   replicas: 1
   template:
     metadata:
       labels:
         app: users-api
+        tier: backend
     spec:
       containers:
         - name: users-api-server
@@ -34,13 +37,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-api-service
+  name: users-api
   labels:
     api: users
+    app: users-api
+    tier: backend
 spec:
   type: ClusterIP
   selector:
     app: users-api
+    tier: backend
   ports:
     - port: 9090
       targetPort: 9090

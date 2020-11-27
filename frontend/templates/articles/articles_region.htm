@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head"}}
+<body>
+    {{template "navbar"}}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="my-4">
+                    Articles from region: {{.region}}
+                </h1>
+                {{range $var := .articles}}
+                    {{template "article_list" $var}}
+                {{end}}
+            </div>
+            <div class="col-md-4">
+                {{template "sidebarhome"}}
+            </div>
+        </div>
+    </div>
+    {{template "footer"}}
+    {{template "bootstrapjs"}}
+</body>
+</html>

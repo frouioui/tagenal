@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head"}}
+<body>
+    {{template "navbar"}}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 class="my-4">
+                    {{.article.Title}}
+                </h1>
+                <h2>
+                    Authors 
+                </h2>
+                <p>
+                    {{.article.Authors}}
+                </p>
+                <h2>
+                    Asbtract 
+                </h2>
+                <p>
+                    {{.article.Abstract}}
+                </p>
+                <h2>
+                    Text
+                </h2>
+                <p>
+                    {{.article.Text}}
+                </p>
+            </div>
+            <div class="col-md-4">
+                {{template "sidebararticle" .article}}
+            </div>
+        </div>
+    </div>
+
+    {{template "footer"}}
+    {{template "bootstrapjs"}}
+</body>
+</html>

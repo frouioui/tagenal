@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"vitess.io/vitess/go/vt/vitessdriver"
 )
 
 type DatabaseManager struct {
@@ -15,14 +16,11 @@ type DatabaseManager struct {
 
 func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 	dbm = &DatabaseManager{}
-	connStr := "user@tcp(traefik:3000)/users"
-
-	db, err := sql.Open("mysql", connStr)
+	dbm.db, err = vitessdriver.Open("traefik:9112", "users@master")
 	if err != nil {
 		return nil, err
 	}
-	dbm.db = db
-	dbm.db.SetConnMaxLifetime(time.Second * 1)
+	dbm.db.SetConnMaxLifetime(time.Second * 5)
 	return dbm, err
 }
 

@@ -7,9 +7,9 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`tagenal`) && PathPrefix(`/users`)
+      match: Host(`api.tagenal`) && PathPrefix(`/users`)
       services:
-        - name: users-api-service
+        - name: users-api
           port: 10000
       middlewares:
         - name: users-api-http-route-stripprefix
@@ -23,17 +23,3 @@ spec:
     prefixes:
       - /users
       - /users/
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRouteTCP
-metadata:
-  name: users-api-grpc-route
-spec:
-  entryPoints:
-    - grpc
-  routes:
-    - kind: Rule
-      match: HostSNI(`*`)
-      services:
-        - name: users-api-service
-          port: 9090

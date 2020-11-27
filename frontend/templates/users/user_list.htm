@@ -1,9 +1,11 @@
 {{define "user_list"}}
-<div class="card mb-4">
-    <div class="card-body">
-        <h2 class="card-title">{{.Name}}</h2>
-        <p class="card-text">{{.Email}}</p>
-        <a href="/users/id/{{.ID}}" class="btn btn-primary">See profile &rarr;</a>
+<div class="col-md-6">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">{{.Name}}</h2>
+            <p class="card-text">{{.Email}}</p>
+            <a href="/users/id/{{.ID}}" class="btn btn-primary">See profile &rarr;</a>
+        </div>
     </div>
 </div>
 {{end}}

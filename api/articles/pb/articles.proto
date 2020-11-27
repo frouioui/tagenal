@@ -54,7 +54,6 @@ service ArticleService {
     rpc GetSingleArticle(ID) returns (Article) {}
     rpc GetCategoryArticles(Category) returns (Articles) {}
     rpc GetArticlesByRegion(ID) returns (Articles) {}
-    rpc GetArticleCountByRegion(ID) returns (Count) {}
     rpc NewArticle(Article) returns (ID) {}
     rpc NewArticles(Articles) returns (IDs) {}
 }

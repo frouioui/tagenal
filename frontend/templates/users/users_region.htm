@@ -9,9 +9,11 @@
                 <h1 class="my-4">
                     Users in region {{.region}}
                 </h1>
-                {{range $var := .users}}
-                    {{template "user_list" $var}}
-                {{end}}
+                <div class="row">
+                    {{range $var := .users}}
+                        {{template "user_list" $var}}
+                    {{end}}
+                </div>
             </div>
             <div class="col-md-4">
                 {{template "sidebarhome"}}

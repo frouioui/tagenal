@@ -27,7 +27,7 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 }
 
 func (dbm *DatabaseManager) GetUserByID(ID uint64) (user User, err error) {
-	qc := `WHERE _id=?`
+	qc := `WHERE _id LIKE ?`
 	user, err = dbm.fetchUser(qc, strconv.Itoa(int(ID)))
 	if err != nil {
 		log.Println(err.Error())

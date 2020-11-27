@@ -41,6 +41,7 @@ spec:
             - --providers.kubernetescrd
             - --entrypoints.web.address=:80
             - --entrypoints.grpc.address=:8000
+            - --entrypoints.vtgate.address=:9112
             - --entrypoints.mysql.address=:3000
             - --entryPoints.metrics.address=:8082
             - --api.insecure
@@ -59,6 +60,8 @@ spec:
               containerPort: 8080
             - name: grpc
               containerPort: 8000
+            - name: vtgate
+              containerPort: 9112
             - name: mysql
               containerPort: 3000
 ---
@@ -86,6 +89,9 @@ spec:
     - port: 8000
       targetPort: 8000
       name: grpc
+    - port: 9112
+      targetPort: 9112
+      name: vtgate
     - port: 3000
       targetPort: 3000
       name: mysql

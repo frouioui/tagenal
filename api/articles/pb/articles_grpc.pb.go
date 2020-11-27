@@ -20,6 +20,8 @@ type ArticleServiceClient interface {
 	ServiceInformation(ctx context.Context, in *ArticleHomeRequest, opts ...grpc.CallOption) (*ArticleHomeResponse, error)
 	GetSingleArticle(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Article, error)
 	GetCategoryArticles(ctx context.Context, in *Category, opts ...grpc.CallOption) (*Articles, error)
+	GetArticlesByRegion(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Articles, error)
+	GetArticleCountByRegion(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Count, error)
 	NewArticle(ctx context.Context, in *Article, opts ...grpc.CallOption) (*ID, error)
 	NewArticles(ctx context.Context, in *Articles, opts ...grpc.CallOption) (*IDs, error)
 }
@@ -59,6 +61,24 @@ func (c *articleServiceClient) GetCategoryArticles(ctx context.Context, in *Cate
 	return out, nil
 }
 
+func (c *articleServiceClient) GetArticlesByRegion(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Articles, error) {
+	out := new(Articles)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/GetArticlesByRegion", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *articleServiceClient) GetArticleCountByRegion(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Count, error) {
+	out := new(Count)
+	err := c.cc.Invoke(ctx, "/pb.ArticleService/GetArticleCountByRegion", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *articleServiceClient) NewArticle(ctx context.Context, in *Article, opts ...grpc.CallOption) (*ID, error) {
 	out := new(ID)
 	err := c.cc.Invoke(ctx, "/pb.ArticleService/NewArticle", in, out, opts...)
@@ -84,6 +104,8 @@ type ArticleServiceServer interface {
 	ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error)
 	GetSingleArticle(context.Context, *ID) (*Article, error)
 	GetCategoryArticles(context.Context, *Category) (*Articles, error)
+	GetArticlesByRegion(context.Context, *ID) (*Articles, error)
+	GetArticleCountByRegion(context.Context, *ID) (*Count, error)
 	NewArticle(context.Context, *Article) (*ID, error)
 	NewArticles(context.Context, *Articles) (*IDs, error)
 	mustEmbedUnimplementedArticleServiceServer()
@@ -101,6 +123,12 @@ func (UnimplementedArticleServiceServer) GetSingleArticle(context.Context, *ID) 
 }
 func (UnimplementedArticleServiceServer) GetCategoryArticles(context.Context, *Category) (*Articles, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCategoryArticles not implemented")
+}
+func (UnimplementedArticleServiceServer) GetArticlesByRegion(context.Context, *ID) (*Articles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticlesByRegion not implemented")
+}
+func (UnimplementedArticleServiceServer) GetArticleCountByRegion(context.Context, *ID) (*Count, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticleCountByRegion not implemented")
 }
 func (UnimplementedArticleServiceServer) NewArticle(context.Context, *Article) (*ID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewArticle not implemented")
@@ -175,6 +203,42 @@ func _ArticleService_GetCategoryArticles_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_GetArticlesByRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).GetArticlesByRegion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/GetArticlesByRegion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).GetArticlesByRegion(ctx, req.(*ID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArticleService_GetArticleCountByRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).GetArticleCountByRegion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ArticleService/GetArticleCountByRegion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).GetArticleCountByRegion(ctx, req.(*ID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArticleService_NewArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Article)
 	if err := dec(in); err != nil {
@@ -226,6 +290,14 @@ var _ArticleService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCategoryArticles",
 			Handler:    _ArticleService_GetCategoryArticles_Handler,
+		},
+		{
+			MethodName: "GetArticlesByRegion",
+			Handler:    _ArticleService_GetArticlesByRegion_Handler,
+		},
+		{
+			MethodName: "GetArticleCountByRegion",
+			Handler:    _ArticleService_GetArticleCountByRegion_Handler,
 		},
 		{
 			MethodName: "NewArticle",

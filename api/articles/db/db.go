@@ -38,7 +38,7 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 
 func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err error) {
 	qc := `WHERE _id LIKE ?`
-	article, err = dbm.fetchArticle(qc, nil, strconv.Itoa(int(ID)))
+	article, err = dbm.fetchArticle(qc, dbm.db, strconv.Itoa(int(ID)))
 	if err != nil {
 		log.Println(err.Error())
 		return article, err
@@ -46,9 +46,9 @@ func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err erro
 	return article, nil
 }
 
-func (dbm *DatabaseManager) GetArticlesOfCategory(region string) (articles []Article, err error) {
+func (dbm *DatabaseManager) GetArticlesOfCategory(category string) (articles []Article, err error) {
 	qc := `WHERE category=?`
-	articles, err = dbm.fetchArticles(qc, nil, region)
+	articles, err = dbm.fetchArticles(qc, dbm.db, category)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -56,16 +56,35 @@ func (dbm *DatabaseManager) GetArticlesOfCategory(region string) (articles []Art
 	return articles, nil
 }
 
-func (dbm *DatabaseManager) fetchArticle(qc string, tx *sql.Tx, args ...interface{}) (article Article, err error) {
-	err = dbm.db.QueryRow(`SELECT * FROM article `+qc, args...).Scan(
+func (dbm *DatabaseManager) GetArticlesFromRegion(region int) (articles []Article, err error) {
+	db := &sql.DB{}
+	if region == 1 {
+		db = dbm.dbBEI
+	} else if region == 2 {
+		db = dbm.dbHKG
+	} else {
+		log.Println("no db region selected")
+		db = dbm.db
+	}
+	qc := ``
+	articles, err = dbm.fetchArticles(qc, db, region)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	return articles, nil
+}
+
+func (dbm *DatabaseManager) fetchArticle(qc string, db *sql.DB, args ...interface{}) (article Article, err error) {
+	err = db.QueryRow(`SELECT * FROM article `+qc, args...).Scan(
 		&article.ID, &article.Timestamp, &article.ID2, &article.AID, &article.Title, &article.Category,
 		&article.Abstract, &article.ArticleTags, &article.Authors, &article.Language, &article.Text,
 		&article.Image, &article.Video)
 	return article, err
 }
 
-func (dbm *DatabaseManager) fetchArticles(qc string, tx *sql.Tx, args ...interface{}) (articles []Article, err error) {
-	rows, err := dbm.db.Query(`SELECT * FROM article `+qc, args...)
+func (dbm *DatabaseManager) fetchArticles(qc string, db *sql.DB, args ...interface{}) (articles []Article, err error) {
+	rows, err := db.Query(`SELECT * FROM article `+qc, args...)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err

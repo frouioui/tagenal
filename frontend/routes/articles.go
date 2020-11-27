@@ -30,6 +30,25 @@ func articlesCategoryHandler(c echo.Context) error {
 	})
 }
 
+func articlesRegionHandler(c echo.Context) error {
+	region := c.Param("region")
+	regionID := 1
+	// TODO: create a global map for region id
+	if region == "beijing" {
+		regionID = 1
+	} else if region == "hong kong" {
+		regionID = 2
+	}
+	ars, err := client.ArticleFromRegion(regionID)
+	if err != nil {
+		return c.String(http.StatusOK, err.Error())
+	}
+	return c.Render(http.StatusOK, "articles_region.htm", map[string]interface{}{
+		"region":   region,
+		"articles": ars,
+	})
+}
+
 func articleIDHandler(c echo.Context) error {
 	id := c.Param("id")
 	ID, err := strconv.Atoi(id)

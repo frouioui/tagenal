@@ -84,6 +84,34 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
+func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	regionIDStr := vars["region_id"]
+	regionID, err := strconv.Atoi(regionIDStr)
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "could not parse parameter"}`, http.StatusBadRequest)
+		return
+	}
+	articles, err := httpsrv.dbm.GetArticlesFromRegion(regionID)
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respJSON, err := json.Marshal(articles)
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
+		return
+	}
+	w.WriteHeader(200)
+	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
+}
+
 func (httpsrv *httpService) newArticleRoute(w http.ResponseWriter, r *http.Request) {
 	var article db.Article
 	err := json.NewDecoder(r.Body).Decode(&article)
@@ -151,6 +179,7 @@ func (httpsrv *httpService) assignRoutesToService() {
 	httpsrv.r.HandleFunc("/", httpsrv.homeRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/id/{id}", httpsrv.getArticleByIDRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/category/{category}", httpsrv.getArticlesOfCategoryRoute).Methods(http.MethodGet)
+	httpsrv.r.HandleFunc("/region/id/{region_id}", httpsrv.getArticlesFromRegionRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/new", httpsrv.newArticleRoute).Methods(http.MethodPost)
 	httpsrv.r.HandleFunc("/new/bulk", httpsrv.newArticlesRoute).Methods(http.MethodPost)
 }

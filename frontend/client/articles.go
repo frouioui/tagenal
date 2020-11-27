@@ -77,3 +77,31 @@ func ArticleFromCategory(category string) (articles []models.Article, err error)
 	}
 	return response.Articles, nil
 }
+
+func ArticleFromRegion(regionID int) (articles []models.Article, err error) {
+	url := fmt.Sprintf("http://articles-api:8080/region/id/%d", regionID)
+	method := "GET"
+
+	client := &http.Client{Timeout: time.Second * 2}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var response responseArrayArticles
+	err = json.NewDecoder(res.Body).Decode(&response)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	return response.Articles, nil
+}

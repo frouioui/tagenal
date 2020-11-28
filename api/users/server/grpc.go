@@ -32,6 +32,7 @@ func (s *userServiceGRPC) ServiceInformation(cxt context.Context, r *pb.UserHome
 func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*pb.User, error) {
 	user, err := s.dbm.GetUserByID(uint64(r.ID))
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	resp := user.ProtoUser()
@@ -41,6 +42,7 @@ func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*
 func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.RequestRegion) (*pb.Users, error) {
 	users, err := s.dbm.GetUsersOfRegion(r.Region)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	resp := db.UsersToProtoUsers(users)
@@ -51,6 +53,7 @@ func (s *userServiceGRPC) NewUser(cxt context.Context, r *pb.User) (*pb.ID, erro
 	user := db.ProtoUserToUser(r)
 	id, err := s.dbm.InsertUser(user)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	pbid := &pb.ID{ID: int64(id)}
@@ -63,6 +66,7 @@ func (s *userServiceGRPC) NewUsers(cxt context.Context, r *pb.Users) (*pb.IDs, e
 		user := db.ProtoUserToUser(u)
 		id, err := s.dbm.InsertUser(user)
 		if err != nil {
+			log.Println(err.Error())
 			return nil, err
 		}
 		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})

@@ -25,6 +25,7 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 
 	respJSON, err := json.Marshal(resp)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -51,10 +52,10 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
-	log.Println(user)
 
 	respJSON, err := json.Marshal(user)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -78,6 +79,7 @@ func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http
 
 	respJSON, err := json.Marshal(users)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -104,10 +106,10 @@ func (httpsrv *httpService) newUserRoute(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	user.ID = int64(newID)
-	log.Println(user)
 
 	respJSON, err := json.Marshal(user)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -141,6 +143,7 @@ func (httpsrv *httpService) newUsersRoute(w http.ResponseWriter, r *http.Request
 
 	respJSON, err := json.Marshal(ids)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return

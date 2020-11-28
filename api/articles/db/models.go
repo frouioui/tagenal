@@ -4,6 +4,8 @@ import (
 	"github.com/frouioui/tagenal/api/articles/pb"
 )
 
+// Article struct refers to the article table of the
+// Vitess MySQl cluster, in the articles keyspace.
 type Article struct {
 	ID          int64  `json:"ID"`
 	Timestamp   string `json:"Timestamp"`
@@ -20,6 +22,8 @@ type Article struct {
 	Video       string `json:"Video"`
 }
 
+// ProtoArticle transforms an Article into a the auto-generated
+// pb.Article structure from protobuf.
 func (u *Article) ProtoArticle() *pb.Article {
 	return &pb.Article{
 		ID:          u.ID,
@@ -38,6 +42,8 @@ func (u *Article) ProtoArticle() *pb.Article {
 	}
 }
 
+// ProtoArticleToArticle transforms an auto-generated pb.Article from
+// protobuf into the package implementation of Article.
 func ProtoArticleToArticle(pbarticle *pb.Article) (article Article) {
 	return Article{
 		ID:          pbarticle.ID,
@@ -56,6 +62,8 @@ func ProtoArticleToArticle(pbarticle *pb.Article) (article Article) {
 	}
 }
 
+// ArticlesToProtoArticles transforms an array of Articles into
+// an array of pb.Articles which are auto-generated from protobuf.
 func ArticlesToProtoArticles(articles []Article) *pb.Articles {
 	pbarticles := &pb.Articles{Articles: make([]*pb.Article, len(articles))}
 	for i, a := range articles {

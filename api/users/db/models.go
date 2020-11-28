@@ -4,6 +4,7 @@ import (
 	"github.com/frouioui/tagenal/api/users/pb"
 )
 
+// User model maps to the user table of Vitess MySQL cluster.
 type User struct {
 	ID              int64  `json:"ID"`
 	Timestamp       string `json:"Timestamp"`
@@ -22,6 +23,8 @@ type User struct {
 	ObtainedCredits string `json:"ObtainedCredits"`
 }
 
+// ProtoUser transforms an User into a the auto-generated
+// pb.User structure from protobuf.
 func (u *User) ProtoUser() *pb.User {
 	return &pb.User{
 		ID:              u.ID,
@@ -42,6 +45,8 @@ func (u *User) ProtoUser() *pb.User {
 	}
 }
 
+// ProtoUserToUser transforms an auto-generated pb.User from
+// protobuf into the package implementation of User.
 func ProtoUserToUser(pbuser *pb.User) (user User) {
 	return User{
 		ID:              pbuser.ID,
@@ -62,6 +67,8 @@ func ProtoUserToUser(pbuser *pb.User) (user User) {
 	}
 }
 
+// UsersToProtoUsers transforms an array of User into
+// an array of pb.Users which are auto-generated from protobuf.
 func UsersToProtoUsers(users []User) *pb.Users {
 	pbusers := &pb.Users{Users: make([]*pb.User, len(users))}
 	for i, u := range users {

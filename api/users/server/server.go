@@ -17,7 +17,10 @@ const (
 )
 
 // UserServerAPI contains the HTTP and GRPC servers which will
-// help running the users API.
+// run the whole user api server.
+// This structure is mainly used as a configuration component
+// that uses a http.Server and grpc.Server objects, themself
+// containing a router/handler for their requests.
 type UserServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
@@ -50,7 +53,14 @@ func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 }
 
 // NewUserServerAPI will create a new UserServerAPI object.
-// It will initiate the HTTP and GRPC servers.
+// It will initiate the HTTP and GRPC servers by calling
+// the setServerHTTP and serServerGRPC package functions.
+// The function returns an UserServerAPI which will be ready
+// to use, if no error is returned, by calling either
+// usersrv.RunServerHTTP() or usersrv.RunServerGRPC().
+//
+// TODO: give parameters to the function in order to tune
+// the servers.
 func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 	err = usersrv.setServerHTTP()
 	if err != nil {

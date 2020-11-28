@@ -402,3 +402,32 @@ Now we can access our services:
 We can login on http://grafana.tagenal with the following credentials:
 - User: admin
 - Password: admin
+
+## Setup the APIs services
+
+In this section we will elaborate on how to build, run, access tagenal's APIs services.
+
+There are currently two APIs:
+
+- `users` [[doc](./api/users/README.md)][[folder](./api/users/)]
+- `articles` [[doc](./api/articles/README.md)][[folder](./api/articles/)]
+
+### Build and push a new docker image
+
+After modifying the codebase, new version of the docker image can be build and pushed to a public docker repository.
+
+`make build_push_apis`
+
+This command will require to change the docker-image name in each of the service's Makefile.
+
+### Run the APIs on kubernetes
+
+To run the APIs on kubernetes:
+
+`make run_apis_k8s`
+
+If you want to use another image than the default ones, this can be done by changing the kubernetes manifests in: `./kubernetes/api/**/*_api_server.yaml`.
+
+### Stop the APIs
+
+`make stop_apis_k8s`

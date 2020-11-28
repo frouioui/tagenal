@@ -193,5 +193,20 @@ show_article_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_1.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_2.sql
 
+build_push_apis:
+	make -C ./api/users/
+	make -C ./api/articles/
+
+build_apis:
+	make -C protobuild dockerbuild ./api/users/
+	make -C protobuild dockerbuild ./api/articles/
+
+run_apis_k8s:
+	kubectl apply -f ./kubernetes/api/users/
+	kubectl apply -f ./kubernetes/api/articles/
+
+stop_apis_k8s:
+	kubectl delete -f ./kubernetes/api/users/
+	kubectl delete -f ./kubernetes/api/articles/
 
 .PHONY: set_aliases

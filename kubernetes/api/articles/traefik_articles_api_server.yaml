@@ -7,9 +7,9 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`tagenal`) && PathPrefix(`/articles`)
+      match: Host(`api.tagenal`) && PathPrefix(`/articles`)
       services:
-        - name: articles-api-service
+        - name: articles-api
           port: 8080
       middlewares:
         - name: articles-api-http-route-stripprefix
@@ -23,17 +23,3 @@ spec:
     prefixes:
       - /articles
       - /articles/
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRouteTCP
-metadata:
-  name: articles-api-grpc-route
-spec:
-  entryPoints:
-    - grpc
-  routes:
-    - kind: Rule
-      match: HostSNI(`*`)
-      services:
-        - name: articles-api-service
-          port: 9090

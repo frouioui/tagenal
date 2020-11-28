@@ -25,6 +25,7 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 
 	respJSON, err := json.Marshal(resp)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -54,6 +55,7 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 
 	respJSON, err := json.Marshal(article)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -76,6 +78,7 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 
 	respJSON, err := json.Marshal(articles)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -104,6 +107,7 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 
 	respJSON, err := json.Marshal(articles)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -134,6 +138,7 @@ func (httpsrv *httpService) newArticleRoute(w http.ResponseWriter, r *http.Reque
 
 	respJSON, err := json.Marshal(article)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
@@ -167,6 +172,7 @@ func (httpsrv *httpService) newArticlesRoute(w http.ResponseWriter, r *http.Requ
 
 	respJSON, err := json.Marshal(ids)
 	if err != nil {
+		log.Println(err.Error())
 		w.WriteHeader(500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return

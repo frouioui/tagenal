@@ -16,8 +16,10 @@ const (
 	httpPort = 8080
 )
 
-// ArticleServerAPI contains the HTTP and GRPC servers which will
-// help running the articles API.
+// ArticleServerAPI mainly servers as a configuration holder.
+// It contains two servers: http.Server and grpc.Server,
+// both servers can be automatically initialized using the
+// NewArticleServerAPI package's method.
 type ArticleServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
@@ -49,8 +51,11 @@ func (artsrv *ArticleServerAPI) setServerGRPC() (err error) {
 	return nil
 }
 
-// NewArticleServerAPI will create a new ArticleServerAPI object.
-// It will initiate the HTTP and GRPC servers.
+// NewArticleServerAPI will create a new ArticleServerAPI
+// struct and initiate both HTTP and GRPC servers.
+// Once returned, the ArticleServerAPI is ready to be used,
+// both gRPC and HTTP endpoint can be started using namely:
+// artsrv.RunServerGRPC() and artsrv.RunServerHTTP()
 func NewArticleServerAPI() (artsrv ArticleServerAPI, err error) {
 	err = artsrv.setServerHTTP()
 	if err != nil {

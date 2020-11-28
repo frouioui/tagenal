@@ -25,6 +25,7 @@ func newServiceGRPC() (grpcsrv articleServiceGRPC, err error) {
 func (s *articleServiceGRPC) GetSingleArticle(cxt context.Context, r *pb.ID) (*pb.Article, error) {
 	article, err := s.dbm.GetArticleByID(uint64(r.ID))
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	resp := article.ProtoArticle()
@@ -34,6 +35,7 @@ func (s *articleServiceGRPC) GetSingleArticle(cxt context.Context, r *pb.ID) (*p
 func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Category) (*pb.Articles, error) {
 	articles, err := s.dbm.GetArticlesOfCategory(r.Category)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	resp := db.ArticlesToProtoArticles(articles)
@@ -43,6 +45,7 @@ func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Cate
 func (s *articleServiceGRPC) GetArticlesByRegion(cxt context.Context, r *pb.ID) (*pb.Articles, error) {
 	articles, err := s.dbm.GetArticlesFromRegion(int(r.ID))
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	resp := db.ArticlesToProtoArticles(articles)
@@ -60,6 +63,7 @@ func (s *articleServiceGRPC) NewArticle(cxt context.Context, r *pb.Article) (*pb
 	user := db.ProtoArticleToArticle(r)
 	id, err := s.dbm.InsertArticle(user)
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 	pbid := &pb.ID{ID: int64(id)}
@@ -72,6 +76,7 @@ func (s *articleServiceGRPC) NewArticles(cxt context.Context, r *pb.Articles) (*
 		user := db.ProtoArticleToArticle(u)
 		id, err := s.dbm.InsertArticle(user)
 		if err != nil {
+			log.Println(err.Error())
 			return nil, err
 		}
 		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})

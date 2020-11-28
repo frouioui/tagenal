@@ -6,16 +6,31 @@ import (
 	"strconv"
 	"time"
 
+	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
 	"vitess.io/vitess/go/vt/vitessdriver"
 )
 
+// DatabaseManager contains the connection pools of
+// the Vitess MySQL cluster.
+// The main connection pool that should be used is
+// the `db *sql.DB` one, the others are just for
+// proof-of-concept-purpose.
 type DatabaseManager struct {
-	db    *sql.DB
-	dbBEI *sql.DB // (as an example) shard in Beijing
-	dbHKG *sql.DB // (as an example) shard in Hong Kong
+	db *sql.DB
+
+	// connection pool used for the purpose of example
+	// connects only to the shard -80 of Vitess Cluster
+	dbBEI *sql.DB
+
+	// connection pool used for the purpose of example
+	// connects only to the shard 80- of Vitess Cluster
+	dbHKG *sql.DB
 }
 
+// NewDatabaseManager will return a newly created DatabaseManager,
+// the DatabaseManager will contain the initialized connection pools
+// to Vitess MySQL cluster.
 func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 	dbm = &DatabaseManager{}
 	dbm.db, err = vitessdriver.Open("traefik:9112", "articles@master")
@@ -36,6 +51,8 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 	return dbm, err
 }
 
+// GetArticleByID will fetch an article from Vitess corresponding
+// to the given unique ID.
 func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err error) {
 	qc := `WHERE _id LIKE ?`
 	article, err = dbm.fetchArticle(qc, dbm.db, strconv.Itoa(int(ID)))
@@ -46,6 +63,8 @@ func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err erro
 	return article, nil
 }
 
+// GetArticlesOfCategory will return all the articles belonging to
+// the given category.
 func (dbm *DatabaseManager) GetArticlesOfCategory(category string) (articles []Article, err error) {
 	qc := `WHERE category=?`
 	articles, err = dbm.fetchArticles(qc, dbm.db, category)
@@ -56,6 +75,15 @@ func (dbm *DatabaseManager) GetArticlesOfCategory(category string) (articles []A
 	return articles, nil
 }
 
+// GetArticlesFromRegion is used as an experiment. It queries all the
+// articles that are stored ONLY in the given region ID.
+//
+// To do such query, the function will not use the default connection
+// pool, instead it will use the shard specific connection pool.
+//
+// RegionID:
+// 1 = Beijing
+// 2 = Hong Kong
 func (dbm *DatabaseManager) GetArticlesFromRegion(region int) (articles []Article, err error) {
 	db := &sql.DB{}
 	if region == 1 {
@@ -104,6 +132,8 @@ func (dbm *DatabaseManager) fetchArticles(qc string, db *sql.DB, args ...interfa
 	return articles, nil
 }
 
+// InsertArticle will insert the given Article in Vitess MySQL cluster
+// the new ID will be returned, in addition to an error if there is any.
 func (dbm *DatabaseManager) InsertArticle(article Article) (newID int, err error) {
 	sql := `INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,authors,language,text,image,video) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
 

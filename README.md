@@ -409,8 +409,8 @@ In this section we will elaborate on how to build, run, access tagenal's APIs se
 
 There are currently two APIs:
 
-- `users`
-- `articles`
+- `users` [[doc](./api/users/README.md)][[folder](./api/users/)]
+- `articles` [[doc](./api/articles/README.md)][[folder](./api/articles/)]
 
 ### Build and push a new docker image
 

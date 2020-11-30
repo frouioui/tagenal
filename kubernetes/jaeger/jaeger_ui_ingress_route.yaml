@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jaeger-web
+  namespace: observability
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`jaeger.tagenal`)
+      services:
+        - namespace: observability
+          name: simplest-query
+          port: 16686

@@ -7,9 +7,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
+                <li class='nav-item {{if eq .page  "home"}}active{{end}}'>
                     <a class="nav-link" href="/">Home
                         <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class='nav-item {{if eq .page  "status"}}active{{end}}'>
+                    <a class="nav-link" href="/status">Status
+                        <span class="sr-only"></span>
                     </a>
                 </li>
             </ul>

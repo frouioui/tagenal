@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {{template "info_table" .srvinfos}}
+            </div>
+        </div>
+    </div>
+
+    {{template "footer"}}
+    {{template "bootstrapjs"}}
+</body>
+</html>

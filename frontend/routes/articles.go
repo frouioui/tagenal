@@ -25,6 +25,7 @@ func articlesCategoryHandler(c echo.Context) error {
 		return c.String(http.StatusOK, err.Error())
 	}
 	return c.Render(http.StatusOK, "articles_category.htm", map[string]interface{}{
+		"page":     "articles_category",
 		"category": category,
 		"articles": ars,
 	})
@@ -44,6 +45,7 @@ func articlesRegionHandler(c echo.Context) error {
 		return c.String(http.StatusOK, err.Error())
 	}
 	return c.Render(http.StatusOK, "articles_region.htm", map[string]interface{}{
+		"page":     "articles_region",
 		"region":   region,
 		"articles": ars,
 	})
@@ -62,6 +64,7 @@ func articleIDHandler(c echo.Context) error {
 		return c.String(http.StatusOK, err.Error())
 	}
 	return c.Render(http.StatusOK, "article.htm", map[string]interface{}{
+		"page":    "article_id",
 		"id":      ID,
 		"article": art,
 	})

@@ -11,5 +11,5 @@ spec:
       match: Host(`jaeger.tagenal`)
       services:
         - namespace: observability
-          name: simplest-query
+          name: jaeger-prod-query
           port: 16686

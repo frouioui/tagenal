@@ -8,6 +8,9 @@ import (
 	"time"
 
 	"github.com/frouioui/tagenal/frontend/models"
+	"github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo/v4"
+	otlog "github.com/opentracing/opentracing-go/log"
 )
 
 type responseSingleArticle struct {
@@ -50,12 +53,15 @@ func ArticleFromID(ID int) (article *models.Article, err error) {
 	return &response.Article, nil
 }
 
-func ArticleFromCategory(category string) (articles []models.Article, err error) {
+func ArticleFromCategory(c echo.Context, category string) (articles []models.Article, err error) {
 	url := fmt.Sprintf("http://articles-api:8080/category/%s", category)
 	method := "GET"
 
 	client := &http.Client{Timeout: time.Second * 10}
-	req, err := http.NewRequest(method, url, nil)
+
+	span := jaegertracing.CreateChildSpan(c, "ArticlesFromCategory")
+	defer span.Finish()
+	req, err := jaegertracing.NewTracedRequest(method, url, nil, span)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -75,6 +81,10 @@ func ArticleFromCategory(category string) (articles []models.Article, err error)
 		log.Println(err.Error())
 		return nil, err
 	}
+	span.LogFields(
+		otlog.String("event", "http request article from categor"),
+		otlog.String("value", response.Status),
+	)
 	return response.Articles, nil
 }
 

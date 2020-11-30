@@ -5,7 +5,7 @@ import (
 
 	"github.com/frouioui/tagenal/frontend/models"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func servicesInfoHandler(c echo.Context) error {

@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tagenal-frontend
+  annotations:
+    "sidecar.jaegertracing.io/inject": "jaeger-prod"
   labels:
     app: tagenal-frontend
 spec:
@@ -17,6 +19,7 @@ spec:
       containers:
         - name: tagenal-frontend
           image: frouioui/tagenal-frontend-service:latest
+          imagePullPolicy: Always
           resources:
             requests:
               cpu: 100m
@@ -27,6 +30,9 @@ spec:
           ports:
             - name: web
               containerPort: 8888
+          env:
+            - name: JAEGER_SERVICE_NAME
+              value: "frontend"
 ---
 apiVersion: v1
 kind: Service

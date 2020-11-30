@@ -11,8 +11,9 @@ import (
 	"strings"
 
 	"github.com/frouioui/tagenal/frontend/routes"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Template struct {
@@ -48,6 +49,9 @@ func main() {
 	}
 
 	e := echo.New()
+
+	c := jaegertracing.New(e, nil)
+	defer c.Close()
 
 	e.Renderer = getTemplateEngine()
 	e.Use(middleware.Logger())

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/frouioui/tagenal/frontend/client"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func usersHandler(c echo.Context) error {

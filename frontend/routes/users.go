@@ -20,6 +20,7 @@ func usersRegionHandler(c echo.Context) error {
 		return c.String(http.StatusOK, err.Error())
 	}
 	return c.Render(http.StatusOK, "users_region.htm", map[string]interface{}{
+		"page":   "users_region",
 		"region": region,
 		"users":  users,
 	})
@@ -39,6 +40,7 @@ func userIDHandler(c echo.Context) error {
 	}
 	log.Println(user)
 	return c.Render(http.StatusOK, "user.htm", map[string]interface{}{
+		"page": "user_id",
 		"id":   ID,
 		"user": user,
 	})

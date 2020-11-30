@@ -11,4 +11,5 @@ func DefineRouteHandlers(e *echo.Echo) {
 	e.GET("/articles/id/:id", articleIDHandler)
 	e.GET("/articles/category/:category", articlesCategoryHandler)
 	e.GET("/articles/region/:region", articlesRegionHandler)
+	e.GET("/status", servicesInfoHandler)
 }

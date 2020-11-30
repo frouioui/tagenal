@@ -2,7 +2,7 @@
 <html lang="en">
 {{template "head"}}
 <body>
-    {{template "navbar"}}
+    {{template "navbar" .}}
 
     <div class="container">
         <div class="row">
@@ -10,6 +10,11 @@
                 <h1 class="my-4">
                     Welcome on Tagenal
                 </h1>
+                <h3 class="my-4">
+                    Tagenal's services status
+                </h3>
+                {{template "info_table" .srvinfos}}
+                <a href="/status">See more</a>
             </div>
             <div class="col-md-4">
                 {{template "sidebarhome"}}

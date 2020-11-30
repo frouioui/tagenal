@@ -2,12 +2,12 @@
 <html lang="en">
 {{template "head"}}
 <body>
-    {{template "navbar"}}
+    {{template "navbar" .}}
     <div class="container">
         <div class="row">
             <div class="col-md-8">
                 <h1 class="my-4">
-                    Articles from region: {{.region}}
+                    Articles stored in {{.region}}
                 </h1>
                 {{range $var := .articles}}
                     {{template "article_list" $var}}

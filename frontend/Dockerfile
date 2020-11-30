@@ -7,6 +7,7 @@ RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ma
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
+ENV PORT=8888
 COPY ./assets /assets
 COPY ./templates /templates
 COPY --from=builder /go/src/github.com/frouioui/tagenal/frontend/main /main

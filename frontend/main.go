@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -40,6 +42,11 @@ func getTemplateEngine() *Template {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal(errors.New("no port specified in env").Error())
+	}
+
 	e := echo.New()
 
 	e.Renderer = getTemplateEngine()
@@ -49,5 +56,5 @@ func main() {
 
 	routes.DefineRouteHandlers(e)
 
-	e.Logger.Fatal(e.Start(":8888"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }

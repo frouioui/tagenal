@@ -198,15 +198,27 @@ build_push_apis:
 	make -C ./api/articles/
 
 build_apis:
-	make -C protobuild dockerbuild ./api/users/
-	make -C protobuild dockerbuild ./api/articles/
+	make -C ./api/users/ protobuild dockerbuild 
+	make -C ./api/articles/ protobuild dockerbuild
+
+build_push_frontend:
+	make -C ./frontend/
+
+build_frontend:
+	make -C ./frontend/ dockerbuild 
 
 run_apis_k8s:
 	kubectl apply -f ./kubernetes/api/users/
 	kubectl apply -f ./kubernetes/api/articles/
 
+run_frontend_k8s:
+	kubectl apply -f ./kubernetes/frontend/
+
 stop_apis_k8s:
 	kubectl delete -f ./kubernetes/api/users/
 	kubectl delete -f ./kubernetes/api/articles/
+
+stop_frontend_k8s:
+	kubectl delete -f ./kubernetes/frontend/
 
 .PHONY: set_aliases

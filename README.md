@@ -431,3 +431,27 @@ If you want to use another image than the default ones, this can be done by chan
 ### Stop the APIs
 
 `make stop_apis_k8s`
+
+## Setup the frontend
+
+This section will cover how to build, push, and run the frontend application of tagenal.
+
+The frontend's code can also be found [here](./api/users/README.md).
+
+### Build and push the frontend image
+
+Run the following command to build and push the frontend docker image into a docker registery:
+
+`make build_push_frontend`
+
+This command will require to change the docker image name in the frontend Makefile.
+
+### Run the frontend on kubernetes
+
+To run the frontend on kubernetes:
+
+`make run_frontend_k8s`
+
+### Stop the frontend
+
+`make stop_frontend_k8s`

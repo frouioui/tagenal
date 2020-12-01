@@ -10,6 +10,8 @@ import (
 	"github.com/frouioui/tagenal/api/users/db"
 	"github.com/frouioui/tagenal/api/users/pb"
 	"github.com/gorilla/mux"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 )
 
 type httpService struct {
@@ -35,12 +37,22 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /id/:id", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	serverSpan.SetTag("http.url", fmt.Sprintf("/id/%s", id))
+	serverSpan.SetTag("http.method", "GET")
+
 	userID, err := strconv.Atoi(id)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		serverSpan.SetTag("http.status_code", http.StatusBadRequest)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "could not parse parameter"}`, http.StatusBadRequest)
 		return
 	}
@@ -48,7 +60,8 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 	user, err := httpsrv.dbm.GetUserByID(uint64(userID))
 	if err != nil {
 		log.Println(err.Error())
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
+		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -56,22 +69,30 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 	respJSON, err := json.Marshal(user)
 	if err != nil {
 		log.Println(err.Error())
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
+		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
 	}
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
+	serverSpan.SetTag("http.status_code", http.StatusOK)
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
 func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /region/:region", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	vars := mux.Vars(r)
 	region := vars["region"]
 
 	users, err := httpsrv.dbm.GetUsersOfRegion(region)
 	if err != nil {
 		log.Println(err.Error())
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
+		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -80,11 +101,13 @@ func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http
 	respJSON, err := json.Marshal(users)
 	if err != nil {
 		log.Println(err.Error())
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
+		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
 	}
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
+	serverSpan.SetTag("http.status_code", http.StatusOK)
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 

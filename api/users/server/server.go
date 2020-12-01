@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -24,6 +25,8 @@ const (
 type UserServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
+
+	tracingCloser io.Closer
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {
@@ -62,6 +65,11 @@ func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 // TODO: give parameters to the function in order to tune
 // the servers.
 func NewUserServerAPI() (usersrv UserServerAPI, err error) {
+	usersrv.tracingCloser, err = newTracer()
+	if err != nil {
+		return usersrv, err
+	}
+
 	err = usersrv.setServerHTTP()
 	if err != nil {
 		return usersrv, err

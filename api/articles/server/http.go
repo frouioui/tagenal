@@ -52,7 +52,7 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
-		serverSpan.SetTag("http.status_code", 500)
+		serverSpan.SetTag("http.status_code", http.StatusBadRequest)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "could not parse parameter"}`, http.StatusBadRequest)
 		return
 	}

@@ -25,21 +25,26 @@ type responseArrayArticles struct {
 	Articles []models.Article `json:"data"`
 }
 
-func ArticleFromID(ID int) (article *models.Article, err error) {
+func ArticleFromID(c echo.Context, ID int) (article *models.Article, err error) {
 	url := fmt.Sprintf("http://articles-api:8080/id/%d", ID)
 	method := "GET"
 
 	client := &http.Client{Timeout: time.Second * 10}
-	req, err := http.NewRequest(method, url, nil)
+
+	span := jaegertracing.CreateChildSpan(c, "ArticleFromID")
+	defer span.Finish()
+	req, err := jaegertracing.NewTracedRequest(method, url, nil, span)
 
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 	defer res.Body.Close()
@@ -48,8 +53,13 @@ func ArticleFromID(ID int) (article *models.Article, err error) {
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
+	span.LogFields(
+		otlog.String("event", "api call ArticleFromID"),
+		otlog.String("value", response.Status),
+	)
 	return &response.Article, nil
 }
 
@@ -65,12 +75,14 @@ func ArticleFromCategory(c echo.Context, category string) (articles []models.Art
 
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 	defer res.Body.Close()
@@ -79,30 +91,36 @@ func ArticleFromCategory(c echo.Context, category string) (articles []models.Art
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 	span.LogFields(
-		otlog.String("event", "http request article from categor"),
+		otlog.String("event", "api call ArticlesFromCategory"),
 		otlog.String("value", response.Status),
 	)
 	return response.Articles, nil
 }
 
-func ArticleFromRegion(regionID int) (articles []models.Article, err error) {
+func ArticleFromRegion(c echo.Context, regionID int) (articles []models.Article, err error) {
 	url := fmt.Sprintf("http://articles-api:8080/region/id/%d", regionID)
 	method := "GET"
 
 	client := &http.Client{Timeout: time.Second * 10}
-	req, err := http.NewRequest(method, url, nil)
+
+	span := jaegertracing.CreateChildSpan(c, "ArticleFromRegion")
+	defer span.Finish()
+	req, err := jaegertracing.NewTracedRequest(method, url, nil, span)
 
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
 	defer res.Body.Close()
@@ -111,7 +129,12 @@ func ArticleFromRegion(regionID int) (articles []models.Article, err error) {
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println(err.Error())
+		span.LogFields(otlog.String("err", err.Error()))
 		return nil, err
 	}
+	span.LogFields(
+		otlog.String("event", "api call ArticleFromRegion"),
+		otlog.String("value", response.Status),
+	)
 	return response.Articles, nil
 }

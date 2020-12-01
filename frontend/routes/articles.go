@@ -35,7 +35,7 @@ func articlesRegionHandler(c echo.Context) error {
 	} else if region == "hong kong" {
 		regionID = 2
 	}
-	ars, err := client.ArticleFromRegion(regionID)
+	ars, err := client.ArticleFromRegion(c, regionID)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}
@@ -53,7 +53,7 @@ func articleIDHandler(c echo.Context) error {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())
 	}
-	art, err := client.ArticleFromID(ID)
+	art, err := client.ArticleFromID(c, ID)
 	if err != nil {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())

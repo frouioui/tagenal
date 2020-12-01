@@ -10,6 +10,8 @@ import (
 	"github.com/frouioui/tagenal/api/articles/db"
 	"github.com/frouioui/tagenal/api/articles/pb"
 	"github.com/gorilla/mux"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 )
 
 type httpService struct {
@@ -35,12 +37,22 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /id/:id", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	serverSpan.SetTag("http.url", fmt.Sprintf("/id/%s", id))
+	serverSpan.SetTag("http.method", "GET")
+
 	artID, err := strconv.Atoi(id)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "could not parse parameter"}`, http.StatusBadRequest)
 		return
 	}
@@ -49,6 +61,7 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -57,21 +70,32 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
 	}
 	w.WriteHeader(200)
+	serverSpan.SetTag("http.status_code", 200)
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
 func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /category/:category", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	vars := mux.Vars(r)
 	category := vars["category"]
+
+	serverSpan.SetTag("http.url", fmt.Sprintf("/category/%s", category))
+	serverSpan.SetTag("http.method", "GET")
 
 	articles, err := httpsrv.dbm.GetArticlesOfCategory(category)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -80,27 +104,40 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
 	}
 	w.WriteHeader(200)
+	serverSpan.SetTag("http.status_code", 200)
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
 func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /region/:region", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	vars := mux.Vars(r)
 	regionIDStr := vars["region_id"]
 	regionID, err := strconv.Atoi(regionIDStr)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "could not parse parameter"}`, http.StatusBadRequest)
 		return
 	}
+
+	serverSpan.SetTag("http.url", fmt.Sprintf("/region/%s", regionIDStr))
+	serverSpan.SetTag("http.method", "GET")
+
 	articles, err := httpsrv.dbm.GetArticlesFromRegion(regionID)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -109,10 +146,12 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, "server error")
 		return
 	}
 	w.WriteHeader(200)
+	serverSpan.SetTag("http.status_code", 200)
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -23,6 +24,8 @@ const (
 type ArticleServerAPI struct {
 	ServerHTTP *http.Server
 	ServerGRPC *grpc.Server
+
+	tracingCloser io.Closer
 }
 
 func (artsrv *ArticleServerAPI) setServerHTTP() (err error) {
@@ -57,6 +60,11 @@ func (artsrv *ArticleServerAPI) setServerGRPC() (err error) {
 // both gRPC and HTTP endpoint can be started using namely:
 // artsrv.RunServerGRPC() and artsrv.RunServerHTTP()
 func NewArticleServerAPI() (artsrv ArticleServerAPI, err error) {
+	artsrv.tracingCloser, err = newTracer()
+	if err != nil {
+		return artsrv, err
+	}
+
 	err = artsrv.setServerHTTP()
 	if err != nil {
 		return artsrv, err

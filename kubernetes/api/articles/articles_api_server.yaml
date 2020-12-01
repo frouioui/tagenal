@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: articles-api
+  annotations:
+    "sidecar.jaegertracing.io/inject": "jaeger-prod"
   labels:
     api: articles
     app: articles-api
@@ -33,6 +35,9 @@ spec:
               containerPort: 9090
             - name: http
               containerPort: 8080
+          env:
+            - name: JAEGER_SERVICE_NAME
+              value: "api-articles"
 ---
 apiVersion: v1
 kind: Service

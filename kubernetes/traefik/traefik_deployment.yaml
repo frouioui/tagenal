@@ -47,9 +47,9 @@ spec:
             - --api.insecure
             - --api
             - --log.level=DEBUG
-            - --tracing.jaeger=true
-            - --tracing.jaeger.samplingServerURL=http://jaeger-prod-agent.observability:5778/sampling
-            - --tracing.jaeger.localAgentHostPort=jaeger-prod-agent.observability:6831
+            # - --tracing.jaeger=false
+            # - --tracing.jaeger.samplingServerURL=http://jaeger-prod-agent.observability:5778/sampling
+            # - --tracing.jaeger.localAgentHostPort=jaeger-prod-agent.observability:6831
             - --accesslog=true
             - --metrics.prometheus=true
             - --metrics.prometheus.entryPoint=metrics

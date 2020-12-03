@@ -33,7 +33,7 @@ func (s *articleServiceGRPC) GetSingleArticle(cxt context.Context, r *pb.ID) (*p
 }
 
 func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Category) (*pb.Articles, error) {
-	articles, err := s.dbm.GetArticlesOfCategory(r.Category)
+	articles, err := s.dbm.GetArticlesOfCategory(cxt, "", r.Category)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err

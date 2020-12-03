@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -91,7 +92,16 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 	serverSpan.SetTag("http.url", fmt.Sprintf("/category/%s", category))
 	serverSpan.SetTag("http.method", "GET")
 
-	articles, err := httpsrv.dbm.GetArticlesOfCategory(category)
+	vtspanctx, err := getVitessSpanContextFromTextMap(serverSpan.Context())
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	articles, err := httpsrv.dbm.GetArticlesOfCategory(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, category)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)

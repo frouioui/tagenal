@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/frouioui/tagenal/frontend/client"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func usersHandler(c echo.Context) error {
@@ -15,7 +15,7 @@ func usersHandler(c echo.Context) error {
 
 func usersRegionHandler(c echo.Context) error {
 	region := c.Param("region")
-	users, err := client.UsersFromRegion(region)
+	users, err := client.UsersFromRegion(c, region)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}
@@ -33,7 +33,7 @@ func userIDHandler(c echo.Context) error {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())
 	}
-	user, err := client.UserFromID(ID)
+	user, err := client.UserFromID(c, ID)
 	if err != nil {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())

@@ -1,0 +1,24 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  vitess-zone1-vtgate-srv
+  namespace: vitess
+spec:
+  selector:
+    planetscale.com/cell: zone1
+    planetscale.com/cluster: vitess
+    planetscale.com/component: vtgate
+  type:  ClusterIP
+  ports:
+    - name: web
+      protocol: TCP
+      port: 15000
+      targetPort: web
+    - name: grpc
+      protocol: TCP
+      port: 15999
+      targetPort: grpc
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: mysql

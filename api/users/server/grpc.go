@@ -30,7 +30,7 @@ func (s *userServiceGRPC) ServiceInformation(cxt context.Context, r *pb.UserHome
 }
 
 func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*pb.User, error) {
-	user, err := s.dbm.GetUserByID(uint64(r.ID))
+	user, err := s.dbm.GetUserByID(cxt, "", uint64(r.ID))
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -40,7 +40,7 @@ func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*
 }
 
 func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.RequestRegion) (*pb.Users, error) {
-	users, err := s.dbm.GetUsersOfRegion(r.Region)
+	users, err := s.dbm.GetUsersOfRegion(cxt, "", r.Region)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err

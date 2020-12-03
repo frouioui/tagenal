@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -20,6 +21,11 @@ type httpService struct {
 }
 
 func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	resp := &pb.UserHomeResponse{
 		IP:   getHostIP(),
 		Host: getHostName(),
@@ -57,7 +63,16 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	user, err := httpsrv.dbm.GetUserByID(uint64(userID))
+	vtspanctx, err := getVitessSpanContextFromTextMap(serverSpan.Context())
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user, err := httpsrv.dbm.GetUserByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(userID))
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +103,19 @@ func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http
 	vars := mux.Vars(r)
 	region := vars["region"]
 
-	users, err := httpsrv.dbm.GetUsersOfRegion(region)
+	serverSpan.SetTag("http.url", fmt.Sprintf("/region/%s", region))
+	serverSpan.SetTag("http.method", "GET")
+
+	vtspanctx, err := getVitessSpanContextFromTextMap(serverSpan.Context())
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	users, err := httpsrv.dbm.GetUsersOfRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, region)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -96,7 +123,6 @@ func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http
 		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 		return
 	}
-	log.Println(users)
 
 	respJSON, err := json.Marshal(users)
 	if err != nil {

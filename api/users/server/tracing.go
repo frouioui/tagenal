@@ -1,7 +1,11 @@
 package server
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/opentracing/opentracing-go"
@@ -39,4 +43,27 @@ func newTracer() (io.Closer, error) {
 	}
 	opentracing.SetGlobalTracer(tracer)
 	return closer, nil
+}
+
+func getVitessSpanContextFromTextMap(ctx opentracing.SpanContext) (string, error) {
+	tracer := opentracing.GlobalTracer()
+
+	textMapCar := opentracing.TextMapCarrier{}
+
+	err := tracer.Inject(ctx, opentracing.TextMap, textMapCar)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	textMapJSON, err := json.Marshal(textMapCar)
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	textMapBase64 := base64.StdEncoding.EncodeToString(textMapJSON)
+	vtspanctx := "VT_SPAN_CONTEXT=" + textMapBase64
+	vtspanctx = fmt.Sprintf("/*%s*/", vtspanctx)
+	return vtspanctx, nil
 }

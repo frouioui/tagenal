@@ -21,6 +21,11 @@ type httpService struct {
 }
 
 func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: /", ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
 	resp := &pb.ArticleHomeResponse{
 		IP:   getHostIP(),
 		Host: getHostName(),
@@ -58,7 +63,16 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	article, err := httpsrv.dbm.GetArticleByID(uint64(artID))
+	vtspanctx, err := getVitessSpanContextFromTextMap(serverSpan.Context())
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	article, err := httpsrv.dbm.GetArticleByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(artID))
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)
@@ -143,7 +157,16 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 	serverSpan.SetTag("http.url", fmt.Sprintf("/region/%s", regionIDStr))
 	serverSpan.SetTag("http.method", "GET")
 
-	articles, err := httpsrv.dbm.GetArticlesFromRegion(regionID)
+	vtspanctx, err := getVitessSpanContextFromTextMap(serverSpan.Context())
+	if err != nil {
+		log.Println(err.Error())
+		w.WriteHeader(500)
+		serverSpan.SetTag("http.status_code", 500)
+		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	articles, err := httpsrv.dbm.GetArticlesFromRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, regionID)
 	if err != nil {
 		log.Println(err.Error())
 		w.WriteHeader(500)

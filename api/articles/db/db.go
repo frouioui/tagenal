@@ -74,7 +74,7 @@ func UnaryClientInterceptor(ctx context.Context, method string, req, reply inter
 
 func createVitessDriverConfig(target string) vitessdriver.Configuration {
 	return vitessdriver.Configuration{
-		Address:         "vitess-zone1-vtgate-1c6a88c4.vitess:15999",
+		Address:         "vitess-zone1-vtgate-srv.vitess:15999",
 		Target:          target,
 		GRPCDialOptions: []grpc.DialOption{grpc.WithUnaryInterceptor(UnaryClientInterceptor)},
 	}
@@ -105,9 +105,9 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 
 // GetArticleByID will fetch an article from Vitess corresponding
 // to the given unique ID.
-func (dbm *DatabaseManager) GetArticleByID(ID uint64) (article Article, err error) {
+func (dbm *DatabaseManager) GetArticleByID(ctx context.Context, vtspanctx string, ID uint64) (article Article, err error) {
 	qc := `WHERE _id LIKE ?`
-	article, err = dbm.fetchArticle(qc, dbm.db, strconv.Itoa(int(ID)))
+	article, err = dbm.fetchArticle(ctx, vtspanctx, qc, dbm.db, strconv.Itoa(int(ID)))
 	if err != nil {
 		log.Println(err.Error())
 		return article, err
@@ -136,7 +136,7 @@ func (dbm *DatabaseManager) GetArticlesOfCategory(ctx context.Context, vtspanctx
 // RegionID:
 // 1 = Beijing
 // 2 = Hong Kong
-func (dbm *DatabaseManager) GetArticlesFromRegion(region int) (articles []Article, err error) {
+func (dbm *DatabaseManager) GetArticlesFromRegion(ctx context.Context, vtspanctx string, region int) (articles []Article, err error) {
 	db := &sql.DB{}
 	if region == 1 {
 		db = dbm.dbBEI
@@ -147,7 +147,7 @@ func (dbm *DatabaseManager) GetArticlesFromRegion(region int) (articles []Articl
 		db = dbm.db
 	}
 	qc := ``
-	articles, err = dbm.fetchArticles(context.Background(), "", qc, db, region)
+	articles, err = dbm.fetchArticles(ctx, vtspanctx, qc, db, region)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -155,8 +155,9 @@ func (dbm *DatabaseManager) GetArticlesFromRegion(region int) (articles []Articl
 	return articles, nil
 }
 
-func (dbm *DatabaseManager) fetchArticle(qc string, db *sql.DB, args ...interface{}) (article Article, err error) {
-	err = db.QueryRow(`SELECT * FROM article `+qc, args...).Scan(
+func (dbm *DatabaseManager) fetchArticle(ctx context.Context, vtspanctx, qc string, db *sql.DB, args ...interface{}) (article Article, err error) {
+	psql := vtspanctx + `SELECT * FROM article ` + qc
+	err = db.QueryRowContext(ctx, psql, args...).Scan(
 		&article.ID, &article.Timestamp, &article.ID2, &article.AID, &article.Title, &article.Category,
 		&article.Abstract, &article.ArticleTags, &article.Authors, &article.Language, &article.Text,
 		&article.Image, &article.Video)
@@ -165,7 +166,6 @@ func (dbm *DatabaseManager) fetchArticle(qc string, db *sql.DB, args ...interfac
 
 func (dbm *DatabaseManager) fetchArticles(ctx context.Context, vtspanctx, qc string, db *sql.DB, args ...interface{}) (articles []Article, err error) {
 	psql := vtspanctx + ` SELECT * FROM article ` + qc
-	log.Println(psql)
 	rows, err := db.QueryContext(ctx, psql, args...)
 	if err != nil {
 		log.Println(err.Error())

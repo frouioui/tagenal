@@ -23,7 +23,7 @@ func newServiceGRPC() (grpcsrv articleServiceGRPC, err error) {
 }
 
 func (s *articleServiceGRPC) GetSingleArticle(cxt context.Context, r *pb.ID) (*pb.Article, error) {
-	article, err := s.dbm.GetArticleByID(uint64(r.ID))
+	article, err := s.dbm.GetArticleByID(cxt, "", uint64(r.ID))
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
@@ -43,7 +43,7 @@ func (s *articleServiceGRPC) GetCategoryArticles(cxt context.Context, r *pb.Cate
 }
 
 func (s *articleServiceGRPC) GetArticlesByRegion(cxt context.Context, r *pb.ID) (*pb.Articles, error) {
-	articles, err := s.dbm.GetArticlesFromRegion(int(r.ID))
+	articles, err := s.dbm.GetArticlesFromRegion(cxt, "", int(r.ID))
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err

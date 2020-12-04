@@ -49,7 +49,7 @@ spec:
       security_policy: read-only
       tracer: opentracing-jaeger
       jaeger-agent-host: jaeger-prod-agent.observability:6831
-      tracing-sampling-rate: "0.0" 
+      tracing-sampling-rate: "1.0" 
     replicas: 1
     resources:
       limits:
@@ -89,7 +89,7 @@ spec:
                       db_charset: utf8mb4
                       tracer: opentracing-jaeger
                       jaeger-agent-host: jaeger-prod-agent.observability:6831
-                      tracing-sampling-rate: "1.0" 
+                      tracing-sampling-rate: "0.0" 
                     resources:
                       requests:
                         cpu: 100m

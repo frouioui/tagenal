@@ -84,6 +84,7 @@ init_kubernetes_unsharded_database:
 	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
 	kubectl apply -f kubernetes/vitess_cluster_config.yaml
 	kubectl apply -f kubernetes/init_cluster_vitess.yaml
+	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
 
 port_forwarding_vitess:
 	./script/port_forwarding.sh

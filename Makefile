@@ -86,9 +86,6 @@ init_kubernetes_unsharded_database:
 	kubectl apply -f kubernetes/init_cluster_vitess.yaml
 	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
 
-port_forwarding_vitess:
-	./script/port_forwarding.sh
-
 init_unsharded_database:
 	$(INIT_USERS_TABLES)
 	$(INIT_USERS_VSCHEMA)
@@ -179,10 +176,6 @@ setup_traefik_vitess: $(shell chmod +x ./kubernetes/traefik/vitess/build.sh)
 
 setup_traefik_monitoring:
 	kubectl create -f kubernetes/traefik/monitoring/
-
-copy_locations_json_to_k8s:
-	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"):/tmp/countries.json
-	kubectl cp ./database/locations/locations.json $(shell kubectl get pods --selector="planetscale.com/component=vtgate" -o custom-columns=":metadata.name"):/tmp/countries.json
 
 show_vttablets:
 	kubectl get pods --namespace=vitess --selector="planetscale.com/component=vttablet" -o custom-columns=":metadata.name" 

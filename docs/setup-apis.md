@@ -35,3 +35,7 @@ To stop the APIs we run the following command:
 ```
 make stop_apis_k8s
 ```
+
+## Next step
+
+The next step is setup the frontend of tagenal. Which is detailled [in the next section](./setup-frontend.md).

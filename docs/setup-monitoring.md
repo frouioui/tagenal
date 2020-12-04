@@ -31,3 +31,7 @@ Now we can access our services on these URLs:
 We can login on http://grafana.tagenal with the following credentials:
 - User: *admin*
 - Password: *admin*
+
+## Next step
+
+The next step is to setup Jaeger. Which is detailled [in the next section](./setup-jaeger.md).

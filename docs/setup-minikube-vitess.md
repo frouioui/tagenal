@@ -1,3 +1,11 @@
+# Setup Minikube / Vitess / Traefik
+
+In this first section of the quick start, we will:
+1. Start our kubernetes cluster
+2. Run the vitess-operator in our kubernetes cluster
+3. Setup a simple version of the Vitess cluster
+4. Setup Traefik
+
 ## Start our kubernetes cluster
 
 We are going to start minikube. We will run the following command:
@@ -185,3 +193,7 @@ This command will display all the vttablets running in our cluster. It should ou
 | zone1 | users    | -     | REPLICA    | SERVING | zone1-4109238961 | 172.17.0.16 |                      |
 +-------+----------+-------+------------+---------+------------------+-------------+----------------------+
 ```
+
+## Next step
+
+The next step is to add a monitoring layer into our kubernetes cluster. Which is detailled [in the next section](./setup-monitoring.md).

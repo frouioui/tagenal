@@ -14,3 +14,6 @@ Tagenal is mostly experiment-oriented and not production-oriented. We then use t
 
 The command also created the ingress route to access Jaeger dashboard. Which can be access at this URL: http://jaeger.tagenal. On this interface we can see the trace of our services.
 
+## Next step
+
+The next step is to run the APIs in our kubernetes cluster. Which is detailled [in the next section](./setup-apis.md).

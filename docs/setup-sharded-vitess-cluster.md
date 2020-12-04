@@ -271,3 +271,7 @@ Articles 80-
 |   7 | 1506000000006 | a6   | 6    | title6 | technology | abstract of article 6 | tags19      | author916  | en       | text_a6.txt | image_a6_0.jpg,image_a6_1.jpg,image_a6_2.jpg,image_a6_3.jpg,image_a6_4.jpg, |       |
 +-----+---------------+------+------+--------+------------+-----------------------+-------------+------------+----------+-------------+-----------------------------------------------------------------------------+-------+
 ```
+
+## Next step
+
+The next step is to shard our newly created Vitess cluster. Which is detailled [in the next section](./setup-sharded-vitess-cluster.md).

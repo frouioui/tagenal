@@ -1,0 +1,19 @@
+language: go
+
+go:
+- 1.15.5
+
+jobs:
+  include:
+    - stage: test build
+      install:
+        - cd api/users ; go get -d -v ./...
+        - cd api/articles ; go get -d -v ./...
+        - cd frontend ; go get -d -v ./...
+        - go get -d -v google.golang.org/grpc/...
+      script:
+        - make -C ./api/articles build
+        - make -C ./api/users build
+        - make -C ./api/users test
+        - make -C ./api/frontend build
+      

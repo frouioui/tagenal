@@ -15,6 +15,12 @@ protobuild:
 	fi
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative ./pb/articles.proto
 
+build:
+	go build main.go
+
+clean:
+	go clean
+
 deps:
 	go get -d -v ./...
 	go get -d -v google.golang.org/grpc/...

@@ -1,7 +1,7 @@
 # Tagenal
 
 ## Description of the project
-<img align="right" width="100" height="100" src="./assets/img/Tsinghua_University_Logo.png">
+<img align="right" width="100" height="100" src="./Tsinghua_University_Logo.png">
 
 This project is part of the **Distributed Database Systems** class of the Advanced Computer Science master degree at **Tsinghua University**.
 
@@ -45,12 +45,12 @@ Before we start, there are some requirements:
 
 ### Steps
 The quick start is architectured as followed:
-1. [Setup of a simple cluster](./docs/setup-minikube-vitess.md)
-2. [Setup our sharded Vitess cluster](./docs/setup-sharded-vitess-cluster.md)
-3. [Setup monitoring](./docs/setup-monitoring.md)
-4. [Setup Jaeger](./docs/setup-jaeger.md)
-5. [Start the APIs](./docs/setup-apis.md)
-6. [Start the frontend](./docs/setup-frontend.md)
+1. [Setup of a simple cluster](./setup-minikube-vitess.md)
+2. [Setup our sharded Vitess cluster](./setup-sharded-vitess-cluster.md)
+3. [Setup monitoring](./setup-monitoring.md)
+4. [Setup Jaeger](./setup-jaeger.md)
+5. [Start the APIs](./setup-apis.md)
+6. [Start the frontend](./setup-frontend.md)
 
 ---
 

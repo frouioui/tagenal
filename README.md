@@ -45,12 +45,12 @@ Before we start, there are some requirements:
 
 ### Steps
 The quick start is architectured as followed:
-1. [Setup of a simple cluster](./docs/setup-minikube-vitess.md)
-2. [Setup our sharded Vitess cluster](./docs/setup-sharded-vitess-cluster.md)
-3. [Setup monitoring](./docs/setup-monitoring.md)
-4. [Setup Jaeger](./docs/setup-jaeger.md)
-5. [Start the APIs](./docs/setup-apis.md)
-6. [Start the frontend](./docs/setup-frontend.md)
+1. [Setup of a simple cluster](./doc/setup-minikube-vitess.md)
+2. [Setup our sharded Vitess cluster](./doc/setup-sharded-vitess-cluster.md)
+3. [Setup monitoring](./doc/setup-monitoring.md)
+4. [Setup Jaeger](./doc/setup-jaeger.md)
+5. [Start the APIs](./doc/setup-apis.md)
+6. [Start the frontend](./doc/setup-frontend.md)
 
 ---
 

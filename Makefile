@@ -147,7 +147,7 @@ init_vreplication_articles:
 	$(SHARD_REPLICATION_CATEGORY_ARTICLE)
 
 final_vitess_cluster:
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh
@@ -156,6 +156,14 @@ run_monitoring: build_monitoring_manifests
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/setup
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
+
+setup_jaeger: $(shell chmod +x ./scripts/jaeger.sh)
+	./scripts/jaeger.sh
+	kubectl create -n observability -f ./kubernetes/jaeger/operator.yaml
+	kubectl create -n observability -f ./kubernetes/jaeger/jaeger.yaml
+	kubectl create -n observability -f ./kubernetes/jaeger/jaeger_ui_ingress_route.yaml
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final_jaeger.yaml
+	kubectl apply -f kubernetes/traefik/traefik_deployment_jaeger.yaml
 
 setup_traefik:
 	kubectl create -f kubernetes/traefik/traefik_crd.yaml

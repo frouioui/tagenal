@@ -3,9 +3,3 @@
 
 # MacOS
 .DS_Store
-
-# Test folder
-# /test
-/test/gridfs_main.go
-/mysql/vitess
-/mysql/vitess-operator

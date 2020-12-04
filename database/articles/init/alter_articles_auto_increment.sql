@@ -1,0 +1,1 @@
+ALTER TABLE article change _id _id INT NOT NULL;

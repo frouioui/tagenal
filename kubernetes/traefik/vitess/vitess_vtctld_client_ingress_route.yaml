@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: vtctld-client
+  namespace: vitess
+spec:
+  entryPoints:
+    - grpc
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - namespace: vitess
+          name: vitess-vtctld-047eb1a6
+          port: 15999

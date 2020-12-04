@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tagenal-frontend
+  annotations:
+    "sidecar.jaegertracing.io/inject": "jaeger-prod"
+  labels:
+    app: tagenal-frontend
+spec:
+  selector:
+    matchLabels:
+      app: tagenal-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tagenal-frontend
+    spec:
+      containers:
+        - name: tagenal-frontend
+          image: frouioui/tagenal-frontend-service:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          ports:
+            - name: web
+              containerPort: 8888
+          env:
+            - name: JAEGER_SERVICE_NAME
+              value: "frontend"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tagenal-frontend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: tagenal-frontend
+  ports:
+    - port: 8888
+      targetPort: 8888
+      name: web

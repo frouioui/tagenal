@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-ingress-controller
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels:
+    app: traefik
+    k8s-app: traefik-ingress-lb
+    kubernetes.io/cluster-service: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - image: traefik:v2.3.2
+          name: traefik-ingress-lb
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 20Mi
+          args:
+            - --providers.kubernetescrd
+            - --entrypoints.web.address=:80
+            - --entrypoints.grpc.address=:8000
+            - --entrypoints.vtgate.address=:9112
+            - --entrypoints.mysql.address=:3000
+            - --entryPoints.metrics.address=:8082
+            - --api.insecure
+            - --api
+            - --log.level=DEBUG
+            - --tracing.jaeger=true
+            - --tracing.jaeger.samplingServerURL=http://jaeger-prod-agent.observability:5778/sampling
+            - --tracing.jaeger.localAgentHostPort=jaeger-prod-agent.observability:6831
+            - --accesslog=true
+            - --metrics.prometheus=true
+            - --metrics.prometheus.entryPoint=metrics
+            - --metrics.prometheus.buckets=0.100000, 0.300000, 1.200000, 5.000000
+          ports:
+            - name: web
+              containerPort: 80
+            - name: metrics
+              containerPort: 8082
+            - name: admin
+              containerPort: 8080
+            - name: grpc
+              containerPort: 8000
+            - name: vtgate
+              containerPort: 9112
+            - name: mysql
+              containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  labels:
+    k8s-app: traefik-ingress-lb
+    app: traefik
+spec:
+  type: ClusterIP
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: api
+    - port: 80
+      targetPort: 80
+      name: web
+    - port: 8082
+      targetPort: 8082
+      name: metrics
+    - port: 8000
+      targetPort: 8000
+      name: grpc
+    - port: 9112
+      targetPort: 9112
+      name: vtgate
+    - port: 3000
+      targetPort: 3000
+      name: mysql

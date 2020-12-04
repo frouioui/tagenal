@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: frontend-http-route
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`tagenal`)
+      services:
+        - name: tagenal-frontend-service
+          port: 8888

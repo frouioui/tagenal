@@ -1,0 +1,10 @@
+{
+    "tables": {
+        "users_seq": {
+            "type": "sequence"
+        },
+        "articles_seq": {
+            "type": "sequence"
+        }
+    }
+}

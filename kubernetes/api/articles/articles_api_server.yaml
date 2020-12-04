@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: articles-api
+  annotations:
+    "sidecar.jaegertracing.io/inject": "jaeger-prod"
+  labels:
+    api: articles
+    app: articles-api
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: articles-api
+      tier: backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: articles-api
+        tier: backend
+    spec:
+      containers:
+        - name: articles-api-server
+          image: frouioui/tagenal-articles-service:latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          ports:
+            - name: grpc
+              containerPort: 9090
+            - name: http
+              containerPort: 8080
+          env:
+            - name: JAEGER_SERVICE_NAME
+              value: "api-articles"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: articles-api
+  labels:
+    app: article-api
+    api: articles
+    tier: backend
+spec:
+  selector:
+    app: articles-api
+    tier: backend
+  ports:
+    - port: 9090
+      targetPort: 9090
+      name: grpc
+    - port: 8080
+      targetPort: 8080
+      name: http

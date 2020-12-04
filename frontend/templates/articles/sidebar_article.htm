@@ -1,0 +1,30 @@
+{{define "sidebararticle"}}
+<div class="card my-4">
+    <h5 class="card-header">Informations</h5>
+    <div class="card-body">
+        <h6>Authors</h6>
+        {{.Authors}}
+        <h6>Tags</h6>
+        {{.ArticleTags}}
+        <h6>Language</h6>
+        {{.Language}}
+    </div>
+</div>
+<div class="card my-4">
+    <h5 class="card-header">Actions</h5>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="list-unstyled mb-0">
+                    <li>
+                        <a href="#">Modify</a>
+                    </li>
+                    <li>
+                        <a href="#">Delete</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

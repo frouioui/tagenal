@@ -1,7 +1,0 @@
-{
-    "tables": {
-        "users_seq": {
-            "type": "sequence"
-        }
-    }
-}

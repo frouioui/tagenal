@@ -93,17 +93,21 @@ Additionally Kubernetes dashboard can be run using the following command, ideall
 
 ### 2. Setup Vitess kubernetes operator
 
-This command will create vitess-operator Kubernetes CRD in Minikube and start the vitess-operator:
+We are now going to do a few things. We will build the operator yaml file from the [Vitess Operator GitHub repository](https://github.com/planetscale/vitess-operator). We will create a `vitess` namespace in our kubernetes cluster. Finally, we will run the operator on kubernetes.
 
-`make install_vitess_operator`
+> You need to have clonned the vitess-operator repository in the `./lib` folder. You can simply run the command: `make clone_vitess_operator`.
 
-The last line of the output should be:
+The make-command we will use is:
 
 ```
-deployment.apps/vitess-operator created
+make install_vitess_operator
 ```
 
-After a moment, vitess-operator's pod should be up and running in kubernetes.
+After a moment, vitess-operator's pod should be up and running in kubernetes, which can be checked by running the following command.
+
+```
+kubectl get pods -n vitess
+```
 
 ### 3. Initialize unsharded database
 

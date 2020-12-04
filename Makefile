@@ -6,7 +6,7 @@ V_KEYSPACE_CONFIG	= config
 
 DATABASE_FOLDER_PATH	= ./database
 KUBE_PROMETHEUS_PATH	= ./lib/kube-prometheus
-VITESS_OPERATOR_PATH	= ./lib/vitess-operator/build/_output/operator.yaml
+VITESS_OPERATOR_PATH	= ./lib/vitess-operator/deploy
 
 # Aliases
 MYSQL_CLIENT	=	mysql -h tagenal -P 3000 -u user
@@ -60,7 +60,7 @@ list_vtctld:
 	kubectl get pods --selector="planetscale.com/component=vtctld" -o custom-columns=":metadata.name"
 
 start_minikube:
-	minikube start --driver=hyperkit --kubernetes-version=v1.19.2 --cpus=10 --memory=10000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
+	minikube start --driver=hyperkit --kubernetes-version=v1.19.2 --cpus=10 --memory=11000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
 	minikube addons disable metrics-server
 
 start_minikube_dashboard:
@@ -69,13 +69,15 @@ start_minikube_dashboard:
 clone_vitess_operator:
 	./lib/get-vitess-operator.sh
 
-build_vitess_operator:
-	make -C ./lib/vitess-operator generate-operator-yaml
-
-install_vitess_operator: build_vitess_operator
+install_vitess_operator:
 	kubectl apply -f kubernetes/vitess_namespace.yaml
 	kubectl config set-context $(shell kubectl config current-context) --namespace=vitess
-	kubectl apply -f $(VITESS_OPERATOR_PATH)
+	kubectl apply -f $(VITESS_OPERATOR_PATH)/crds/
+	kubectl apply -f $(VITESS_OPERATOR_PATH)/priority.yaml
+	kubectl apply -f $(VITESS_OPERATOR_PATH)/role.yaml
+	kubectl apply -f $(VITESS_OPERATOR_PATH)/role_binding.yaml
+	kubectl apply -f $(VITESS_OPERATOR_PATH)/service_account.yaml
+	kubectl apply -f kubernetes/vitess_operator.yaml
 	kubectl config set-context $(shell kubectl config current-context) --namespace=default
 
 init_kubernetes_unsharded_database:
@@ -145,7 +147,7 @@ init_vreplication_articles:
 	$(SHARD_REPLICATION_CATEGORY_ARTICLE)
 
 final_vitess_cluster:
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh
@@ -154,6 +156,14 @@ run_monitoring: build_monitoring_manifests
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/setup
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f $(KUBE_PROMETHEUS_PATH)/manifests/
+
+setup_jaeger: $(shell chmod +x ./scripts/jaeger.sh)
+	./scripts/jaeger.sh
+	kubectl create -n observability -f ./kubernetes/jaeger/operator.yaml
+	kubectl create -n observability -f ./kubernetes/jaeger/jaeger.yaml
+	kubectl create -n observability -f ./kubernetes/jaeger/jaeger_ui_ingress_route.yaml
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final_jaeger.yaml
+	kubectl apply -f kubernetes/traefik/traefik_deployment_jaeger.yaml
 
 setup_traefik:
 	kubectl create -f kubernetes/traefik/traefik_crd.yaml

@@ -64,129 +64,37 @@ CREATE TABLE article (
 );
 ```
 
-## How to run
+## Quick Start
 
-Tagenal uses Kubernetes and Vitess as main components, it is therefore necessary to install a few things before getting started.
+In this quick start we will cover the following items:
 
-### Prerequisite
+- Setup our Kubernetes cluster
+- Create a sharded Vitess cluster
+- Add Traefik Proxy to our cluster
+- Enable tracing with Jaeger
+- Setup some APIs
+- Setup a Frontend application
+- Setup some monitoring with Grafana, Prometheus and Alertmanager
 
-- At least 10Gb of available RAM on the host
-- Install yq a YAML processor https://github.com/mikefarah/yq
-- Install jsonnet-bundler (jb) allowing us to deal with jsonnet files https://github.com/jsonnet-bundler/jsonnet-bundler
-- Install vtctlclient `go get vitess.io/vitess/go/cmd/vtctlclient`
+Once the quick start is over, we will have a fully setup application using distributed database systems.
+
+### Requirements
+Before we start, there are some requirements:
+
+- Have at least 10Gb of available RAM on the host
+- Install [yq](https://github.com/mikefarah/yq) a YAML processor
+- Install [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) (jb), allowing us to deal with jsonnet files
+- Install vtctlclient, the following command `go get vitess.io/vitess/go/cmd/vtctlclient` can be used
 - Install `mysql` and `mysql-client` using your system's packet manager
-- Have kubernetes
-- Have golang version 1.15.x
-- Run the scripts in `./lib/*.sh` to download a few repositories
+- Have Kubernetes / Minikube installed
+- Have Golang version 1.15.x installed
+- Run the shell scripts that are located in `./lib/*.sh`. These scripts will download the basic libraries and repositories that we need
 
-### 1. Start minikube
+### Sections
+The quick start is architectured as followed:
+- [Setup of a simple cluster](./docs/setup-minikube-vitess.md)
+- Setup our sharded Vitess cluster
 
-To start minikube run the following command:
-
-`make start_minikube`
-
-Minikube will use the driver `hyperkit`, which could be an issue for Linux and Windows distribution as mentioned in issue #11 (https://github.com/frouioui/tagenal/issues/11).
-
-Additionally Kubernetes dashboard can be run using the following command, ideally in a second terminal:
-
-`make start_minikube_dashboard`
-
-### 2. Setup Vitess kubernetes operator
-
-We are now going to do a few things. We will build the operator yaml file from the [Vitess Operator GitHub repository](https://github.com/planetscale/vitess-operator). We will create a `vitess` namespace in our kubernetes cluster. Finally, we will run the operator on kubernetes.
-
-> You need to have clonned the vitess-operator repository in the `./lib` folder. You can simply run the command: `make clone_vitess_operator`.
-
-The make-command we will use is:
-
-```
-make install_vitess_operator
-```
-
-After a moment, vitess-operator's pod should be up and running in kubernetes, which can be checked by running the following command.
-
-```
-kubectl get pods -n vitess
-```
-
-### 3. Initialize unsharded database
-
-We will now do a simple first initialization of the vitess clusterr. We will load the needed configuration into kubernetes and create three keyspaces:
-
-- config
-- articles
-- users
-
-For now we will have a simple 1 Master / 1 Replica configuration for each keyspace.
-
-The command is:
-
-`make init_kubernetes_unsharded_database`
-
-And, the expected output is:
-
-```
-kubectl apply -f kubernetes/vitess_cluster_secret.yaml
-secret/vitess-cluster-secret created
-kubectl apply -f kubernetes/vitess_cluster_config.yaml
-configmap/vitess-cluster-config-sharding created
-kubectl apply -f kubernetes/init_cluster_vitess.yaml
-vitesscluster.planetscale.com/vitess created
-```
-
-### 4. Setup Traefik proxy
-
-We use Traefik as a kubernetes ingress controller. Traefik proxy will enable us to commnunicate directly with our services.
-
-The following command will create all the necessary Kubernetes CRD, and create a traefik deployment in addition to the Admin Web UI of traefik:
-
-`make setup_traefik`
-
-After a while, the tail of the output should look like:
-
-```
-deployment.apps/traefik created
-service/traefik created
-```
-
-Now, we will create the ingress routes to access vitess' services. We will create two HTTP routes, one for vttablet, and another one for vtctld. We will also create two TCP routes, one to access VTGate's mysql interface, and the other to use vtctlclient.
-
-`make setup_traefik_vitess`
-
-Once the latter command is completed, we are going to fetch minikube's ip:
-
-`minikube ip`
-
-And expect an output similar to:
-
-`192.168.64.10`
-
-We will now open `/etc/hosts` and add the following lines at the very end of the file:
-
-```
-192.168.64.10 tagenal
-192.168.64.10 grafana.tagenal
-192.168.64.10 prometheus.tagenal
-192.168.64.10 alertmanager.tagenal
-```
-
-*You replace the IP address by the one `minikube ip` showed you.*
-
-For now, we can ignore the last 3 lines we added in the file, they will come in handy later on.
-
-To conclude this step, we can now access the following URLs:
-
-- http://tagenal:8080
-- http://tagenal/vtctld/app/dashboard
-- http://tagenal/vttablet/metrics
-
-We can also connect to vitess cluster using a MySQL client with the following credentials:
-
-`mysql -h tagenal -P 3000 -u user`
-
-And finally, we can use vtctlclient with the following configuration:
-
-`vtctlclient -server=tagenal:8000`
 
 ### 5. Create MySQL tables and Vitess VSchemas
 

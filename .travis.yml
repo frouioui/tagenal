@@ -7,8 +7,8 @@ jobs:
   include:
     - stage: test build
       install:
-        - cd api/users && go get -d -v ./... && cd ..
-        - cd api/articles && go get -d -v ./... && cd ..
+        - cd api/users && go get -d -v ./... && cd ./../..
+        - cd api/articles && go get -d -v ./... && cd ./../..
         - cd frontend && go get -d -v ./... && cd ..
         - go get -d -v google.golang.org/grpc/...
       script:

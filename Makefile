@@ -1,13 +1,12 @@
+export GO111MODULE=on
+
 V_KEYSPACE_USERS	= users
 V_KEYSPACE_ARTICLES	= articles
 V_KEYSPACE_CONFIG	= config
 
 DATABASE_FOLDER_PATH	= ./database
-
 KUBE_PROMETHEUS_PATH	= ./lib/kube-prometheus
-
-VITESS_OPERATOR_PATH	= ./lib/vitess/examples/operator
-VITESS_COMMON_PATH		= ./lib/vitess/examples/common
+VITESS_OPERATOR_PATH	= ./lib/vitess-operator/build/_output/operator.yaml
 
 # Aliases
 MYSQL_CLIENT	=	mysql -h tagenal -P 3000 -u user
@@ -67,13 +66,16 @@ start_minikube:
 start_minikube_dashboard:
 	minikube dashboard
 
-clone_vitess_github:
-	./lib/script/get-vitess.sh
+clone_vitess_operator:
+	./lib/get-vitess-operator.sh
 
-install_vitess_operator:
+build_vitess_operator:
+	make -C ./lib/vitess-operator generate-operator-yaml
+
+install_vitess_operator: build_vitess_operator
 	kubectl apply -f kubernetes/vitess_namespace.yaml
 	kubectl config set-context $(shell kubectl config current-context) --namespace=vitess
-	kubectl apply -f $(VITESS_OPERATOR_PATH)/operator.yaml
+	kubectl apply -f $(VITESS_OPERATOR_PATH)
 	kubectl config set-context $(shell kubectl config current-context) --namespace=default
 
 init_kubernetes_unsharded_database:

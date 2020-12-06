@@ -1,5 +1,7 @@
 # Tagenal
 
+[![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal)
+
 ## Description of the project
 <img align="right" width="100" height="100" src="./assets/img/Tsinghua_University_Logo.png">
 

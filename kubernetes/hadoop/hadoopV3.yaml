@@ -1,0 +1,331 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hadoop
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hadoop-env
+  namespace: hadoop
+type: Opaque
+stringData:
+  CORE_CONF_fs_defaultFS: "hdfs://hadoop-namenode.hadoop:9000"
+  CORE_CONF_hadoop_http_staticuser_user: "root"
+  CORE_CONF_hadoop_proxyuser_hue_hosts: "*"
+  CORE_CONF_hadoop_proxyuser_hue_groups: "*"
+  CORE_CONF_io_compression_codecs: "org.apache.hadoop.io.compress.SnappyCodec"
+  HDFS_CONF_dfs_webhdfs_enabled: "true"
+  HDFS_CONF_dfs_permissions_enabled: "false"
+  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
+  YARN_CONF_yarn_log___aggregation___enable: "true"
+  YARN_CONF_yarn_log_server_url: "http://historyserver.hadoop:8188/applicationhistory/logs/"
+  YARN_CONF_yarn_resourcemanager_recovery_enabled: "true"
+  YARN_CONF_yarn_resourcemanager_store_class: "org.apache.hadoop.yarn.server.resourcemanager.recovery.FileSystemRMStateStore"
+  YARN_CONF_yarn_resourcemanager_scheduler_class: "org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler"
+  YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___mb: "8192"
+  YARN_CONF_yarn_scheduler_capacity_root_default_maximum___allocation___vcores: "4"
+  YARN_CONF_yarn_resourcemanager_fs_state___store_uri: "/rmstate"
+  YARN_CONF_yarn_resourcemanager_system___metrics___publisher_enabled: "true"
+  YARN_CONF_yarn_resourcemanager_hostname: "resourcemanager.hadoop"
+  YARN_CONF_yarn_resourcemanager_address: "resourcemanager.hadoop:8032"
+  YARN_CONF_yarn_resourcemanager_scheduler_address: "resourcemanager.hadoop:8030"
+  YARN_CONF_yarn_resourcemanager_resource__tracker_address: "resourcemanager.hadoop:8031"
+  YARN_CONF_yarn_timeline___service_enabled: "true"
+  YARN_CONF_yarn_timeline___service_generic___application___history_enabled: "true"
+  YARN_CONF_yarn_timeline___service_hostname: "historyserver.hadoop"
+  YARN_CONF_mapreduce_map_output_compress: "true"
+  YARN_CONF_mapred_map_output_compress_codec: "org.apache.hadoop.io.compress.SnappyCodec"
+  YARN_CONF_yarn_nodemanager_resource_memory___mb: "16384"
+  YARN_CONF_yarn_nodemanager_resource_cpu___vcores: "8"
+  YARN_CONF_yarn_nodemanager_disk___health___checker_max___disk___utilization___per___disk___percentage: "98.5"
+  YARN_CONF_yarn_nodemanager_remote___app___log___dir: "/app-logs"
+  YARN_CONF_yarn_nodemanager_aux___services: "mapreduce_shuffle"
+  MAPRED_CONF_mapreduce_framework_name: "yarn"
+  MAPRED_CONF_mapred_child_java_opts: "-Xmx4096m"
+  MAPRED_CONF_mapreduce_map_memory_mb: "4096"
+  MAPRED_CONF_mapreduce_reduce_memory_mb: "8192"
+  MAPRED_CONF_mapreduce_map_java_opts: "-Xmx3072m"
+  MAPRED_CONF_mapreduce_reduce_java_opts: "-Xmx6144m"
+  MAPRED_CONF_yarn_app_mapreduce_am_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+  MAPRED_CONF_mapreduce_map_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+  MAPRED_CONF_mapreduce_reduce_env: "HADOOP_MAPRED_HOME=/opt/hadoop-3.2.1/"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hdfs-pvc
+  namespace: hadoop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hdfs-datanode-pvc
+  namespace: hadoop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hadoop-namenode
+  namespace: hadoop
+  labels:
+    name: hadoop-namenode
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: hadoop-namenode
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: hadoop-namenode
+    spec:
+      containers:
+      - name: hadoop-namenode
+        image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+        volumeMounts:
+        - mountPath: /hadoop/dfs/name
+          name: hdfs-namenode-data
+        envFrom:
+        - secretRef:
+            name: hadoop-env
+        env:
+          - name: CLUSTER_NAME
+            value: "minikube"
+      volumes:
+      - name: hdfs-namenode-data
+        persistentVolumeClaim:
+          claimName: hdfs-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hadoop-namenode
+  namespace: hadoop
+spec:
+  selector:
+    name: hadoop-namenode
+  ports:
+  - name: port-1
+    port: 9870
+  - name: port-2
+    port: 9000
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hadoop-web
+  namespace: hadoop
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`test.tagenal`)
+      services:
+        - namespace: hadoop
+          name: hadoop-namenode
+          port: 9870
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hadoop-datanode
+  namespace: hadoop
+  labels:
+    name: hadoop-datanode
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: hadoop-datanode
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: hadoop-datanode
+    spec:
+      containers:
+      - name: hadoop-datanode
+        image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+        volumeMounts:
+        - mountPath: /hadoop/dfs/data
+          name: hdfs-datanode-data
+        envFrom:
+        - secretRef:
+            name: hadoop-env
+        env:
+          - name: SERVICE_PRECONDITION
+            value: "hadoop-namenode.hadoop:9870"
+      volumes:
+      - name: hdfs-datanode-data
+        persistentVolumeClaim:
+          claimName: hdfs-datanode-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hadoop-datanode
+  namespace: hadoop
+spec:
+  selector:
+    name: hadoop-datanode
+  ports:
+  - name: port-1
+    port: 9864
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+  namespace: hadoop
+spec:
+  selector:
+    app: spark-master
+  ports:
+  - name: web-ui
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: master
+    protocol: TCP
+    port: 7077
+    targetPort: 7077
+  - name: master-rest
+    protocol: TCP
+    port: 6066
+    targetPort: 6066
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-client
+  namespace: hadoop
+spec:
+  selector:
+    app: spark-client
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master
+  namespace: hadoop
+  labels:
+    app: spark-master
+spec:
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      containers:
+      - name: spark-master
+        image: bde2020/spark-master:3.0.1-hadoop3.2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 7077
+        - containerPort: 6066
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: spark-worker
+  namespace: hadoop
+  labels:
+    app: spark-worker
+spec:
+  selector:
+    matchLabels:
+      name: spark-worker
+  template:
+    metadata:
+      labels:
+        name: spark-worker
+    spec:
+      containers:
+      - name: spark-worker
+        image: bde2020/spark-worker:3.0.1-hadoop3.2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-notebook
+  namespace: hadoop
+  labels:
+    name: spark-notebook
+spec:
+  selector:
+    matchLabels:
+      name: spark-notebook
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: spark-notebook
+    spec:
+      containers:
+      - name: spark-notebook
+        image: bde2020/spark-notebook:2.1.0-hadoop2.8-hive
+        envFrom:
+        - secretRef:
+            name: hadoop-env
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-notebook
+  namespace: hadoop
+spec:
+  selector:
+    name: spark-notebook
+  ports:
+  - name: port-1
+    port: 9001
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: spark-notebook-web
+  namespace: hadoop
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`api.tagenal`)
+      services:
+        - namespace: hadoop
+          name: spark-notebook
+          port: 9001
+---

@@ -274,4 +274,4 @@ Articles 80-
 
 ## Next step
 
-The next step is to shard our newly created Vitess cluster. Which is detailled [in the next section](./setup-sharded-vitess-cluster.md).
+The next step is to add a monitoring layer into our kubernetes cluster. Which is detailled [in the next section](./setup-monitoring.md).

@@ -3,6 +3,18 @@ kind: Namespace
 metadata:
   name:  redis
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-configmap
+  namespace: redis
+  labels:
+    app: redis
+data:
+  cluster.conf: |
+    maxmemory 5mb
+    maxmemory-policy allkeys-lru
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,13 +39,31 @@ spec:
     spec:
       containers:
       - name: master
-        image: k8s.gcr.io/redis:e2e
+        image: redis
+        command:
+          - redis-server
+          - "/redis-master/cluster.conf"
+        env:
+        - name: MASTER
+          value: "true"
         resources:
           requests:
             cpu: 100m
             memory: 100Mi
         ports:
         - containerPort: 6379
+        volumeMounts:
+          - mountPath: /redis-master-data
+            name: data
+          - mountPath: /redis-master/cluster.conf
+            name: config
+            subPath: cluster.conf
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: redis-configmap
 ---        
 apiVersion: v1
 kind: Service
@@ -78,14 +108,21 @@ spec:
     spec:
       containers:
       - name: slave
-        image: gcr.io/google_samples/gb-redisslave:v3
+        image: redis
+        command:
+          - redis-server
+          - --slaveof redis-master 6379
+        env:
+        - name: MASTER
+          value: "false"
+        - name: MASTER_HOST
+          value: "redis-master"
+        - name: MASTER_PORT
+          value: "6379"
         resources:
           requests:
             cpu: 100m
             memory: 100Mi
-        env:
-        - name: GET_HOSTS_FROM
-          value: dns
         ports:
         - containerPort: 6379
 ---

@@ -55,6 +55,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: JAEGER_PROPAGATION
+          value: "jaeger,b3,w3c"
+        - name: JAEGER_SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         volumeMounts:
         - name: conf
           mountPath: /conf
@@ -62,6 +68,41 @@ spec:
         - name: data
           mountPath: /data
           readOnly: false
+      - name: jaeger-agent
+        image: jaegertracing/jaeger-agent:1.21.0
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5775
+            name: zk-compact-trft
+            protocol: UDP
+          - containerPort: 5778
+            name: config-rest
+            protocol: TCP
+          - containerPort: 6831
+            name: jg-compact-trft
+            protocol: UDP
+          - containerPort: 6832
+            name: jg-binary-trft
+            protocol: UDP
+          - containerPort: 14271
+            name: admin-http
+            protocol: TCP
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        args:
+          - --jaeger.tags=cluster=${NODE_NAME},pod.namespace=redis,pod.name=${POD_NAME:},host.ip=${HOST_IP:},container.name=redis
+          - --reporter.grpc.host-port=dns:///jaeger-prod-collector-headless.observability.svc:14250
       volumes:
       - name: conf
         configMap:

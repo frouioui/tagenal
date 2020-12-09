@@ -6,139 +6,90 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redis-configmap
+  name: redis-cluster
   namespace: redis
-  labels:
-    app: redis
 data:
-  cluster.conf: |
-    maxmemory 5mb
-    maxmemory-policy allkeys-lru
+  update-node.sh: |
+    #!/bin/sh
+    REDIS_NODES="/data/nodes.conf"
+    sed -i -e "/myself/ s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${POD_IP}/" ${REDIS_NODES}
+    exec "$@"
+  redis.conf: |+
+    cluster-enabled yes
+    cluster-require-full-coverage no
+    cluster-node-timeout 15000
+    cluster-config-file /data/nodes.conf
+    cluster-migration-barrier 1
+    appendonly yes
+    protected-mode no
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: redis-master
+  name: redis-cluster
   namespace: redis
-  labels:
-    app: redis
+  annotations:
+    "sidecar.jaegertracing.io/inject": "jaeger-prod"
 spec:
+  serviceName: redis-cluster
+  replicas: 6
   selector:
     matchLabels:
-      app: redis
-      role: master
-      tier: backend
-  replicas: 1
+      app: redis-cluster
   template:
     metadata:
-      namespace: redis
       labels:
-        app: redis
-        role: master
-        tier: backend
+        app: redis-cluster
     spec:
       containers:
-      - name: master
-        image: redis
-        command:
-          - redis-server
-          - "/redis-master/cluster.conf"
-        env:
-        - name: MASTER
-          value: "true"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
+      - name: redis
+        image: redis:5.0.1-alpine
         ports:
         - containerPort: 6379
+          name: client
+        - containerPort: 16379
+          name: gossip
+        command: ["/conf/update-node.sh", "redis-server", "/conf/redis.conf"]
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         volumeMounts:
-          - mountPath: /redis-master-data
-            name: data
-          - mountPath: /redis-master/cluster.conf
-            name: config
-            subPath: cluster.conf
-      volumes:
+        - name: conf
+          mountPath: /conf
+          readOnly: false
         - name: data
-          emptyDir: {}
-        - name: config
-          configMap:
-            name: redis-configmap
----        
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-master
-  namespace: redis
-  labels:
-    app: redis
-    role: master
-    tier: backend
-spec:
-  ports:
-  - name: redis
-    port: 6379
-    targetPort: 6379
-  selector:
-    app: redis
-    role: master
-    tier: backend
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: redis-slave
-  namespace: redis
-  labels:
-    app: redis
-spec:
-  selector:
-    matchLabels:
-      app: redis
-      role: slave
-      tier: backend
-  replicas: 2
-  template:
-    metadata:
-      namespace: redis
-      labels:
-        app: redis
-        role: slave
-        tier: backend
+          mountPath: /data
+          readOnly: false
+      volumes:
+      - name: conf
+        configMap:
+          name: redis-cluster
+          defaultMode: 0755
+  volumeClaimTemplates:
+  - metadata:
+      name: data
     spec:
-      containers:
-      - name: slave
-        image: redis
-        command:
-          - redis-server
-          - --slaveof redis-master 6379
-        env:
-        - name: MASTER
-          value: "false"
-        - name: MASTER_HOST
-          value: "redis-master"
-        - name: MASTER_PORT
-          value: "6379"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        ports:
-        - containerPort: 6379
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-slave
+  name: redis-cluster
   namespace: redis
-  labels:
-    app: redis
-    role: slave
-    tier: backend
 spec:
+  type: ClusterIP
   ports:
   - port: 6379
+    targetPort: 6379
+    name: client
+  - port: 16379
+    targetPort: 16379
+    name: gossip
   selector:
-    app: redis
-    role: slave
-    tier: backend
+    app: redis-cluster
+---

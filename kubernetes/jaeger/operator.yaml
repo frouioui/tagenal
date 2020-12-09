@@ -30,7 +30,6 @@ spec:
           imagePullPolicy: Always
           env:
           - name: WATCH_NAMESPACE
-            value: default,vitess,observability
           - name: POD_NAME
             valueFrom:
               fieldRef:

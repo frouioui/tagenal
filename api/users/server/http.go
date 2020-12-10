@@ -72,13 +72,20 @@ func (httpsrv *httpService) getUserByIDRoute(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	user, err := httpsrv.dbm.GetUserByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(userID))
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
-		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
-		return
+	var user db.User
+	if user, err = getCacheUser(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("user_id_%d", userID), user); err != nil {
+		user, err = httpsrv.dbm.GetUserByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(userID))
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
+			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+			return
+		}
+		err = setCacheUser(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("user_id_%d", userID), user)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 
 	respJSON, err := json.Marshal(user)
@@ -115,13 +122,20 @@ func (httpsrv *httpService) getUsersOfRegionRoute(w http.ResponseWriter, r *http
 		return
 	}
 
-	users, err := httpsrv.dbm.GetUsersOfRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, region)
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
-		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
-		return
+	var users []db.User
+	if users, err = getCacheUsers(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("user_region_%s", region), users); err != nil {
+		users, err = httpsrv.dbm.GetUsersOfRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, region)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			serverSpan.SetTag("http.status_code", http.StatusInternalServerError)
+			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+			return
+		}
+		err = setCacheUsers(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("user_region_%s", region), users)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 
 	respJSON, err := json.Marshal(users)

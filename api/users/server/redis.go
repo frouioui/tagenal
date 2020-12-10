@@ -1,9 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
+
+	"github.com/frouioui/tagenal/api/users/db"
 
 	"github.com/go-redis/cache/v8"
 	"github.com/go-redis/redis/extra/redisotel"
@@ -66,4 +70,44 @@ func initRedisClusterClient() error {
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),
 	})
 	return nil
+}
+
+func setCacheUser(ctx context.Context, query string, data db.User) error {
+	err := rdc.Set(ctx, query, &data, time.Minute).Err()
+	return err
+}
+
+func getCacheUser(ctx context.Context, query string, data db.User) (db.User, error) {
+	str := rdc.Get(ctx, query)
+	err := str.Err()
+	if err != nil {
+		log.Println(err)
+		return db.User{}, err
+	}
+	err = str.Scan(&data)
+	if err != nil {
+		log.Println(err)
+		return db.User{}, err
+	}
+	return data, str.Err()
+}
+
+func setCacheUsers(ctx context.Context, query string, data db.UserArray) error {
+	err := rdc.Set(ctx, query, &data, time.Minute).Err()
+	return err
+}
+
+func getCacheUsers(ctx context.Context, query string, data db.UserArray) (db.UserArray, error) {
+	str := rdc.Get(ctx, query)
+	err := str.Err()
+	if err != nil {
+		log.Println(err)
+		return []db.User{}, err
+	}
+	err = str.Scan(&data)
+	if err != nil {
+		log.Println(err)
+		return []db.User{}, err
+	}
+	return data, str.Err()
 }

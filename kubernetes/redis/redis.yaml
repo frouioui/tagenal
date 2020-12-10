@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:5.0.1-alpine
+        image: redis
         ports:
         - containerPort: 6379
           name: client
@@ -102,7 +102,8 @@ spec:
               fieldPath: spec.nodeName
         args:
           - --jaeger.tags=cluster=${NODE_NAME},pod.namespace=redis,pod.name=${POD_NAME:},host.ip=${HOST_IP:},container.name=redis
-          - --reporter.grpc.host-port=dns:///jaeger-prod-collector-headless.observability.svc:14250
+          - --reporter.grpc.host-port=jaeger-prod-collector-headless.observability.svc:14250
+          - --log-level=debug
       volumes:
       - name: conf
         configMap:

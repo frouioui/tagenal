@@ -72,13 +72,20 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	article, err := httpsrv.dbm.GetArticleByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(artID))
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(500)
-		serverSpan.SetTag("http.status_code", 500)
-		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
-		return
+	var article db.Article
+	if article, err = getCacheArticle(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_id_%d", artID), article); err != nil {
+		article, err = httpsrv.dbm.GetArticleByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(artID))
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(500)
+			serverSpan.SetTag("http.status_code", 500)
+			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+			return
+		}
+		err = setCacheArticle(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_id_%d", artID), article)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 
 	respJSON, err := json.Marshal(article)
@@ -115,13 +122,20 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 		return
 	}
 
-	articles, err := httpsrv.dbm.GetArticlesOfCategory(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, category)
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(500)
-		serverSpan.SetTag("http.status_code", 500)
-		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
-		return
+	var articles []db.Article
+	if articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_category_%s", category), articles); err != nil {
+		articles, err = httpsrv.dbm.GetArticlesOfCategory(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, category)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(500)
+			serverSpan.SetTag("http.status_code", 500)
+			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+			return
+		}
+		err = setCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_category_%s", category), articles)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 
 	respJSON, err := json.Marshal(articles)
@@ -166,15 +180,21 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 		return
 	}
 
-	articles, err := httpsrv.dbm.GetArticlesFromRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, regionID)
-	if err != nil {
-		log.Println(err.Error())
-		w.WriteHeader(500)
-		serverSpan.SetTag("http.status_code", 500)
-		fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
-		return
+	var articles []db.Article
+	if articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%d", regionID), articles); err != nil {
+		articles, err := httpsrv.dbm.GetArticlesFromRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, regionID)
+		if err != nil {
+			log.Println(err.Error())
+			w.WriteHeader(500)
+			serverSpan.SetTag("http.status_code", 500)
+			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
+			return
+		}
+		err = setCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%d", regionID), articles)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
-
 	respJSON, err := json.Marshal(articles)
 	if err != nil {
 		log.Println(err.Error())

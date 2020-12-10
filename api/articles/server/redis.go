@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/frouioui/tagenal/api/users/db"
+	"github.com/frouioui/tagenal/api/articles/db"
 
 	"github.com/go-redis/redis/extra/redisotel"
 	"github.com/go-redis/redis/v8"
@@ -66,42 +66,42 @@ func initRedisClusterClient() error {
 	return nil
 }
 
-func setCacheUser(ctx context.Context, query string, data db.User) error {
+func setCacheArticle(ctx context.Context, query string, data db.Article) error {
 	err := rdc.Set(ctx, query, &data, time.Minute).Err()
 	return err
 }
 
-func getCacheUser(ctx context.Context, query string, data db.User) (db.User, error) {
+func getCacheArticle(ctx context.Context, query string, data db.Article) (db.Article, error) {
 	str := rdc.Get(ctx, query)
 	err := str.Err()
 	if err != nil {
 		log.Println(err)
-		return db.User{}, err
+		return db.Article{}, err
 	}
 	err = str.Scan(&data)
 	if err != nil {
 		log.Println(err)
-		return db.User{}, err
+		return db.Article{}, err
 	}
 	return data, str.Err()
 }
 
-func setCacheUsers(ctx context.Context, query string, data db.UserArray) error {
+func setCacheArticles(ctx context.Context, query string, data db.ArticleArray) error {
 	err := rdc.Set(ctx, query, &data, time.Minute).Err()
 	return err
 }
 
-func getCacheUsers(ctx context.Context, query string, data db.UserArray) (db.UserArray, error) {
+func getCacheArticles(ctx context.Context, query string, data db.ArticleArray) (db.ArticleArray, error) {
 	str := rdc.Get(ctx, query)
 	err := str.Err()
 	if err != nil {
 		log.Println(err)
-		return []db.User{}, err
+		return db.ArticleArray{}, err
 	}
 	err = str.Scan(&data)
 	if err != nil {
 		log.Println(err)
-		return []db.User{}, err
+		return db.ArticleArray{}, err
 	}
 	return data, str.Err()
 }

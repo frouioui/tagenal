@@ -1,8 +1,14 @@
 package db
 
 import (
+	"encoding/json"
+
 	"github.com/frouioui/tagenal/api/articles/pb"
 )
+
+// ArticleArray represents an array of Article.
+// Implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler.
+type ArticleArray []Article
 
 // Article struct refers to the article table of the
 // Vitess MySQl cluster, in the articles keyspace.
@@ -70,4 +76,24 @@ func ArticlesToProtoArticles(articles []Article) *pb.Articles {
 		pbarticles.Articles[i] = a.ProtoArticle()
 	}
 	return pbarticles
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+func (u *Article) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, u)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (u *Article) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(u)
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+func (ua *ArticleArray) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, ua)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (ua *ArticleArray) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(ua)
 }

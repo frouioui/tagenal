@@ -7,11 +7,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/frouioui/tagenal/api/articles/db"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	otlog "github.com/opentracing/opentracing-go/log"
-
-	"github.com/frouioui/tagenal/api/articles/db"
 
 	"github.com/go-redis/redis/extra/redisotel"
 	"github.com/go-redis/redis/v8"
@@ -55,7 +54,12 @@ func (rdcc *redisClusterConfig) getAddrsArray() []string {
 
 func initRedisClusterClient() error {
 	rdcc := redisClusterConfig{
-		master: newRedisServiceConfig(os.Getenv("REDIS_MASTER_HOSTNAME"), os.Getenv("REDIS_MASTER_PORT"), defMasterHostname, defMasterPort),
+		master: newRedisServiceConfig(
+			os.Getenv("REDIS_MASTER_HOSTNAME"),
+			os.Getenv("REDIS_MASTER_PORT"),
+			defMasterHostname,
+			defMasterPort,
+		),
 	}
 
 	rdc = redis.NewClusterClient(&redis.ClusterOptions{
@@ -70,12 +74,21 @@ func initRedisClusterClient() error {
 	return nil
 }
 
-func setCacheArticle(ctx context.Context, query string, data db.Article) error {
+func wrapperTracing(ctx context.Context, action string) (opentracing.Span, context.Context) {
 	parentSpan := opentracing.SpanFromContext(ctx)
-	span := opentracing.StartSpan("redis set cache article", opentracing.ChildOf(parentSpan.Context()))
-	defer span.Finish()
+	if parentSpan == nil {
+		return nil, ctx
+	}
+	span := opentracing.StartSpan("redis "+action, opentracing.ChildOf(parentSpan.Context()))
+	return span, opentracing.ContextWithSpan(context.Background(), span)
+}
 
-	err := rdc.Set(opentracing.ContextWithSpan(context.Background(), span), query, &data, time.Minute).Err()
+func setCacheArticles(ctx context.Context, query string, data db.ArticleArray) error {
+	span, sctx := wrapperTracing(ctx, "set cache")
+	defer span.Finish()
+	var err error
+
+	err = rdc.Set(sctx, query, &data, time.Minute).Err()
 	if err != nil {
 		if err != redis.Nil {
 			ext.Error.Set(span, true)
@@ -86,13 +99,54 @@ func setCacheArticle(ctx context.Context, query string, data db.Article) error {
 	return nil
 }
 
-func getCacheArticle(ctx context.Context, query string, data db.Article) (db.Article, error) {
-	parentSpan := opentracing.SpanFromContext(ctx)
-	span := opentracing.StartSpan("redis get cache article", opentracing.ChildOf(parentSpan.Context()))
+func setCacheArticle(ctx context.Context, query string, data db.Article) error {
+	span, sctx := wrapperTracing(ctx, "set cache")
 	defer span.Finish()
+	var err error
 
-	str := rdc.Get(ctx, query)
-	if err := str.Err(); err != nil {
+	err = rdc.Set(sctx, query, &data, time.Minute).Err()
+	if err != nil {
+		if err != redis.Nil {
+			ext.Error.Set(span, true)
+			span.LogFields(otlog.String("error", err.Error()))
+		}
+		return err
+	}
+	return nil
+}
+
+func getCacheArticles(ctx context.Context, query string, data db.ArticleArray) (db.ArticleArray, error) {
+	span, sctx := wrapperTracing(ctx, "get cache")
+	defer span.Finish()
+	var err error
+
+	str := rdc.Get(sctx, query)
+	if err = str.Err(); err != nil {
+		if err != redis.Nil {
+			ext.Error.Set(span, true)
+			span.LogFields(otlog.String("error", err.Error()))
+			log.Println(err)
+		}
+		return nil, err
+	}
+
+	err = str.Scan(&data)
+	if err != nil {
+		ext.Error.Set(span, true)
+		span.LogFields(otlog.String("error", err.Error()))
+		log.Println(err)
+		return nil, err
+	}
+	return data, nil
+}
+
+func getCacheArticle(ctx context.Context, query string, data db.Article) (db.Article, error) {
+	span, sctx := wrapperTracing(ctx, "get cache")
+	defer span.Finish()
+	var err error
+
+	str := rdc.Get(sctx, query)
+	if err = str.Err(); err != nil {
 		if err != redis.Nil {
 			ext.Error.Set(span, true)
 			span.LogFields(otlog.String("error", err.Error()))
@@ -100,31 +154,13 @@ func getCacheArticle(ctx context.Context, query string, data db.Article) (db.Art
 		}
 		return db.Article{}, err
 	}
-	if err := str.Scan(&data); err != nil {
+
+	err = str.Scan(&data)
+	if err != nil {
 		ext.Error.Set(span, true)
 		span.LogFields(otlog.String("error", err.Error()))
 		log.Println(err)
 		return db.Article{}, err
 	}
 	return data, nil
-}
-
-func setCacheArticles(ctx context.Context, query string, data db.ArticleArray) error {
-	err := rdc.Set(ctx, query, &data, time.Minute).Err()
-	return err
-}
-
-func getCacheArticles(ctx context.Context, query string, data db.ArticleArray) (db.ArticleArray, error) {
-	str := rdc.Get(ctx, query)
-	err := str.Err()
-	if err != nil {
-		log.Println(err)
-		return db.ArticleArray{}, err
-	}
-	err = str.Scan(&data)
-	if err != nil {
-		log.Println(err)
-		return db.ArticleArray{}, err
-	}
-	return data, str.Err()
 }

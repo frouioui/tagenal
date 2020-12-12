@@ -80,7 +80,7 @@ func ArticlesToProtoArticles(articles []Article) *pb.Articles {
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (u *Article) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, u)
+	return json.Unmarshal(data, &u)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -90,7 +90,7 @@ func (u *Article) MarshalBinary() (data []byte, err error) {
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (ua *ArticleArray) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, ua)
+	return json.Unmarshal(data, &ua)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.

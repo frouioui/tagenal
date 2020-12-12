@@ -17,6 +17,9 @@ require (
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible
+	go.opentelemetry.io/otel v0.14.0
+	go.opentelemetry.io/otel/exporters/stdout v0.14.0
+	go.opentelemetry.io/otel/sdk v0.14.0
 	google.golang.org/grpc v1.33.2
 	gopkg.in/DataDog/dd-trace-go.v1 v1.17.0
 )

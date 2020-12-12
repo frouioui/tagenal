@@ -73,7 +73,8 @@ func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.R
 	}
 
 	var article db.Article
-	if article, err = getCacheArticle(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_id_%d", artID), article); err != nil {
+	article, err = getCacheArticle(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_id_%d", artID), article)
+	if err != nil {
 		article, err = httpsrv.dbm.GetArticleByID(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, uint64(artID))
 		if err != nil {
 			log.Println(err.Error())
@@ -122,8 +123,9 @@ func (httpsrv *httpService) getArticlesOfCategoryRoute(w http.ResponseWriter, r 
 		return
 	}
 
-	var articles []db.Article
-	if articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_category_%s", category), articles); err != nil {
+	var articles db.ArticleArray
+	articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_category_%s", category), articles)
+	if err != nil {
 		articles, err = httpsrv.dbm.GetArticlesOfCategory(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, category)
 		if err != nil {
 			log.Println(err.Error())
@@ -180,9 +182,10 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 		return
 	}
 
-	var articles []db.Article
-	if articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%d", regionID), articles); err != nil {
-		articles, err := httpsrv.dbm.GetArticlesFromRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, regionID)
+	var articles db.ArticleArray
+	articles, err = getCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%s", regionIDStr), articles)
+	if err != nil {
+		articles, err = httpsrv.dbm.GetArticlesFromRegion(opentracing.ContextWithSpan(context.Background(), serverSpan), vtspanctx, regionID)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(500)
@@ -190,11 +193,12 @@ func (httpsrv *httpService) getArticlesFromRegionRoute(w http.ResponseWriter, r 
 			fmt.Fprintf(w, `{"status": "failure", "code": %d, "error": "%s"}`, http.StatusInternalServerError, err.Error())
 			return
 		}
-		err = setCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%d", regionID), articles)
+		err = setCacheArticles(opentracing.ContextWithSpan(context.Background(), serverSpan), fmt.Sprintf("article_region_%s", regionIDStr), articles)
 		if err != nil {
 			log.Println(err.Error())
 		}
 	}
+
 	respJSON, err := json.Marshal(articles)
 	if err != nil {
 		log.Println(err.Error())

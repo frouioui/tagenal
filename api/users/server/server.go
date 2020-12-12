@@ -79,6 +79,8 @@ func NewUserServerAPI() (usersrv UserServerAPI, err error) {
 	if err != nil {
 		return usersrv, err
 	}
+
+	initRedisClusterClient()
 	return usersrv, nil
 }
 

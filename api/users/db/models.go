@@ -1,10 +1,17 @@
 package db
 
 import (
+	"encoding/json"
+
 	"github.com/frouioui/tagenal/api/users/pb"
 )
 
+// UserArray represents an array of User.
+// Implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler.
+type UserArray []User
+
 // User model maps to the user table of Vitess MySQL cluster.
+// Implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler.
 type User struct {
 	ID              int64  `json:"ID"`
 	Timestamp       string `json:"Timestamp"`
@@ -75,4 +82,24 @@ func UsersToProtoUsers(users []User) *pb.Users {
 		pbusers.Users[i] = u.ProtoUser()
 	}
 	return pbusers
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+func (u *User) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, u)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (u *User) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(u)
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+func (ua *UserArray) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, ua)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (ua *UserArray) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(ua)
 }

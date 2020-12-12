@@ -74,6 +74,7 @@ func NewArticleServerAPI() (artsrv ArticleServerAPI, err error) {
 	if err != nil {
 		return artsrv, err
 	}
+	initRedisClusterClient()
 	return artsrv, nil
 }
 

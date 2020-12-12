@@ -17,6 +17,18 @@
                 "column": "_id",
                 "sequence": "users_seq"
             }
+        },
+        "user_read": {
+            "column_vindexes": [
+                {
+                    "column": "_id",
+                    "name": "hash"
+                }
+            ],
+            "auto_increment": {
+                "column": "_id",
+                "sequence": "user_read_seq"
+            }
         }
     }
 }

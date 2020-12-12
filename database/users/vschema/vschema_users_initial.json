@@ -1,5 +1,6 @@
 {
     "tables": {
-        "user": {}
+        "user": {},
+        "user_read": {}
     }
 }

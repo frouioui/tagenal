@@ -5,13 +5,12 @@ from PIL import Image
 from shutil import copyfile
 import os
 
-USERS_NUM = 10000
-ARTICLES_NUM = 10000
-READS_NUM = 1000000
+USERS_NUM = 100
+ARTICLES_NUM = 100
+READS_NUM = 100
 
 uid_region = {}
 aid_lang = {}
-
 
 # Beijing:60%   Hong Kong:40%
 # en:20%    zh:80%

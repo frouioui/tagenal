@@ -25,7 +25,7 @@ SHARD_INIT_CONFIG_SEQUENCES_SQL		= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat
 SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/config/vschema/vschema_config_seq.json)' $(V_KEYSPACE_CONFIG)
 
 ## Users
-SHARD_ALTER_USERS_TABLES_SQL				= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/alter_user_auto_increment.sql)" $(V_KEYSPACE_USERS)
+SHARD_ALTER_USERS_TABLES_SQL				= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/alter_users_auto_increment.sql)" $(V_KEYSPACE_USERS)
 SHARD_INIT_USERS_VSCHEMA					= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard.json)' $(V_KEYSPACE_USERS)
 SHARD_INIT_RESHARD_USERS					= $(VTCTL_CLIENT) Reshard $(V_KEYSPACE_USERS).user2user '-' '-80,80-'
 SHARD_VERIFY_USERS_SHARDING_PROCESS			= $(VTCTL_CLIENT) VDiff $(V_KEYSPACE_USERS).user2user
@@ -45,9 +45,7 @@ SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run scripts/vreplgen.go '$(she
 
 # Region sharding commands
 ## Users
-REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/region/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
-REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) CreateLookupVindex -tablet_types=REPLICA $(V_KEYSPACE_USERS) '$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/region/vschema_users_shard_lookup_vindex.json)'
-REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX		= $(VTCTL_CLIENT) ExternalizeVindex $(V_KEYSPACE_USERS).user_region_lookup
+REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
 
 ## Articles
 REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/region/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
@@ -96,7 +94,6 @@ init_config_increment_sequence:
 	$(SHARD_INIT_CONFIG_SEQUENCES_SQL)
 	$(SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA)
 
-	$(SHARD_ALTER_USERS_TABLES_SQL)
 	$(SHARD_INIT_USERS_VSCHEMA)
 	
 	$(SHARD_ALTER_ARTICLES_TABLES_SQL)
@@ -107,10 +104,6 @@ init_sharded_database:
 
 init_region_sharding_users:
 	$(REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA)
-	$(REGION_SHARD_INIT_CONFIG_USER_LOOKUP_VINDEX)
-	@echo Wait ...
-	@sleep 5
-	$(REGION_SHARD_EXTERNALIZE_USER_LOOKUP_VINDEX)
 
 init_region_sharding_articles:
 	$(REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA)

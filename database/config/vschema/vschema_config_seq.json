@@ -3,6 +3,9 @@
         "users_seq": {
             "type": "sequence"
         },
+        "user_read_seq": {
+            "type": "sequence"
+        },
         "articles_seq": {
             "type": "sequence"
         }

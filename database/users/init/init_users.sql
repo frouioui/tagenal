@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_read;
 
 CREATE TABLE user (
-  _id INT NOT NULL auto_increment,
+  _id INT NOT NULL,
   timestamp CHAR(14) DEFAULT NULL,
   id CHAR(5) DEFAULT NULL,
   uid CHAR(5) DEFAULT NULL,
@@ -17,4 +18,24 @@ CREATE TABLE user (
   preferTags CHAR(7) DEFAULT NULL,
   obtainedCredits CHAR(3) DEFAULT NULL,
   PRIMARY KEY(_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE user_read (
+  _id INT NOT NULL,
+  timestamp CHAR(14) DEFAULT NULL,
+  id CHAR(7) DEFAULT NULL,
+  uid INT NOT NULL,
+  aid CHAR(7) DEFAULT NULL,
+  readOrNot CHAR(2) DEFAULT NULL,
+  readTimeLength CHAR(3) DEFAULT NULL,
+  readSequence CHAR(2) DEFAULT NULL,
+  agreeOrNot CHAR(2) DEFAULT NULL,
+  commentOrNot CHAR(2) DEFAULT NULL,
+  shareOrNot CHAR(2) DEFAULT NULL,
+  commentDetail CHAR(100) DEFAULT NULL,
+
+  PRIMARY KEY(_id),
+
+  FOREIGN KEY(uid) REFERENCES user(_id)
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

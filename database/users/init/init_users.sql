@@ -1,10 +1,17 @@
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS users_lookup;
 DROP TABLE IF EXISTS user_read;
+DROP TABLE IF EXISTS user;
+
+CREATE TABLE users_lookup (
+  id INT NOT NULL,
+  keyspace_id VARBINARY(128),
+
+  PRIMARY KEY(id)
+);
 
 CREATE TABLE user (
-  _id INT NOT NULL,
+  id INT NOT NULL,
   timestamp CHAR(14) DEFAULT NULL,
-  id CHAR(5) DEFAULT NULL,
   uid CHAR(5) DEFAULT NULL,
   name CHAR(9) DEFAULT NULL,
   gender CHAR(7) DEFAULT NULL,
@@ -17,13 +24,13 @@ CREATE TABLE user (
   role CHAR(6) DEFAULT NULL,
   preferTags CHAR(7) DEFAULT NULL,
   obtainedCredits CHAR(3) DEFAULT NULL,
-  PRIMARY KEY(_id)
+  
+  PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE user_read (
-  _id INT NOT NULL,
+  id INT NOT NULL,
   timestamp CHAR(14) DEFAULT NULL,
-  id CHAR(7) DEFAULT NULL,
   uid INT NOT NULL,
   aid CHAR(7) DEFAULT NULL,
   readOrNot CHAR(2) DEFAULT NULL,
@@ -34,8 +41,8 @@ CREATE TABLE user_read (
   shareOrNot CHAR(2) DEFAULT NULL,
   commentDetail CHAR(100) DEFAULT NULL,
 
-  PRIMARY KEY(_id),
+  PRIMARY KEY(id),
 
-  FOREIGN KEY(uid) REFERENCES user(_id)
+  FOREIGN KEY(uid) REFERENCES user(id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -6,7 +6,13 @@
         "user_read_seq": {
             "type": "sequence"
         },
-        "articles_seq": {
+        "article_seq": {
+            "type": "sequence"
+        },
+        "be_read_seq": {
+            "type": "sequence"
+        },
+        "popularity_seq": {
             "type": "sequence"
         }
     }

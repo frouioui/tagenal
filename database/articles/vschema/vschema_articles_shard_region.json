@@ -7,22 +7,22 @@
     "region_vdx": {
       "type": "region_json",
       "params": {
-        "region_map": "/tmp/countries.json",
+        "region_map": "/tmp/categories.json",
         "region_bytes": "1"
       }
     },
-    "user_region_lookup": {
+    "article_region_lookup": {
       "type": "consistent_lookup_unique",
       "params": {
-        "table": "users.users_lookup",
+        "table": "articles.articles_lookup",
         "from": "id",
         "to": "keyspace_id"
       },
-      "owner": "user"
+      "owner": "article"
     }
   },
   "tables": {
-    "users_lookup": {
+    "articles_lookup": {
       "column_vindexes": [
         {
           "column": "id",
@@ -30,35 +30,47 @@
         }
       ]
     },
-    "user": {
+    "article": {
       "column_vindexes": [
         {
           "columns": [
             "id",
-            "region"
+            "category"
           ],
           "name": "region_vdx"
         },
         {
           "column": "id",
-          "name": "user_region_lookup"
+          "name": "article_region_lookup"
         }
       ],
       "auto_increment": {
         "column": "id",
-        "sequence": "users_seq"
+        "sequence": "article_seq"
       }
     },
-    "user_read": {
+    "be_read": {
       "column_vindexes": [
         {
-          "column": "uid",
-          "name": "user_region_lookup"
+          "column": "aid",
+          "name": "article_region_lookup"
         }
       ],
       "auto_increment": {
         "column": "id",
-        "sequence": "user_read_seq"
+        "sequence": "be_read_seq"
+      }
+    },
+    "popularity": {
+      "column_vindexes": [
+        {
+          "column": "aid",
+          "name": "article_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "popularity_seq"
       }
     }
   }

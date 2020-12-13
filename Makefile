@@ -1,4 +1,3 @@
-export GO111MODULE=on
 
 V_KEYSPACE_USERS	= users
 V_KEYSPACE_ARTICLES	= articles
@@ -12,18 +11,7 @@ VITESS_OPERATOR_PATH	= ./lib/vitess-operator/deploy
 MYSQL_CLIENT	=	mysql -h tagenal -P 3000 -u user
 VTCTL_CLIENT	=	vtctlclient -server=tagenal:8000
 
-# Unsharded commands
-INIT_USERS_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)
-INIT_USERS_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_initial.json)' $(V_KEYSPACE_USERS)
-
-INIT_ARTICLES_TABLES	= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/articles/init/init_articles.sql)" $(V_KEYSPACE_ARTICLES)
-INIT_ARTICLES_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_initial.json)' $(V_KEYSPACE_ARTICLES)
-
-# Sharded commands
-## Config
-SHARD_INIT_CONFIG_SEQUENCES_SQL		= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/config/init/init_increment_seq.sql)" $(V_KEYSPACE_CONFIG)
-SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA	= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/config/vschema/vschema_config_seq.json)' $(V_KEYSPACE_CONFIG)
-
+# Shards
 ## Users
 SHARD_ALTER_USERS_TABLES_SQL				= $(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/alter_users_auto_increment.sql)" $(V_KEYSPACE_USERS)
 SHARD_INIT_USERS_VSCHEMA					= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard.json)' $(V_KEYSPACE_USERS)
@@ -43,7 +31,7 @@ SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=r
 SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
 SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run scripts/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
-# Region sharding commands
+# Region sharding
 REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
 REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
 
@@ -80,12 +68,12 @@ setup_vitess_kubernetes:
 	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
 
 init_mysql_tables:
-	$(INIT_USERS_TABLES)
-	$(INIT_ARTICLES_TABLES)
+	$(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)
+	$(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/articles/init/init_articles.sql)" $(V_KEYSPACE_ARTICLES)
 
 init_increment_sequences:
-	$(SHARD_INIT_CONFIG_SEQUENCES_SQL)
-	$(SHARD_INIT_CONFIG_SEQUENCES_VSCHEMA)
+	$(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/config/init/init_increment_seq.sql)" $(V_KEYSPACE_CONFIG)
+	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/config/vschema/vschema_config_seq.json)' $(V_KEYSPACE_CONFIG)
 
 init_region_sharding_users:
 	$(REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA)
@@ -107,11 +95,15 @@ resharding_process_articles:
 	$(SHARD_SWITCH_READ_RDONLY_ARTICLES)
 	$(SHARD_SWITCH_WRITE_ARTICLES)
 
-init_vreplication_articles:
-	$(SHARD_REPLICATION_CATEGORY_ARTICLE)
-
 final_vitess_cluster:
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
+
+init_vreplication_articles:
+	$(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
+
+init_vreplication_article_be_read:
+	$(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
+	$(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh

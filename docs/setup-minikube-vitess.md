@@ -8,7 +8,7 @@ In this first section of the quick start, we will:
 
 ## Start our kubernetes cluster
 
-We are going to start minikube. We will run the following command:
+We are going to start minikube using the following command:
 
 ```
 make start_minikube
@@ -26,7 +26,7 @@ make start_minikube_dashboard
 
 We are now going to do a few things. We will create a `vitess` namespace in our kubernetes cluster. We create the custom resources (CRD) and other kubernetes objects required to run the operator, taken from the official [Vitess Operator GitHub repository](https://github.com/planetscale/vitess-operator). Finally, we will run the operator on kubernetes.
 
-> You need to have clonned the vitess-operator repository in the `./lib` folder. You can simply run the command: `make clone_vitess_operator`.
+> You need to have cloned the vitess-operator repository in the `./lib` folder. You can simply run the command: `make clone_vitess_operator`.
 
 The make-command we will use is:
 
@@ -42,13 +42,13 @@ kubectl get pods -n vitess
 
 ## Setup a simple vitess cluster
 
-Now, we are going to setup a very simple vitess cluster. We will create 3 keyspaces in vitess:
+Now, we are going to setup a simple vitess cluster. We will create 3 keyspaces in vitess:
 
 - config
 - articles
 - users
 
-Each keyspace will be formed of 2 kubernetes pods. We will have 1 pod for the `master`, and 1 other pod for the `replica`. We are also going to create a `ConfigMap` and a `Secret`. Bost are hosting config that will be used throughout this quickstart. The command we will now run is:
+Each keyspace will be formed of 2 kubernetes pods. We will have 1 pod for the `master`, and 1 other pod for the `replica`. We are also going to create a `ConfigMap` and a `Secret`. Both are hosting config that will be used throughout this quick-start. The command we will now run is:
 
 ```
 make init_kubernetes_unsharded_database
@@ -196,4 +196,4 @@ This command will display all the vttablets running in our cluster. It should ou
 
 ## Next step
 
-The next step is to shard our newly created Vitess cluster. Which is detailled [in the next section](./setup-sharded-vitess-cluster.md).
+The next step is to shard our newly created Vitess cluster. Which is detailed [in the next section](./setup-sharded-vitess-cluster.md).

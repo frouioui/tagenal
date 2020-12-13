@@ -1,6 +1,6 @@
 # Setup Jaeger
 
-This section will cover how to setup the `observability` namespace of our kubernetes cluster. We are going to use Jaeger.
+This section will cover how to setup the `observability` namespace of our kubernetes cluster.
 
 ## Setup Jaeger
 
@@ -16,4 +16,4 @@ The command also created the ingress route to access Jaeger dashboard. Which can
 
 ## Next step
 
-The next step is to run the APIs in our kubernetes cluster. Which is detailled [in the next section](./setup-apis.md).
+The next step is to run the APIs in our kubernetes cluster. Which is detailed [in the next section](./setup-apis.md).

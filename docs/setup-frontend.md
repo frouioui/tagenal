@@ -1,10 +1,10 @@
 # Setup the frontend
 
-This section will cover how to build, push, and run the frontend application of tagenal. The frontend's code can be found [here](./api/users/README.md).
+This section will cover how to build, push, and run the frontend application of tagenal. The frontend code can be found [here](./api/users/README.md).
 
 ## Build and push the frontend docker image
 
-After modifying the frontend code, and creating a new version. We can build and push the new version onto a docker registery. We can modify the name of the docker image and the repository in the frontend's Makefile.
+After modifying the frontend code, and creating a new version. We can build and push the new version onto a docker registry. We can modify the name of the docker image and the repository in the frontend's Makefile.
 
 ```
 make build_push_frontend

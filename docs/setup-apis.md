@@ -1,13 +1,13 @@
 # Setup the APIs
 
-In this section we will elaborate on how to build, run, access tagenal's APIs services. There are currently two APIs:
+In this section we will elaborate on how to build, run, and access tagenal's APIs services. There are currently two APIs:
 
 - `users` [[see](./api/users/)]
 - `articles` [[see](./api/articles/)]
 
 ## Build and Push docker images
 
-After modifying the codebase. A new version of the docker image can be build and pushed to a public docker repository. We do so using the following command:
+After modifying the codebase. A new version of the docker image can be built and pushed to a public docker repository. We do so using the following command:
 
 ```
 make build_push_apis
@@ -15,7 +15,7 @@ make build_push_apis
 
 ## Run the APIs on kubernetes
 
-To run the APIs on our kubernetes cluster we use the following command. It will create the two APIs in the `default` namespace of our kubernetes cluster.
+To run the APIs on our kubernetes cluster we use the following command. This will create the two APIs in the `default` namespace of our kubernetes cluster.
 
 ```
 make run_apis_k8s
@@ -38,4 +38,4 @@ make stop_apis_k8s
 
 ## Next step
 
-The next step is setup the frontend of tagenal. Which is detailled [in the next section](./setup-frontend.md).
+The next step is setup the frontend of tagenal. Which is detailed [in the next section](./setup-frontend.md).

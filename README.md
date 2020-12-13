@@ -44,12 +44,13 @@ Before we start, there are some requirements:
 - Install `mysql` and `mysql-client` using your system's packet manager
 - Have Kubernetes / Minikube installed
 - Have Golang version 1.15.x installed
-- Run the shell scripts that are located in `./lib/*.sh`. These scripts will download the basic libraries and repositories that we need
+- Install gojsontoyaml, the following command `go get github.com/brancz/gojsontoyaml` can be used
+- Run the shell scripts that are located in `./lib/*.sh`. These scripts will download the necessary basic libraries and repositories 
 
 ### Steps
-The quick start is architectured as followed:
+The quick start is as follows:
 1. [Setup of a simple cluster](./docs/setup-minikube-vitess.md)
-2. [Setup our sharded Vitess cluster](./docs/setup-sharded-vitess-cluster.md)
+2. [Setup of our sharded Vitess cluster](./docs/setup-sharded-vitess-cluster.md)
 3. [Setup monitoring](./docs/setup-monitoring.md)
 4. [Setup Jaeger](./docs/setup-jaeger.md)
 5. [Start the APIs](./docs/setup-apis.md)

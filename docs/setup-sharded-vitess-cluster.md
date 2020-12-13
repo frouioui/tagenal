@@ -62,7 +62,7 @@ Additionally, we can use the `make show_vitess_tablets` to see our vttablets. Th
 make show_vitess_tablets
 ```
 
-Should now ouputs:
+Should now output:
 
 ```
 +-------+----------+-------+------------+---------+------------------+-------------+----------------------+
@@ -94,7 +94,7 @@ make init_region_sharding_users
 make init_region_sharding_articles
 ```
 
-We can now complete the resharding process of our keyspaces. For that, we will use the following commands:
+We can now complete the re-sharding process of our keyspaces. For that, we will use the following commands:
 
 ```
 make resharding_process_users
@@ -274,4 +274,4 @@ Articles 80-
 
 ## Next step
 
-The next step is to add a monitoring layer into our kubernetes cluster. Which is detailled [in the next section](./setup-monitoring.md).
+The next step is to add a monitoring layer into our kubernetes cluster. Which is detailed [in the next section](./setup-monitoring.md).

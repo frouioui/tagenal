@@ -39,6 +39,7 @@ Before we start, there are some requirements:
 - Have at least 10Gb of available RAM on the host
 - Install [yq](https://github.com/mikefarah/yq) a YAML processor
 - Install [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) (jb), allowing us to deal with jsonnet files
+- Install jsonnet using you system's packet manager
 - Install vtctlclient, the following command `go get vitess.io/vitess/go/cmd/vtctlclient` can be used
 - Install `mysql` and `mysql-client` using your system's packet manager
 - Have Kubernetes / Minikube installed

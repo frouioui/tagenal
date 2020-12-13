@@ -160,6 +160,11 @@ show_user_table:
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_shard_1.sql
 	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_shard_2.sql
 
+show_user_read_table:
+	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_read.sql
+	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_read_shard_1.sql
+	@$(MYSQL_CLIENT) --table < ./database/users/select/select_user_read_shard_2.sql
+
 show_article_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_1.sql

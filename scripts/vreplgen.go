@@ -65,7 +65,7 @@ func replicationArticlesScience() (*binlogdatapb.BinlogSource, string) {
 }
 
 func main() {
-	vtctl := "vtctlclient -server=tagenal:8000"
+	// vtctl := "vtctlclient -server=tagenal:8000"
 
 	shardInfoStr := os.Args[2]
 	shardInfo := shardInfo{}
@@ -90,5 +90,5 @@ func main() {
 		"(db_name, source, pos, max_tps, max_replication_lag, tablet_types, time_updated, transaction_timestamp, state) values"+
 		"('%s', %s, '', 9999, 9999, 'master', 0, 0, 'Running')", dbName, sqlEscaped.String())
 
-	fmt.Printf("%s VReplicationExec %s '%s'\n", vtctl, tabletDestID, strings.Replace(query, "'", "'\"'\"'", -1))
+	fmt.Printf("VReplicationExec %s '%s'\n", tabletDestID, strings.Replace(query, "'", "'\"'\"'", -1))
 }

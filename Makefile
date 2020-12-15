@@ -99,11 +99,11 @@ final_vitess_cluster:
 	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
 
 init_vreplication_articles:
-	$(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 init_vreplication_article_be_read:
-	$(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
-	$(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh
@@ -161,6 +161,12 @@ show_article_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_1.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_2.sql
+
+show_article_beread_table:
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_beread.sql
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_beread_shard_1.sql
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_beread_shard_2.sql
+
 
 build_push_apis:
 	make -C ./api/users/

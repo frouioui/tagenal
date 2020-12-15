@@ -8,11 +8,12 @@ CREATE TABLE articles_lookup (
   keyspace_id VARBINARY(128),
 
   PRIMARY KEY(id)
+
 );
 
 CREATE TABLE article (
   id BIGINT NOT NULL,
-  timestamp CHAR(14) DEFAULT NULL,
+  timestamp BIGINT DEFAULT 0,
   aid CHAR(7) DEFAULT NULL,
   title CHAR(15) DEFAULT NULL,
   category VARBINARY(256) DEFAULT NULL,
@@ -30,10 +31,10 @@ CREATE TABLE article (
 
 CREATE TABLE be_read (
   id BIGINT NOT NULL,
-  timestamp CHAR(14) DEFAULT NULL,
+  timestamp BIGINT DEFAULT 0,
   aid BIGINT NOT NULL,
   reads_nb INT,
-  read_uid_list CHAR(256) DEFAULT NULL,
+  read_uid_list CHAR(255) DEFAULT NULL,
   comments_nb INT,
   comment_uid_list CHAR(255) DEFAULT NULL,
   agrees_nb INT,
@@ -48,7 +49,7 @@ CREATE TABLE be_read (
 
 CREATE TABLE popularity (
   id BIGINT NOT NULL,
-  timestamp CHAR(14) DEFAULT NULL,
+  timestamp BIGINT DEFAULT 0,
   temporality ENUM('daily', 'weekly', 'monthly'),
   aid BIGINT NOT NULL,
 

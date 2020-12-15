@@ -64,7 +64,7 @@ setup_vitess_operator_kubernetes:
 setup_vitess_kubernetes:
 	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
 	kubectl apply -f kubernetes/vitess_cluster_config.yaml
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded.yaml
+	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
 	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
 
 init_mysql_tables:
@@ -104,6 +104,10 @@ init_vreplication_articles:
 init_vreplication_article_be_read:
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
+
+init_vreplication_article_read_stats:
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go read_stats '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go read_stats '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh

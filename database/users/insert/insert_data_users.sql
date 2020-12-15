@@ -8,8 +8,9 @@ INSERT INTO user (timestamp,uid,name,gender,email,phone,dept,grade,language,regi
   (1506328859004, '4', 'user4', 'male', 'email4', 'phone4', 'dept15', 'grade4', 'en', 'Hong Kong', 'role2', 'tags18', '63');
 
 INSERT INTO user_read (timestamp,uid,aid,read_or_not,read_time_length,read_sequence,agree_or_not,comment_or_not,share_or_not,comment_detail) VALUES
-  (1506332297000, 21, "40", "1", "55", "2", "0", "0", "0", "comments to this article: (88,40)"),
-  (1506332307000, 22, "99", "1", "42", "0", "0", "0", "0", "comments to this article: (13,99)"),
-  (1506332317000, 23, "12", "1", "98", "0", "1", "0", "0", "comments to this article: (27,12)"),
-  (1506332327000, 24, "37", "1", "97", "2", "0", "0", "1", "comments to this article: (31,37)"),
-  (1506332337000, 25, "53", "1", "25", "3", "0", "0", "0", "comments to this article: (66,53)");
+  (1506332297000, 1, 4, "1", "55", "2", "0", "1", "0", "comments to this article: (88,40)"),
+  (1506332307000, 5, 4, "1", "42", "0", "0", "0", "0", "comments to this article: (13,99)"),
+  (1506332317000, 5, 3, "1", "98", "0", "1", "1", "0", "comments to this article: (27,12)"),
+  (1506332327000, 4, 1, "1", "97", "2", "0", "0", "1", "comments to this article: (31,37)"),
+  (1506332327000, 4, 3, "1", "97", "2", "0", "1", "1", "comments to this article: (31,37)"),
+  (1506332337000, 5, 5, "1", "25", "3", "0", "0", "0", "comments to this article: (66,53)");

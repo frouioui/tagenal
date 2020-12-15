@@ -72,6 +72,18 @@
         "column": "id",
         "sequence": "popularity_seq"
       }
+    },
+    "read_stats": {
+      "column_vindexes": [
+        {
+          "column": "aid",
+          "name": "article_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "read_stats_seq"
+      }
     }
   }
 }

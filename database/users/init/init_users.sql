@@ -34,7 +34,7 @@ CREATE TABLE user_read (
   id INT NOT NULL,
   timestamp BIGINT DEFAULT 0,
   uid INT NOT NULL,
-  aid CHAR(7) DEFAULT NULL,
+  aid BIGINT NOT NULL,
   read_or_not CHAR(2) DEFAULT NULL,
   read_time_length CHAR(3) DEFAULT NULL,
   read_sequence CHAR(2) DEFAULT NULL,

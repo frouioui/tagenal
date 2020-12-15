@@ -12,3 +12,6 @@ INSERT INTO be_read_seq(id, next_id, cache) VALUES(0, 1, 100);
 
 CREATE TABLE popularity_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence';
 INSERT INTO popularity_seq(id, next_id, cache) VALUES(0, 1, 100);
+
+CREATE TABLE read_stats_seq(id INT, next_id BIGINT, cache BIGINT, PRIMARY KEY(id)) comment 'vitess_sequence';
+INSERT INTO read_stats_seq(id, next_id, cache) VALUES(0, 1, 100);

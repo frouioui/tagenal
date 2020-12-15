@@ -22,6 +22,29 @@ type shardInfo struct {
 	MasterAlias aliasInfo `json:"master_alias"`
 }
 
+func replicationReadStats() (*binlogdatapb.BinlogSource, string) {
+	shard := os.Args[3]
+	if shard == "" {
+		panic(errors.New("missing source shard info"))
+	}
+	dbName := "users"
+
+	filter := &binlogdatapb.Filter{
+		Rules: []*binlogdatapb.Rule{{
+			Match:  "read_stats",
+			Filter: "SELECT aid AS id, 0 AS timestamp, aid, SUM(read_or_not) AS reads_nb, SUM(comment_or_not) AS comments_nb, SUM(agree_or_not) AS agrees_nb, SUM(share_or_not) AS shares_nb FROM user_read GROUP BY aid;",
+		}},
+	}
+
+	bls := &binlogdatapb.BinlogSource{
+		Keyspace: "users",
+		Shard:    shard,
+		Filter:   filter,
+		OnDdl:    binlogdatapb.OnDDLAction_IGNORE,
+	}
+	return bls, dbName
+}
+
 func replicationArticlesToBeRead() (*binlogdatapb.BinlogSource, string) {
 	shard := os.Args[3]
 	if shard == "" {
@@ -81,6 +104,8 @@ func main() {
 		bls, dbName = replicationArticlesScience()
 	} else if os.Args[1] == "be_read_articles" {
 		bls, dbName = replicationArticlesToBeRead()
+	} else if os.Args[1] == "read_stats" {
+		bls, dbName = replicationReadStats()
 	}
 
 	val := sqltypes.NewVarBinary(fmt.Sprintf("%v", bls))

@@ -31,10 +31,6 @@ SHARD_SWITCH_READ_RDONLY_ARTICLES			= $(VTCTL_CLIENT) SwitchReads -tablet_type=r
 SHARD_SWITCH_WRITE_ARTICLES					= $(VTCTL_CLIENT) SwitchWrites $(V_KEYSPACE_ARTICLES).article2article
 SHARD_REPLICATION_CATEGORY_ARTICLE			= $(shell go run scripts/vreplgen.go '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
-# Region sharding
-REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
-REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA			= $(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
-
 GET_USERS_VSCHEMA	= $(VTCTL_CLIENT) GetVSchema $(V_KEYSPACE_USERS)
 
 list_vtctld:
@@ -76,10 +72,10 @@ init_increment_sequences:
 	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/config/vschema/vschema_config_seq.json)' $(V_KEYSPACE_CONFIG)
 
 init_region_sharding_users:
-	$(REGION_SHARD_INIT_CONFIG_USERS_VSCHEMA)
+	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
 
 init_region_sharding_articles:
-	$(REGION_SHARD_INIT_CONFIG_ARTICLES_VSCHEMA)
+	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
 
 resharding_process_users:
 	$(SHARD_INIT_RESHARD_USERS)
@@ -102,12 +98,10 @@ init_vreplication_articles:
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 init_vreplication_article_be_read:
-	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
-
-init_vreplication_article_read_stats:
-	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go read_stats '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)
-	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go read_stats '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' 80-)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' -80)
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/80-)' 80-)
 
 build_monitoring_manifests: $(shell chmod +x ./monitoring/build.sh)
 	./monitoring/build.sh
@@ -165,6 +159,9 @@ show_article_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_1.sql
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_shard_2.sql
+
+show_article_keyspace:
+	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_article_all.sql
 
 show_article_beread_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_beread.sql

@@ -50,17 +50,19 @@ func replicationArticlesToBeRead() (*binlogdatapb.BinlogSource, string) {
 	if shard == "" {
 		panic(errors.New("missing source shard info"))
 	}
-	dbName := "articles"
+	dbName := "users"
 
 	filter := &binlogdatapb.Filter{
-		Rules: []*binlogdatapb.Rule{{
-			Match:  "be_read",
-			Filter: "SELECT id as id, timestamp, id AS aid, 0 as reads_nb, CONCAT('ruid_', id) as read_uid_list, 0 as comments_nb, CONCAT('cuid_', id) as comment_uid_list, 0 as agrees_nb, CONCAT('auid_', id) as agree_uid_list, 0 as shares_nb, CONCAT('suid_', id) as share_uid_list  FROM article",
-		}},
+		Rules: []*binlogdatapb.Rule{
+			{
+				Match:  "be_read",
+				Filter: "SELECT aid AS id, 0 AS timestamp, aid, SUM(read_or_not) AS reads_nb, CONCAT('ruid_', id) as read_uid_list, SUM(comment_or_not) AS comments_nb, CONCAT('cuid_', id) as comment_uid_list, SUM(agree_or_not) AS agrees_nb, CONCAT('auid_', id) as agree_uid_list, SUM(share_or_not) AS shares_nb, CONCAT('suid_', id) as share_uid_list FROM user_read GROUP BY aid;",
+			},
+		},
 	}
 
 	bls := &binlogdatapb.BinlogSource{
-		Keyspace: "articles",
+		Keyspace: "users",
 		Shard:    shard,
 		Filter:   filter,
 		OnDdl:    binlogdatapb.OnDDLAction_IGNORE,

@@ -57,17 +57,3 @@ CREATE TABLE popularity (
   FOREIGN KEY(aid) REFERENCES article(id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE read_stats (
-  id BIGINT NOT NULL AUTO_INCREMENT,
-  timestamp BIGINT DEFAULT 0,
-  aid BIGINT NOT NULL,
-  reads_nb INT DEFAULT 0,
-  comments_nb INT DEFAULT 0,
-  agrees_nb INT DEFAULT 0,
-  shares_nb INT DEFAULT 0,
-
-  PRIMARY KEY(id),
-  FOREIGN KEY(aid) REFERENCES article(id)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

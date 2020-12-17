@@ -113,7 +113,7 @@ func (dbm *DatabaseManager) GetUsersOfRegion(ctx context.Context, vtspanctx, reg
 func (dbm *DatabaseManager) fetchUser(ctx context.Context, vtspanctx, qc string, args ...interface{}) (user User, err error) {
 	psql := vtspanctx + `SELECT * FROM user ` + qc
 	err = dbm.db.QueryRowContext(ctx, psql, args...).Scan(
-		&user.ID, &user.Timestamp, &user.ID2, &user.UID, &user.Name, &user.Gender,
+		&user.ID, &user.Timestamp, &user.UID, &user.Name, &user.Gender,
 		&user.Email, &user.Phone, &user.Dept, &user.Grade, &user.Language,
 		&user.Region, &user.Role, &user.PreferTags, &user.ObtainedCredits)
 	return user, err
@@ -128,7 +128,7 @@ func (dbm *DatabaseManager) fetchUsers(ctx context.Context, vtspanctx, qc string
 
 	for rows.Next() {
 		var user User
-		err = rows.Scan(&user.ID, &user.Timestamp, &user.ID2, &user.UID, &user.Name, &user.Gender,
+		err = rows.Scan(&user.ID, &user.Timestamp, &user.UID, &user.Name, &user.Gender,
 			&user.Email, &user.Phone, &user.Dept, &user.Grade, &user.Language, &user.Region,
 			&user.Role, &user.PreferTags, &user.ObtainedCredits)
 		if err != nil {
@@ -143,7 +143,7 @@ func (dbm *DatabaseManager) fetchUsers(ctx context.Context, vtspanctx, qc string
 // The new auto-generated ID will be returned, in addition to an
 // error if any.
 func (dbm *DatabaseManager) InsertUser(user User) (newID int, err error) {
-	sql := `INSERT INTO user (timestamp,id,uid,name,gender,email,phone,dept,grade,language,region,role,preferTags,obtainedCredits) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+	sql := `INSERT INTO user (timestamp,uid,name,gender,email,phone,dept,grade,language,region,role,preferTags,obtainedCredits) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`
 
 	id, err := dbm.insertUser(sql, user)
 	if err != nil {
@@ -160,7 +160,7 @@ func (dbm *DatabaseManager) insertUser(sql string, user User) (newID int64, err 
 	}
 	defer query.Close()
 
-	res, err := query.Exec(user.Timestamp, user.ID2, user.UID, user.Name, user.Gender,
+	res, err := query.Exec(user.Timestamp, user.UID, user.Name, user.Gender,
 		user.Email, user.Phone, user.Dept, user.Grade, user.Language, user.Region,
 		user.Role, user.PreferTags, user.ObtainedCredits)
 	if err != nil {

@@ -13,21 +13,20 @@ type UserArray []User
 // User model maps to the user table of Vitess MySQL cluster.
 // Implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler.
 type User struct {
-	ID              int64  `json:"ID"`
-	Timestamp       string `json:"Timestamp"`
-	ID2             string `json:"ID2"`
-	UID             string `json:"UID"`
-	Name            string `json:"Name"`
-	Gender          string `json:"Gender"`
-	Email           string `json:"Email"`
-	Phone           string `json:"Phone"`
-	Dept            string `json:"Dept"`
-	Grade           string `json:"Grade"`
-	Language        string `json:"Language"`
-	Region          string `json:"Region"`
-	Role            string `json:"Role"`
-	PreferTags      string `json:"PreferTags"`
-	ObtainedCredits string `json:"ObtainedCredits"`
+	ID              int64  `json:"id"`
+	Timestamp       int64  `json:"timestamp"`
+	UID             string `json:"uid"`
+	Name            string `json:"name"`
+	Gender          string `json:"gender"`
+	Email           string `json:"email"`
+	Phone           string `json:"phone"`
+	Dept            string `json:"dept"`
+	Grade           string `json:"grade"`
+	Language        string `json:"language"`
+	Region          string `json:"region"`
+	Role            string `json:"role"`
+	PreferTags      string `json:"prefer_tags"`
+	ObtainedCredits string `json:"obtained_credits"`
 }
 
 // ProtoUser transforms an User into a the auto-generated
@@ -36,7 +35,6 @@ func (u *User) ProtoUser() *pb.User {
 	return &pb.User{
 		ID:              u.ID,
 		Timestamp:       u.Timestamp,
-		ID2:             u.ID2,
 		UID:             u.UID,
 		Name:            u.Name,
 		Gender:          u.Gender,
@@ -58,7 +56,6 @@ func ProtoUserToUser(pbuser *pb.User) (user User) {
 	return User{
 		ID:              pbuser.ID,
 		Timestamp:       pbuser.Timestamp,
-		ID2:             pbuser.ID2,
 		UID:             pbuser.UID,
 		Name:            pbuser.Name,
 		Gender:          pbuser.Gender,

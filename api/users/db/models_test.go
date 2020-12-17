@@ -10,8 +10,7 @@ import (
 func TestUser_ProtoUser(t *testing.T) {
 	type fields struct {
 		ID              int64
-		Timestamp       string
-		ID2             string
+		Timestamp       int64
 		UID             string
 		Name            string
 		Gender          string
@@ -32,8 +31,8 @@ func TestUser_ProtoUser(t *testing.T) {
 	}{
 		{
 			"user to protobuf user",
-			fields{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
-			&pb.User{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
+			fields{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
+			&pb.User{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
 		},
 	}
 	for _, tt := range tests {
@@ -41,7 +40,6 @@ func TestUser_ProtoUser(t *testing.T) {
 			u := &User{
 				ID:              tt.fields.ID,
 				Timestamp:       tt.fields.Timestamp,
-				ID2:             tt.fields.ID2,
 				UID:             tt.fields.UID,
 				Name:            tt.fields.Name,
 				Gender:          tt.fields.Gender,
@@ -73,8 +71,8 @@ func TestProtoUserToUser(t *testing.T) {
 	}{
 		{
 			"protobuf user to user",
-			args{pbuser: &pb.User{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"}},
-			User{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
+			args{pbuser: &pb.User{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"}},
+			User{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "male", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
 		},
 	}
 	for _, tt := range tests {
@@ -98,12 +96,12 @@ func TestUsersToProtoUsers(t *testing.T) {
 		{
 			"protobuf user to user",
 			args{users: []User{
-				{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "it", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
-				{ID: 2, Timestamp: "78910", ID2: "u2", UID: "u3", Name: "tela", Gender: "fem", Email: "u3", Phone: "tela", Dept: "cs", Language: "zh", Region: "Hong Kong", Role: "admin2", PreferTags: "tag2", ObtainedCredits: "5"},
+				{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "it", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
+				{ID: 2, Timestamp: 78910, UID: "u3", Name: "tela", Gender: "fem", Email: "u3", Phone: "tela", Dept: "cs", Language: "zh", Region: "Hong Kong", Role: "admin2", PreferTags: "tag2", ObtainedCredits: "5"},
 			}},
 			&pb.Users{Users: []*pb.User{
-				{ID: 1, Timestamp: "12345", ID2: "u1", UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "it", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
-				{ID: 2, Timestamp: "78910", ID2: "u2", UID: "u3", Name: "tela", Gender: "fem", Email: "u3", Phone: "tela", Dept: "cs", Language: "zh", Region: "Hong Kong", Role: "admin2", PreferTags: "tag2", ObtainedCredits: "5"},
+				{ID: 1, Timestamp: 12345, UID: "u2", Name: "john", Gender: "male", Email: "u2", Phone: "john", Dept: "it", Language: "zh", Region: "Beijing", Role: "admin", PreferTags: "tag", ObtainedCredits: "1"},
+				{ID: 2, Timestamp: 78910, UID: "u3", Name: "tela", Gender: "fem", Email: "u3", Phone: "tela", Dept: "cs", Language: "zh", Region: "Hong Kong", Role: "admin2", PreferTags: "tag2", ObtainedCredits: "5"},
 			}},
 		},
 	}

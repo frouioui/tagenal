@@ -1,0 +1,59 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: vitess
+  name: popularity-daily
+spec:
+  successfulJobsHistoryLimit: 1
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 3
+      template:
+        spec:
+          containers:
+          - name: popularity
+            image: frouioui/tagenal-job-pop
+            command: ["/main",  "-vtgate=vitess-zone1-vtgate-srv.vitess:15999", "-gran=daily", "-limit=5"]
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: vitess
+  name: popularity-weekly
+spec:
+  successfulJobsHistoryLimit: 1
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 3
+      template:
+        spec:
+          containers:
+          - name: popularity
+            image: frouioui/tagenal-job-pop
+            command: ["/main",  "-vtgate=vitess-zone1-vtgate-srv.vitess:15999", "-gran=weekly", "-limit=5"]
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: vitess
+  name: popularity-monthly
+spec:
+  successfulJobsHistoryLimit: 1
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 3
+      template:
+        spec:
+          containers:
+          - name: popularity
+            image: frouioui/tagenal-job-pop
+            command: ["/main",  "-vtgate=vitess-zone1-vtgate-srv.vitess:15999", "-gran=monthly", "-limit=5"]
+          restartPolicy: OnFailure

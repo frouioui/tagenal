@@ -51,9 +51,10 @@ CREATE TABLE popularity (
   id BIGINT NOT NULL,
   timestamp BIGINT DEFAULT 0,
   temporality ENUM('daily', 'weekly', 'monthly'),
-  aid BIGINT NOT NULL,
+  main_aid BIGINT NOT NULL,
+  aid_list CHAR(255) DEFAULT NULL,
 
   PRIMARY KEY(id),
-  FOREIGN KEY(aid) REFERENCES article(id)
+  FOREIGN KEY(main_aid) REFERENCES article(id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

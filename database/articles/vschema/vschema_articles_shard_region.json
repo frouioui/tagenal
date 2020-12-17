@@ -64,7 +64,7 @@
     "popularity": {
       "column_vindexes": [
         {
-          "column": "aid",
+          "column": "main_aid",
           "name": "article_region_lookup"
         }
       ],

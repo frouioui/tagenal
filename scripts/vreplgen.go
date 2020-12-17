@@ -89,9 +89,26 @@ func replicationArticlesScience() (*binlogdatapb.BinlogSource, string) {
 	return bls, dbName
 }
 
-func main() {
-	// vtctl := "vtctlclient -server=tagenal:8000"
+func replicationPopularityScience() (*binlogdatapb.BinlogSource, string) {
+	dbName := "articles"
 
+	filter := &binlogdatapb.Filter{
+		Rules: []*binlogdatapb.Rule{{
+			Match:  "popularity",
+			Filter: "select * from popularity",
+		}},
+	}
+
+	bls := &binlogdatapb.BinlogSource{
+		Keyspace: "articles",
+		Shard:    "-80",
+		Filter:   filter,
+		OnDdl:    binlogdatapb.OnDDLAction_IGNORE,
+	}
+	return bls, dbName
+}
+
+func main() {
 	shardInfoStr := os.Args[2]
 	shardInfo := shardInfo{}
 	err := json.Unmarshal([]byte(shardInfoStr), &shardInfo)
@@ -108,6 +125,8 @@ func main() {
 		bls, dbName = replicationArticlesToBeRead()
 	} else if os.Args[1] == "read_stats" {
 		bls, dbName = replicationReadStats()
+	} else if os.Args[1] == "popularity_science" {
+		bls, dbName = replicationPopularityScience()
 	}
 
 	val := sqltypes.NewVarBinary(fmt.Sprintf("%v", bls))

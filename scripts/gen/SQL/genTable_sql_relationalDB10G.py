@@ -5,9 +5,9 @@ from PIL import Image
 from shutil import copyfile
 import os
 
-USERS_NUM = 2000
-ARTICLES_NUM = 2500
-READS_NUM = 5000
+USERS_NUM = 5500
+ARTICLES_NUM = 4000
+READS_NUM = 20000
 
 uid_region = {}
 aid_lang = {}
@@ -157,18 +157,21 @@ def gen_an_read (i):
             "\"" + read["comment_detail"] + "\")"
 
 with open("user.sql", "w+") as f:
+    f.write("USE users;\n")
     f.write("INSERT INTO user (timestamp,uid,name,gender,email,phone,dept,grade,language,region,role,prefer_tags,obtained_credits) VALUES\n")
     for i in range (USERS_NUM-1):
         f.write("  " + gen_an_user(i+1) + ",\n")
     f.write("  " + gen_an_user(USERS_NUM) + ";\n")
 
 with open("article.sql", "w+") as f:
+    f.write("USE articles;\n")
     f.write("INSERT INTO article (timestamp,aid,title,category,abstract,article_tags,authors,language,text,image,video) VALUES\n")
     for i in range (ARTICLES_NUM-1):
         f.write("  " + gen_an_article(i+1) + ",\n")
     f.write("  " + gen_an_article(ARTICLES_NUM-1) + ";\n")
 
 with open("user_read.sql", "w+") as f:
+    f.write("USE users;\n")
     f.write("INSERT INTO user_read (timestamp,uid,aid,read_or_not,read_time_length,read_sequence,agree_or_not,comment_or_not,share_or_not,comment_detail) VALUES\n")
     for i in range (READS_NUM-1):
         f.write("  " + gen_an_read(i+1) + ",\n")

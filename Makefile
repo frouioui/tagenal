@@ -60,7 +60,7 @@ setup_vitess_operator_kubernetes:
 setup_vitess_kubernetes:
 	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
 	kubectl apply -f kubernetes/vitess_cluster_config.yaml
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
+	kubectl apply -f kubernetes/vitess_cluster.yaml	
 	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
 
 init_mysql_tables:
@@ -96,6 +96,7 @@ final_vitess_cluster:
 
 init_vreplication_articles:
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
+	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go popularity_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
 
 init_vreplication_article_be_read:
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go be_read_articles '$(shell $(VTCTL_CLIENT) GetShard articles/-80)' -80)

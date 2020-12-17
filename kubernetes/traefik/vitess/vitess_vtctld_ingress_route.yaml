@@ -8,21 +8,8 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`tagenal`) && PathPrefix(`/vtctld`)
+      match: Host(`vtctld.tagenal`)
       services:
         - namespace: vitess
           name: vitess-vtctld-047eb1a6
           port: 15000
-      middlewares:
-        - namespace: vitess
-          name: vtctld-web-stripprefix
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: vtctld-web-stripprefix
-  namespace: vitess
-spec:
-  stripPrefix:
-    prefixes:
-      - /vtctld

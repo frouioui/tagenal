@@ -87,7 +87,7 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 // GetUserByID will returns a single User corresponding
 // to the given ID.
 func (dbm *DatabaseManager) GetUserByID(ctx context.Context, vtspanctx string, ID uint64) (user User, err error) {
-	qc := `WHERE _id LIKE ?`
+	qc := `WHERE id=?`
 	user, err = dbm.fetchUser(ctx, vtspanctx, qc, strconv.Itoa(int(ID)))
 	if err != nil {
 		log.Println(err.Error())

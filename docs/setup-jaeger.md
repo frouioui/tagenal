@@ -17,5 +17,3 @@ By using minikube dashboard or `kubectl` we can observe the successful deploymen
 ## Next
 
 For now, we can't access Jaeger UI, we will cover that in the next section thanks to Traefik Proxy. Next step is [here](./setup-traefik.md).
-
-<!-- The next step is to run the APIs in our kubernetes cluster. Which is detailed [in the next section](./setup-apis.md). -->

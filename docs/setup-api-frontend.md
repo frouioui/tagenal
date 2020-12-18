@@ -1,4 +1,4 @@
-# Quick Start - 6. Setup the APIs and frontend
+# Quick Start - 7. Setup the APIs and frontend
 
 In this final section, we are going to setup two APIs and a frontend application. We will deploy them to the `default` namespace of our kubernetes cluster.
 

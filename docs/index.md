@@ -36,13 +36,12 @@ To run locally, tagenal needs:
 
 In this quick start we will cover the following items:
 
-1. [Setup the Kubernetes cluster](./docs/setup-minikube-vitess.md)
-1. [Setup Jaeger](./docs/setup-jaeger.md)
-1. [Setup Traefik Proxy]()
-1. [Setup the Vitess cluster]()
-1. [Setup the Redis cluster]()
-1. [Setup monitoring with Grafana, Prometheus and Alertmanager](./docs/setup-monitoring.md)
-1. [Setup the APIs](./docs/setup-apis.md)
-1. [Setup the Frontend application](./docs/setup-frontend.md)
+1. [Setup the Kubernetes cluster](./setup-minikube-vitess.md)
+1. [Setup Jaeger](./setup-jaeger.md)
+1. [Setup Traefik Proxy](./setup-traefik.md)
+1. [Setup the Vitess cluster](./setup-vitess.md)
+1. [Setup the Redis cluster](./setup-redis.md)
+1. [Setup monitoring with Grafana, Prometheus and Alertmanager](./setup-monitoring.md)
+1. [Setup the APIs and frontend](./setup-api-frontend.md)
 
 Once the quick start is over, we will have a fully setup application using distributed database systems.

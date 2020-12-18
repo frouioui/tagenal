@@ -1,4 +1,4 @@
-# Quick Start - 5. Setup monitoring
+# Quick Start - 6. Setup monitoring
 
 The following section will allow us to setup the monitoring tools for our kubernetes cluster. We will be using Grafana, Prometheus, and Alertmanager. The goal of this section is to setup the `monitoring` namespace.
 

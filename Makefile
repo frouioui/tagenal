@@ -179,6 +179,9 @@ show_article_beread_table:
 	@$(MYSQL_CLIENT) --table < ./database/articles/select/select_beread_shard_2.sql
 
 
+setup_redis: $(shell chmod +x ./kubernetes/redis/setup.sh)
+	kubectl apply -f kubernetes/redis/redis.yaml
+
 build_push_apis:
 	make -C ./api/users/
 	make -C ./api/articles/

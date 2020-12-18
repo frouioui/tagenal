@@ -3,7 +3,19 @@
         "users_seq": {
             "type": "sequence"
         },
-        "articles_seq": {
+        "user_read_seq": {
+            "type": "sequence"
+        },
+        "article_seq": {
+            "type": "sequence"
+        },
+        "be_read_seq": {
+            "type": "sequence"
+        },
+        "popularity_seq": {
+            "type": "sequence"
+        },
+        "read_stats_seq": {
             "type": "sequence"
         }
     }

@@ -1,0 +1,77 @@
+{
+  "sharded": true,
+  "vindexes": {
+    "hash": {
+      "type": "hash"
+    },
+    "region_vdx": {
+      "type": "region_json",
+      "params": {
+        "region_map": "/tmp/categories.json",
+        "region_bytes": "1"
+      }
+    },
+    "article_region_lookup": {
+      "type": "consistent_lookup_unique",
+      "params": {
+        "table": "articles.articles_lookup",
+        "from": "id",
+        "to": "keyspace_id"
+      },
+      "owner": "article"
+    }
+  },
+  "tables": {
+    "articles_lookup": {
+      "column_vindexes": [
+        {
+          "column": "id",
+          "name": "hash"
+        }
+      ]
+    },
+    "article": {
+      "column_vindexes": [
+        {
+          "columns": [
+            "id",
+            "category"
+          ],
+          "name": "region_vdx"
+        },
+        {
+          "column": "id",
+          "name": "article_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "article_seq"
+      }
+    },
+    "be_read": {
+      "column_vindexes": [
+        {
+          "column": "aid",
+          "name": "article_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "be_read_seq"
+      }
+    },
+    "popularity": {
+      "column_vindexes": [
+        {
+          "column": "main_aid",
+          "name": "article_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "popularity_seq"
+      }
+    }
+  }
+}

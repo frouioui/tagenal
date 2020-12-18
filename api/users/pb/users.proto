@@ -22,24 +22,37 @@ message RequestRegion {
 
 message User {
     int64 ID = 1;
-    string Timestamp = 2;
-    string ID2 = 3;
-    string UID = 4;
-    string Name = 5;
-    string Gender = 6;
-    string Email = 7;
-    string Phone = 8;
-    string Dept = 9;
-    string Grade = 10;
-    string Language = 11;
-    string Region = 12;
-    string Role = 13;
-    string PreferTags = 14;
-    string ObtainedCredits = 15;
+    int64 Timestamp = 2;
+    string UID = 3;
+    string Name = 4;
+    string Gender = 5;
+    string Email = 6;
+    string Phone = 7;
+    string Dept = 8;
+    string Grade = 9;
+    string Language = 10;
+    string Region = 11;
+    string Role = 12;
+    string PreferTags = 13;
+    string ObtainedCredits = 14;
 }
 
 message Users {
     repeated User Users = 1;
+}
+
+message UserRead {
+    int64 ID = 1;
+    int64 Timestamp = 2;
+    string UID = 3;
+    string AID = 4;
+    string Read = 5;
+    string ReadTime = 6;
+    string ReadSeq = 7;
+    string Agree = 8;
+    string Comment = 9;
+    string Share = 10;
+    string CommentDetails = 11;
 }
 
 message UserHomeRequest {

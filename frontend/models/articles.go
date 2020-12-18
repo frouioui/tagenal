@@ -1,17 +1,16 @@
 package models
 
 type Article struct {
-	ID          int64  `json:"ID"`
-	Timestamp   string `json:"Timestamp"`
-	ID2         string `json:"ID2"`
-	AID         string `json:"AID"`
-	Title       string `json:"Title"`
-	Category    string `json:"Category"`
-	Abstract    string `json:"Abstract"`
-	ArticleTags string `json:"ArticleTags"`
-	Authors     string `json:"Authors"`
-	Language    string `json:"Language"`
-	Text        string `json:"Text"`
-	Image       string `json:"Image"`
-	Video       string `json:"Video"`
+	ID          int64  `json:"id"`
+	Timestamp   int64  `json:"timestamp"`
+	AID         string `json:"aid"`
+	Title       string `json:"title"`
+	Category    string `json:"category"`
+	Abstract    string `json:"abstract"`
+	ArticleTags string `json:"article_tags"`
+	Authors     string `json:"authors"`
+	Language    string `json:"language"`
+	Text        string `json:"text"`
+	Image       string `json:"image"`
+	Video       string `json:"video"`
 }

@@ -127,16 +127,14 @@ setup_jaeger: $(shell chmod +x ./scripts/jaeger.sh)
 	./scripts/jaeger.sh
 	kubectl create -n observability -f ./kubernetes/jaeger/operator.yaml
 	kubectl create -n observability -f ./kubernetes/jaeger/jaeger.yaml
-	kubectl create -n observability -f ./kubernetes/jaeger/jaeger_ui_ingress_route.yaml
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final_jaeger.yaml
-	kubectl apply -f kubernetes/traefik/traefik_deployment_jaeger.yaml
 
 setup_traefik:
 	kubectl create -f kubernetes/traefik/traefik_crd.yaml
 	kubectl create -f kubernetes/traefik/traefik_rbac.yaml
 	@echo Wait 5s
 	@sleep 5
-	kubectl create -f kubernetes/traefik/traefik_deployment.yaml
+	kubectl create -f kubernetes/traefik/traefik_deployment_jaeger.yaml
+	kubectl create -n observability -f ./kubernetes/jaeger/jaeger_ui_ingress_route.yaml
 
 setup_traefik_vitess: $(shell chmod +x ./kubernetes/traefik/vitess/build.sh)
 	./kubernetes/traefik/vitess/build.sh

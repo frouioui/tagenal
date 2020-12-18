@@ -1,6 +1,6 @@
-# Setup monitoring
+# Quick Start - 5. Setup monitoring
 
-The following section will allow us to setup a fully monitored cluster using Grafana, Prometheus, and Alertmanager.
+The following section will allow us to setup the monitoring tools for our kubernetes cluster. We will be using Grafana, Prometheus, and Alertmanager. The goal of this section is to setup the `monitoring` namespace.
 
 ## Setup kube-prometheus
 
@@ -32,6 +32,6 @@ We can login on http://grafana.tagenal with the following credentials:
 - User: *admin*
 - Password: *admin*
 
-## Next step
+## Next
 
-The next step is to setup Jaeger. Which is detailed [in the next section](./setup-jaeger.md).
+We are now reaching the end of this quick start, to finish, we will complete our application by setting up the APIs and a frontend application, this step is detailed [here](./setup-api-frontend.md).

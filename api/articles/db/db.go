@@ -106,7 +106,7 @@ func NewDatabaseManager() (dbm *DatabaseManager, err error) {
 // GetArticleByID will fetch an article from Vitess corresponding
 // to the given unique ID.
 func (dbm *DatabaseManager) GetArticleByID(ctx context.Context, vtspanctx string, ID uint64) (article Article, err error) {
-	qc := `WHERE _id LIKE ?`
+	qc := `WHERE id=?`
 	article, err = dbm.fetchArticle(ctx, vtspanctx, qc, dbm.db, strconv.Itoa(int(ID)))
 	if err != nil {
 		log.Println(err.Error())
@@ -158,7 +158,7 @@ func (dbm *DatabaseManager) GetArticlesFromRegion(ctx context.Context, vtspanctx
 func (dbm *DatabaseManager) fetchArticle(ctx context.Context, vtspanctx, qc string, db *sql.DB, args ...interface{}) (article Article, err error) {
 	psql := vtspanctx + `SELECT * FROM article ` + qc
 	err = db.QueryRowContext(ctx, psql, args...).Scan(
-		&article.ID, &article.Timestamp, &article.ID2, &article.AID, &article.Title, &article.Category,
+		&article.ID, &article.Timestamp, &article.AID, &article.Title, &article.Category,
 		&article.Abstract, &article.ArticleTags, &article.Authors, &article.Language, &article.Text,
 		&article.Image, &article.Video)
 	return article, err
@@ -174,7 +174,7 @@ func (dbm *DatabaseManager) fetchArticles(ctx context.Context, vtspanctx, qc str
 
 	for rows.Next() {
 		var article Article
-		err = rows.Scan(&article.ID, &article.Timestamp, &article.ID2, &article.AID, &article.Title, &article.Category,
+		err = rows.Scan(&article.ID, &article.Timestamp, &article.AID, &article.Title, &article.Category,
 			&article.Abstract, &article.ArticleTags, &article.Authors, &article.Language, &article.Text,
 			&article.Image, &article.Video)
 		if err != nil {
@@ -189,7 +189,7 @@ func (dbm *DatabaseManager) fetchArticles(ctx context.Context, vtspanctx, qc str
 // InsertArticle will insert the given Article in Vitess MySQL cluster
 // the new ID will be returned, in addition to an error if there is any.
 func (dbm *DatabaseManager) InsertArticle(article Article) (newID int, err error) {
-	sql := `INSERT INTO article (timestamp,id,aid,title,category,abstract,articleTags,authors,language,text,image,video) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
+	sql := `INSERT INTO article (timestamp,aid,title,category,abstract,articleTags,authors,language,text,image,video) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
 
 	id, err := dbm.insertArticle(sql, article)
 	if err != nil {
@@ -206,7 +206,7 @@ func (dbm *DatabaseManager) insertArticle(sql string, article Article) (newID in
 	}
 	defer query.Close()
 
-	res, err := query.Exec(article.Timestamp, article.ID2, article.AID, article.Title, article.Category,
+	res, err := query.Exec(article.Timestamp, article.AID, article.Title, article.Category,
 		article.Abstract, article.ArticleTags, article.Authors, article.Language, article.Text,
 		article.Image, article.Video)
 	if err != nil {

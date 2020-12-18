@@ -22,18 +22,17 @@ message Category {
 
 message Article {
     int64 ID = 1;
-    string Timestamp = 2;
-    string ID2 = 3;
-    string AID = 4;
-    string Title = 5;
-    string Category = 6;
-    string Abstract = 7;
-    string ArticleTags = 8;
-    string Authors = 9;
-    string Language = 10;
-    string Text = 11;
-    string Image = 12;
-    string Video = 13;
+    int64 Timestamp = 2;
+    string AID = 3;
+    string Title = 4;
+    string Category = 5;
+    string Abstract = 6;
+    string ArticleTags = 7;
+    string Authors = 8;
+    string Language = 9;
+    string Text = 10;
+    string Image = 11;
+    string Video = 12;
 }
 
 message Articles {

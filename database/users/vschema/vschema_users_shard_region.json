@@ -1,0 +1,65 @@
+{
+  "sharded": true,
+  "vindexes": {
+    "hash": {
+      "type": "hash"
+    },
+    "region_vdx": {
+      "type": "region_json",
+      "params": {
+        "region_map": "/tmp/countries.json",
+        "region_bytes": "1"
+      }
+    },
+    "user_region_lookup": {
+      "type": "consistent_lookup_unique",
+      "params": {
+        "table": "users.users_lookup",
+        "from": "id",
+        "to": "keyspace_id"
+      },
+      "owner": "user"
+    }
+  },
+  "tables": {
+    "users_lookup": {
+      "column_vindexes": [
+        {
+          "column": "id",
+          "name": "hash"
+        }
+      ]
+    },
+    "user": {
+      "column_vindexes": [
+        {
+          "columns": [
+            "id",
+            "region"
+          ],
+          "name": "region_vdx"
+        },
+        {
+          "column": "id",
+          "name": "user_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "users_seq"
+      }
+    },
+    "user_read": {
+      "column_vindexes": [
+        {
+          "column": "uid",
+          "name": "user_region_lookup"
+        }
+      ],
+      "auto_increment": {
+        "column": "id",
+        "sequence": "user_read_seq"
+      }
+    }
+  }
+}

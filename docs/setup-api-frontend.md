@@ -2,10 +2,10 @@
 
 In this final section, we are going to setup two APIs and a frontend application. We will deploy them to the `default` namespace of our kubernetes cluster.
 
-We will cover how to build, push, and run the frontend application and APIs. The frontend code can be found [here](./api/users/README.md), and the APIs can be found here:
+We will cover how to build, push, and run the frontend application and APIs. The frontend code can be found [here](../frontend/README.md), and the APIs can be found here:
 
-- `users` [[see](./api/users/)]
-- `articles` [[see](./api/articles/)]
+- `users` [[see](../api/users/)]
+- `articles` [[see](../api/articles/)]
 
 ## Frontend
 

@@ -20,4 +20,4 @@ This command will tell the redis cluster that we want to split the cluster in th
 
 ## Next
 
-Now, let's move on to the next step, seting up the monitoring in our cluster, which is explained [here](./setup-monitoring.md)
+Now, let's move on to the next step, seting up the monitoring in our cluster, which is explained [here](./setup-monitoring.md).

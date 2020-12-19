@@ -36,7 +36,7 @@ To run locally, tagenal needs:
 
 In this quick start we will cover the following items:
 
-1. [Setup the Kubernetes cluster](./setup-minikube-vitess.md)
+1. [Setup the Kubernetes cluster](./setup-minikube.md)
 1. [Setup Jaeger](./setup-jaeger.md)
 1. [Setup Traefik Proxy](./setup-traefik.md)
 1. [Setup the Vitess cluster](./setup-vitess.md)

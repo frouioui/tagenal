@@ -82,6 +82,7 @@ func (dbm *DatabaseManager) getUserRead(limit int, granularity string) (urds []U
 		log.Println(err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var urd UserReadCount

@@ -1,10 +1,10 @@
-# Setup Jaeger
+# Quick Start - 2. Setup Jaeger
 
-This section will cover how to setup the `observability` namespace of our kubernetes cluster. We are going to use Jaeger.
+This section will cover how to setup our first kubernetes namespace: `observability`. This namespace will host our observability stack, for now only composed of Jaeger.
 
 ## Setup Jaeger
 
-We use the following command for a few things. It will create the whole `observability` namespace and the required CRDs. It will also add Jaeger configuration to the Vitess cluster and to Traefik.
+The following command will do a few things for us. It will create the `observability` namespace, and the CRDs that Jaeger needs to successfully run on kubernetes. Then, it will 
 
 ```
 make setup_jaeger
@@ -12,8 +12,8 @@ make setup_jaeger
 
 Tagenal is mostly experiment-oriented and not production-oriented. We then use the `AllInOne` configuration of Jaeger, which will greatly ease the deployment.
 
-The command also created the ingress route to access Jaeger dashboard. Which can be access at this URL: http://jaeger.tagenal. On this interface we can see the trace of our services.
+By using minikube dashboard or `kubectl` we can observe the successful deployment of Jaeger.
 
-## Next step
+## Next
 
-The next step is to run the APIs in our kubernetes cluster. Which is detailled [in the next section](./setup-apis.md).
+For now, we can't access Jaeger UI, we will cover that in the next section thanks to Traefik Proxy. Next step is [here](./setup-traefik.md).

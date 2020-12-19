@@ -1,10 +1,10 @@
-# Setup monitoring
+# Quick Start - 6. Setup monitoring
 
-The following section will allow us to setup a fully monitored cluster using Grafana, Prometheus, and Alertmanager.
+The following section will allow us to setup the monitoring tools for our kubernetes cluster. We will be using Grafana, Prometheus, and Alertmanager. The goal of this section is to setup the `monitoring` namespace.
 
 ## Setup kube-prometheus
 
-We are going to use the library [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus). This libary gives us a good interface to the prometheus Kubernetes operator, and allow us to quickly add and modify Grafana dashboards using jsonnet.
+We are going to use the library [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus). This library gives us a good interface to the prometheus Kubernetes operator, allowing us to quickly add and modify Grafana dashboards using jsonnet.
 
 To build the operator's manifest, and create all the Kubernetes CRD in our cluster use the following command:
 
@@ -32,6 +32,6 @@ We can login on http://grafana.tagenal with the following credentials:
 - User: *admin*
 - Password: *admin*
 
-## Next step
+## Next
 
-The next step is to setup Jaeger. Which is detailled [in the next section](./setup-jaeger.md).
+We are now reaching the end of this quick start, to finish, we will complete our application by setting up the APIs and a frontend application, this step is detailed [here](./setup-api-frontend.md).

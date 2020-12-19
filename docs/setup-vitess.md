@@ -172,4 +172,4 @@ Thanks to the ingress routes we have created with Traefik Proxy earlier, we can 
 
 ## Next
 
-Now, we will create a cache layer with Redis, which is explained [here](./setup-monitoring.md)
+Now, we will create a cache layer with Redis, which is explained [here](./setup-redis.md).

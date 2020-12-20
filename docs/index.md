@@ -11,12 +11,13 @@ This project is part of the **Distributed Database Systems** class of the Advanc
 
 ## List of main features
 
-- Bulk load of the User, Article, and Read tables
-- Query users, articles, and users' readings
-- Insert new data in the Be-Read table
-- Query top 5 daily/weekly/monthly articles, with their details
-- Efficient execution of the data insert, update, and queries
-- Monitoring of the whole distributed system
+- Distributed system application to serve articles
+- Sharded MySQL cluster with Vitess
+- Tracing with Jaeger
+- Orchestration with Kubernetes
+- Routing with Traefik Proxy
+- Monitoring with Grafana, Prometheus, and Alertmanager
+- Caching with Redis Cluster
 
 ## Requirements
 To run locally, tagenal needs:

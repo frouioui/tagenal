@@ -1,5 +1,5 @@
 import json
-from random import random
+from random import random,randrange
 import numpy as np
 from PIL import Image
 from shutil import copyfile
@@ -73,7 +73,7 @@ def gen_an_article (i):
     if not os.path.exists(path):
         os.makedirs(path) 
     num = int(random()*1000)
-    text = ['Tsinghua']*num
+    text = ['tsinghua ']*num
     f = open(path+"/text_a"+str(i)+'.txt','w+',encoding="utf8")
     f.write("".join(text))
     f.close()
@@ -82,24 +82,24 @@ def gen_an_article (i):
     image_num = int(random()*5)+1
     image_str = ""
     for j in range(image_num):
+        a = np.random.randint(0,255,(360,480,3))
+        # img = Image.fromarray(a.astype('uint8')).convert('RGB')
         image_str+= 'image_a'+str(i)+'_'+str(j)+'.jpg,'
+        # img.save(path + '/image_a' + str(i) + '_' + str(j) + '.jpg')
+        copyfile('../images/' + str(randrange(1,12)) + '.jpg', path + '/image_a' + str(i) + '_' + str(j) + '.jpg')
+
     article["image"] = image_str
-    # num_image = int(random()*5)+1
-    # for j in range(num_image):
-    #     a = np.random.randint(0,255,(360,480,3))
-    #     img = Image.fromarray(a.astype('uint8')).convert('RGB')
-    #     img.save(path+'/image_a'+str(i)+'_'+str(j)+'.jpg')
 
     # create video
-    # if random() < 0.05:
-    #     # #has one video
-    #     # article["video"] = "video_a"+str(i)+'_video.flv'
-    #     # if random()<0.5:
-    #     #     copyfile('../video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
-    #     # else:
-    #     #     copyfile('../video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
-    # else:
-    article["video"] = ""
+    if random() < 0.05:
+        #has one video
+        article["video"] = "video_a"+str(i)+'_video.flv'
+        if random()<0.5:
+            copyfile('../video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
+        else:
+            copyfile('../video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
+    else:
+        article["video"] = ""
 
     aid_lang[article["aid"]] = article["language"]
     return "(" +  \

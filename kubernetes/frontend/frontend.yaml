@@ -33,6 +33,18 @@ spec:
           env:
             - name: JAEGER_SERVICE_NAME
               value: "frontend"
+            - name: DATA_ASSETS_PATH
+              value: "/assets/data"
+            - name: STATIC_PATH
+              value: "/static/data"
+          volumeMounts:
+            - name: assets
+              mountPath: /assets/data
+      volumes:
+      - name: assets
+        hostPath:
+          path: /mount_data/data
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

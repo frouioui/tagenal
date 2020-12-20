@@ -3,6 +3,7 @@ package routes
 import (
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/frouioui/tagenal/frontend/client"
@@ -18,6 +19,12 @@ func articlesCategoryHandler(c echo.Context) error {
 	ars, err := client.ArticleFromCategory(c, category)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
+	}
+	for i, ar := range ars {
+		imgs, _ := ar.GetAssetsInfo()
+		if len(imgs) > 0 {
+			ars[i].Image = imgs[0]
+		}
 	}
 	return c.Render(http.StatusOK, "articles_category.htm", map[string]interface{}{
 		"page":     "articles_category",
@@ -39,6 +46,12 @@ func articlesRegionHandler(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}
+	for i, ar := range ars {
+		imgs, _ := ar.GetAssetsInfo()
+		if len(imgs) > 0 {
+			ars[i].Image = imgs[0]
+		}
+	}
 	return c.Render(http.StatusOK, "articles_region.htm", map[string]interface{}{
 		"page":     "articles_region",
 		"region":   region,
@@ -58,9 +71,22 @@ func articleIDHandler(c echo.Context) error {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())
 	}
+
+	txts, err := art.GetText()
+	if err != nil {
+		log.Println(err.Error())
+		return c.String(http.StatusOK, err.Error())
+	}
+
+	imgs, vids := art.GetAssetsInfo()
+
 	return c.Render(http.StatusOK, "article.htm", map[string]interface{}{
-		"page":    "article_id",
-		"id":      ID,
-		"article": art,
+		"page":        "article_id",
+		"assets_path": os.Getenv("DATA_ASSETS_PATH"),
+		"id":          ID,
+		"article":     art,
+		"text":        txts,
+		"imgs":        imgs,
+		"vids":        vids,
 	})
 }

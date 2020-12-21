@@ -21,6 +21,10 @@ spec:
               name: vitess-cluster-secret
               key: users.json
         replicas: 1
+        extraFlags:
+          tracer: opentracing-jaeger
+          jaeger-agent-host: jaeger-prod-agent.observability:6831
+          tracing-sampling-rate: "1.0" 
         resources:
           requests:
             cpu: 100m
@@ -43,13 +47,16 @@ spec:
       - zone1
     extraFlags:
       security_policy: read-only
+      tracer: opentracing-jaeger
+      jaeger-agent-host: jaeger-prod-agent.observability:6831
+      tracing-sampling-rate: "1.0" 
     replicas: 1
     resources:
       limits:
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     extraVolumeMounts:
       - name: vitess-region-config-volume
         mountPath: /tmp/countries.json
@@ -66,43 +73,6 @@ spec:
       turndownPolicy: Immediate
       partitionings:
         - equal:
-            parts: 1
-            shardTemplate:
-              databaseInitScriptSecret:
-                name: vitess-cluster-secret
-                key: init_db.sql
-              replication:
-                enforceSemiSync: false
-              tabletPools:
-                - cell: zone1
-                  type: replica
-                  replicas: 2
-                  vttablet:
-                    extraFlags:
-                      db_charset: utf8mb4
-                    resources:
-                      requests:
-                        cpu: 100m
-                        memory: 256Mi
-                  mysqld:
-                    resources:
-                      requests:
-                        cpu: 100m
-                        memory: 256Mi
-                  extraVolumeMounts:
-                    - name: vitess-region-config-volume
-                      mountPath: /tmp/categories.json
-                      subPath: categories.json
-                  extraVolumes:
-                    - name: vitess-region-config-volume
-                      configMap:
-                        name: vitess-cluster-config-sharding
-                  dataVolumeClaimTemplate:
-                    accessModes: ["ReadWriteOnce"]
-                    resources:
-                      requests:
-                        storage: 10Gi
-        - equal:
             parts: 2
             shardTemplate:
               databaseInitScriptSecret:
@@ -113,10 +83,13 @@ spec:
               tabletPools:
                 - cell: zone1
                   type: replica
-                  replicas: 2
+                  replicas: 3
                   vttablet:
                     extraFlags:
                       db_charset: utf8mb4
+                      tracer: opentracing-jaeger
+                      jaeger-agent-host: jaeger-prod-agent.observability:6831
+                      tracing-sampling-rate: "0.0" 
                     resources:
                       requests:
                         cpu: 100m
@@ -124,7 +97,7 @@ spec:
                   mysqld:
                     resources:
                       requests:
-                        cpu: 100m
+                        cpu: 200m
                         memory: 256Mi
                   dataVolumeClaimTemplate:
                     accessModes: ["ReadWriteOnce"]
@@ -144,43 +117,6 @@ spec:
       turndownPolicy: Immediate
       partitionings:
         - equal:
-            parts: 1
-            shardTemplate:
-              databaseInitScriptSecret:
-                name: vitess-cluster-secret
-                key: init_db.sql
-              replication:
-                enforceSemiSync: false
-              tabletPools:
-                - cell: zone1
-                  type: replica
-                  replicas: 2
-                  vttablet:
-                    extraFlags:
-                      db_charset: utf8mb4
-                    resources:
-                      requests:
-                        cpu: 100m
-                        memory: 256Mi
-                  mysqld:
-                    resources:
-                      requests:
-                        cpu: 100m
-                        memory: 256Mi
-                  extraVolumeMounts:
-                    - name: vitess-region-config-volume
-                      mountPath: /tmp/countries.json
-                      subPath: countries.json
-                  extraVolumes:
-                    - name: vitess-region-config-volume
-                      configMap:
-                        name: vitess-cluster-config-sharding
-                  dataVolumeClaimTemplate:
-                    accessModes: ["ReadWriteOnce"]
-                    resources:
-                      requests:
-                        storage: 10Gi
-        - equal:
             parts: 2
             shardTemplate:
               databaseInitScriptSecret:
@@ -191,10 +127,13 @@ spec:
               tabletPools:
                 - cell: zone1
                   type: replica
-                  replicas: 2
+                  replicas: 3
                   vttablet:
                     extraFlags:
                       db_charset: utf8mb4
+                      tracer: opentracing-jaeger
+                      jaeger-agent-host: jaeger-prod-agent.observability:6831
+                      tracing-sampling-rate: "0.0" 
                     resources:
                       requests:
                         cpu: 100m
@@ -202,7 +141,7 @@ spec:
                   mysqld:
                     resources:
                       requests:
-                        cpu: 100m
+                        cpu: 200m
                         memory: 256Mi
                   dataVolumeClaimTemplate:
                     accessModes: ["ReadWriteOnce"]
@@ -232,10 +171,13 @@ spec:
               tabletPools:
                 - cell: zone1
                   type: replica
-                  replicas: 2
+                  replicas: 3
                   vttablet:
                     extraFlags:
                       db_charset: utf8mb4
+                      tracer: opentracing-jaeger
+                      jaeger-agent-host: jaeger-prod-agent.observability:6831
+                      tracing-sampling-rate: "0.0" 
                     resources:
                       requests:
                         cpu: 100m

@@ -39,7 +39,7 @@ list_vtctld:
 start_minikube:
 	minikube start --driver=hyperkit --mount --mount-string ./data:/mount_data --kubernetes-version=v1.19.2 --cpus=10 --memory=11000 --disk-size=80g --extra-config=kubelet.authentication-token-webhook=true --extra-config=kubelet.authorization-mode=Webhook --extra-config=scheduler.address=0.0.0.0 --extra-config=controller-manager.address=0.0.0.0
 	minikube addons disable metrics-server
-	@sleep 5
+	@sleep 15
 	echo "$(shell pwd)/data -alldirs -mapall="$(shell id -u)":"$(shell id -g)" $(shell minikube ip)" | sudo tee -a /etc/exports && sudo nfsd restart
 
 start_minikube_dashboard:
@@ -49,21 +49,21 @@ clone_vitess_operator:
 	./lib/get-vitess-operator.sh
 
 setup_vitess_operator_kubernetes:
-	kubectl apply -f kubernetes/vitess_namespace.yaml
+	kubectl apply -f kubernetes/vitess/vitess_namespace.yaml
 	kubectl config set-context $(shell kubectl config current-context) --namespace=vitess
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/crds/
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/priority.yaml
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/role.yaml
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/role_binding.yaml
 	kubectl apply -f $(VITESS_OPERATOR_PATH)/service_account.yaml
-	kubectl apply -f kubernetes/vitess_operator.yaml
+	kubectl apply -f kubernetes/vitess/vitess_operator.yaml
 	kubectl config set-context $(shell kubectl config current-context) --namespace=default
 
 setup_vitess_kubernetes:
-	kubectl apply -f kubernetes/vitess_cluster_secret.yaml
-	kubectl apply -f kubernetes/vitess_cluster_config.yaml
-	kubectl apply -f kubernetes/vitess_cluster.yaml	
-	kubectl apply -f kubernetes/vitess_vtgate_service.yaml
+	kubectl apply -f kubernetes/vitess/vitess_cluster_secret.yaml
+	kubectl apply -f kubernetes/vitess/vitess_cluster_config.yaml
+	kubectl apply -f kubernetes/vitess/vitess_cluster.yaml	
+	kubectl apply -f kubernetes/vitess/vitess_vtgate_service.yaml
 
 init_mysql_tables:
 	$(VTCTL_CLIENT) ApplySchema -sql="$(shell cat $(DATABASE_FOLDER_PATH)/users/init/init_users.sql)" $(V_KEYSPACE_USERS)
@@ -86,23 +86,6 @@ init_vitess_all:
 	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/config/vschema/vschema_config_seq.json)' $(V_KEYSPACE_CONFIG)
 	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/users/vschema/vschema_users_shard_region.json)' $(V_KEYSPACE_USERS)
 	$(VTCTL_CLIENT) ApplyVSchema -vschema='$(shell cat $(DATABASE_FOLDER_PATH)/articles/vschema/vschema_articles_shard_region.json)' $(V_KEYSPACE_ARTICLES)
-
-resharding_process_users:
-	$(SHARD_INIT_RESHARD_USERS)
-	$(SHARD_VERIFY_USERS_SHARDING_PROCESS)
-	$(SHARD_SWITCH_READ_REPLICA_USERS)
-	$(SHARD_SWITCH_READ_RDONLY_USERS)
-	$(SHARD_SWITCH_WRITE_USERS)
-
-resharding_process_articles:
-	$(SHARD_INIT_RESHARD_ARTICLES)
-	$(SHARD_VERIFY_ARTICLES_SHARDING_PROCESS)
-	$(SHARD_SWITCH_READ_REPLICA_ARTICLES)
-	$(SHARD_SWITCH_READ_RDONLY_ARTICLES)
-	$(SHARD_SWITCH_WRITE_ARTICLES)
-
-final_vitess_cluster:
-	kubectl apply -f kubernetes/init_cluster_vitess_sharded_final.yaml	
 
 init_vreplication_articles:
 	$(VTCTL_CLIENT) $(shell go run scripts/vreplgen.go articles_science '$(shell $(VTCTL_CLIENT) GetShard articles/80-)') 
@@ -144,9 +127,6 @@ setup_traefik_vitess: $(shell chmod +x ./kubernetes/traefik/vitess/build.sh)
 
 setup_traefik_monitoring:
 	kubectl create -f kubernetes/traefik/monitoring/
-
-show_vttablets:
-	kubectl get pods --namespace=vitess --selector="planetscale.com/component=vttablet" -o custom-columns=":metadata.name" 
 
 show_vitess_tablets:
 	echo "show vitess_tablets;" | $(MYSQL_CLIENT) --table

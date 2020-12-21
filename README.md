@@ -1,6 +1,6 @@
 # Tagenal
 
-[![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal) [![Go Report Card](https://goreportcard.com/badge/github.com/frouioui/tagenal)](https://goreportcard.com/report/github.com/frouioui/tagenal)
+[![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal) [![Go Report Card](https://goreportcard.com/badge/github.com/frouioui/tagenal)](https://goreportcard.com/report/github.com/frouioui/tagenal) [![Maintainability](https://api.codeclimate.com/v1/badges/55fb8c66d617c9425aff/maintainability)](https://codeclimate.com/github/frouioui/tagenal/maintainability)
 
 ## Description
 

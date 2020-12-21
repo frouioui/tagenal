@@ -1,6 +1,6 @@
 # Tagenal
 
-[![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal)
+[![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal) [![Go Report Card](https://goreportcard.com/badge/github.com/frouioui/tagenal)](https://goreportcard.com/report/github.com/frouioui/tagenal)
 
 ## Description
 

@@ -2,22 +2,19 @@
 
 [![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal)
 
-## Description of the project
-<img align="right" width="100" height="100" src="./assets/img/Tsinghua_University_Logo.png">
+## Description
 
-This project is part of the **Distributed Database Systems** class of the Advanced Computer Science master degree at **Tsinghua University**.
+Tagenal is a playground with a set of tools that enable experimentation in a cloud-native application.
 
-<br>
+The tools we use are:
 
-## List of main features
-
-- Distributed system application to serve articles
-- Sharded MySQL cluster with Vitess
-- Tracing with Jaeger
-- Orchestration with Kubernetes
-- Routing with Traefik Proxy
-- Monitoring with Grafana, Prometheus, and Alertmanager
+- Relational Database Sharding with Vitess
+- Container Orchestration with Kubernetes
+- Complete Runtime Tracing and Observation with Jaeger
+- Application State Monitoring with Grafana, Alertmanager and Promotheus
+- Request Caching with Redis Cluster
 - Caching with Redis Cluster
+- APIs and Front-End Application
 
 ## Requirements
 To run locally, tagenal needs:
@@ -47,3 +44,6 @@ In this quick start we will cover the following items:
 
 Once the quick start is over, we will have a fully setup application using distributed database systems.
 
+## Architecture
+
+<img src="./docs/Tagenal k8s.png">

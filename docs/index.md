@@ -2,22 +2,19 @@
 
 [![Build Status](https://travis-ci.com/frouioui/tagenal.svg?token=XhmJBhJBxshbY6hsWepE&branch=master)](https://travis-ci.com/frouioui/tagenal)
 
-## Description of the project
-<img align="right" width="100" height="100" src="./Tsinghua_University_Logo.png">
+## Description
 
-This project is part of the **Distributed Database Systems** class of the Advanced Computer Science master degree at **Tsinghua University**.
+Tagenal is a playground with a set of tools that enable experimentation in a cloud-native application.
 
-<br>
+The tools we use are:
 
-## List of main features
-
-- Distributed system application to serve articles
-- Sharded MySQL cluster with Vitess
-- Tracing with Jaeger
-- Orchestration with Kubernetes
-- Routing with Traefik Proxy
-- Monitoring with Grafana, Prometheus, and Alertmanager
+- Relational Database Sharding with Vitess
+- Container Orchestration with Kubernetes
+- Complete Runtime Tracing and Observation with Jaeger
+- Application State Monitoring with Grafana, Alertmanager and Promotheus
+- Request Caching with Redis Cluster
 - Caching with Redis Cluster
+- APIs and Front-End Application
 
 ## Requirements
 To run locally, tagenal needs:
@@ -37,12 +34,16 @@ To run locally, tagenal needs:
 
 In this quick start we will cover the following items:
 
-1. [Setup the Kubernetes cluster](./setup-minikube.md)
-1. [Setup Jaeger](./setup-jaeger.md)
-1. [Setup Traefik Proxy](./setup-traefik.md)
-1. [Setup the Vitess cluster](./setup-vitess.md)
-1. [Setup the Redis cluster](./setup-redis.md)
-1. [Setup monitoring with Grafana, Prometheus and Alertmanager](./setup-monitoring.md)
-1. [Setup the APIs and frontend](./setup-api-frontend.md)
+1. [Setup the Kubernetes cluster](./docs/setup-minikube.md)
+1. [Setup Jaeger](./docs/setup-jaeger.md)
+1. [Setup Traefik Proxy](./docs/setup-traefik.md)
+1. [Setup the Vitess cluster](./docs/setup-vitess.md)
+1. [Setup the Redis cluster](./docs/setup-redis.md)
+1. [Setup monitoring with Grafana, Prometheus and Alertmanager](./docs/setup-monitoring.md)
+1. [Setup the APIs and frontend](./docs/setup-api-frontend.md)
 
 Once the quick start is over, we will have a fully setup application using distributed database systems.
+
+## Architecture
+
+<img src="./Tagenal k8s.png">

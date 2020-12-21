@@ -16,6 +16,7 @@ func GetDefaultServicesInfos() []ServiceInfo {
 		{"Prometheus", "", "http://prometheus.tagenal", true},
 		{"AlertManager", "", "http://alertmanager.tagenal", true},
 		{"Traefik", "", "http://tagenal:8080", true},
-		{"Vtctld Dashboard", "", "http://tagenal/vtctld/app/dashboard", true},
+		{"Vtctld Dashboard", "", "http://vtctld.tagenal", true},
+		{"Jager", "", "http://jaeger.tagenal", true},
 	}
 }

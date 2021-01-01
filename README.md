@@ -6,13 +6,12 @@
 
 Tagenal is a playground with a set of tools that enable experimentation in a cloud-native application.
 
-The tools we use are:
+Tagenal uses:
 
 - Relational Database Sharding with Vitess
 - Container Orchestration with Kubernetes
 - Complete Runtime Tracing and Observation with Jaeger
 - Application State Monitoring with Grafana, Alertmanager and Promotheus
-- Request Caching with Redis Cluster
 - Caching with Redis Cluster
 - APIs and Front-End Application
 

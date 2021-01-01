@@ -86,7 +86,7 @@ def gen_an_article (i):
         # img = Image.fromarray(a.astype('uint8')).convert('RGB')
         image_str+= 'image_a'+str(i)+'_'+str(j)+'.jpg,'
         # img.save(path + '/image_a' + str(i) + '_' + str(j) + '.jpg')
-        copyfile('../images/' + str(randrange(1,12)) + '.jpg', path + '/image_a' + str(i) + '_' + str(j) + '.jpg')
+        copyfile('./images/' + str(randrange(1,12)) + '.jpg', path + '/image_a' + str(i) + '_' + str(j) + '.jpg')
 
     article["image"] = image_str
 
@@ -95,9 +95,9 @@ def gen_an_article (i):
         #has one video
         article["video"] = "video_a"+str(i)+'_video.flv'
         if random()<0.5:
-            copyfile('../video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('./video/video1.flv',path+"/video_a"+str(i)+'_video.flv')
         else:
-            copyfile('../video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
+            copyfile('./video/video2.flv',path+"/video_a"+str(i)+'_video.flv')
     else:
         article["video"] = ""
 

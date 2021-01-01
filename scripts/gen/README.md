@@ -1,17 +1,18 @@
-# Tagenal
+# Generation of data
 
-## Generation of the datasets
+## How to run
 
-### Requirements
+Execute the following command:
 
-To generate the data you must have all the required python packages:
+```
+python3 generation_data.py
+```
+
+The data will be generated in the `article.sql`, `user.sql`, `user_read.sql`. Media and text files related to articles, will be store in the `articles` folder, where each subfolder corresponds to an article.
+
+## Requirements
+
+To use the data generation script you must have installed the following python packages:
 
 - numpy
 - pillow
-
-Here are the command lines to download the required packages:
-
-```shell
-python3 -m pip install Pillow
-python3 -m pip install numpy
-```

@@ -6,13 +6,12 @@
 
 Tagenal is a playground with a set of tools that enable experimentation in a cloud-native application.
 
-The tools we use are:
+Tagenal uses:
 
 - Relational Database Sharding with Vitess
 - Container Orchestration with Kubernetes
 - Complete Runtime Tracing and Observation with Jaeger
 - Application State Monitoring with Grafana, Alertmanager and Promotheus
-- Request Caching with Redis Cluster
 - Caching with Redis Cluster
 - APIs and Front-End Application
 
@@ -43,6 +42,10 @@ In this quick start we will cover the following items:
 1. [Setup the APIs and frontend](./setup-api-frontend.md)
 
 Once the quick start is over, we will have a fully setup application using distributed database systems.
+
+## Generate sample data
+
+The documentation and script to generate the sample data can be found [here](https://github.com/frouioui/tagenal/tree/master/scripts/gen).
 
 ## Architecture
 

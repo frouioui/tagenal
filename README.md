@@ -43,6 +43,10 @@ In this quick start we will cover the following items:
 
 Once the quick start is over, we will have a fully setup application using distributed database systems.
 
+## Generate sample data
+
+The documentation and script to generate the sample data can be found [here](./scrips/gen/).
+
 ## Architecture
 
 <img src="./docs/Tagenal k8s.png">

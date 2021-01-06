@@ -2,7 +2,11 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"log"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/frouioui/tagenal/api/users/db"
 	"github.com/frouioui/tagenal/api/users/pb"
@@ -32,29 +36,31 @@ func (s *userServiceGRPC) ServiceInformation(cxt context.Context, r *pb.Informat
 func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.ID) (*pb.User, error) {
 	user, err := s.dbm.GetUserByID(cxt, "", uint64(r.ID))
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		if err == sql.ErrNoRows {
+			st := status.New(codes.NotFound, "Not found.")
+			return nil, st.Err()
+		}
+		st, _ := status.FromError(err)
+		return nil, st.Err()
 	}
-	resp := user.ProtoUser()
-	return resp, nil
+	return user.ProtoUser(), nil
 }
 
 func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.Region) (*pb.Users, error) {
 	users, err := s.dbm.GetUsersOfRegion(cxt, "", r.Region)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		st, _ := status.FromError(err)
+		return nil, st.Err()
 	}
-	resp := db.UsersToProtoUsers(users)
-	return resp, nil
+	return db.UsersToProtoUsers(users), nil
 }
 
 func (s *userServiceGRPC) NewUser(cxt context.Context, r *pb.User) (*pb.ID, error) {
 	user := db.ProtoUserToUser(r)
 	id, err := s.dbm.InsertUser(user)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		st, _ := status.FromError(err)
+		return nil, st.Err()
 	}
 	pbid := &pb.ID{ID: int64(id)}
 	return pbid, nil
@@ -66,8 +72,8 @@ func (s *userServiceGRPC) NewUsers(cxt context.Context, r *pb.Users) (*pb.IDs, e
 		user := db.ProtoUserToUser(u)
 		id, err := s.dbm.InsertUser(user)
 		if err != nil {
-			log.Println(err.Error())
-			return nil, err
+			st, _ := status.FromError(err)
+			return nil, st.Err()
 		}
 		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})
 	}

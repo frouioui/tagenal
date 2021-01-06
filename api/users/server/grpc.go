@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"google.golang.org/grpc/codes"
@@ -34,14 +35,25 @@ func (s *userServiceGRPC) ServiceInformation(ctx context.Context, r *pb.Informat
 }
 
 func (s *userServiceGRPC) GetSingleUser(ctx context.Context, r *pb.ID) (*pb.User, error) {
-	user, err := s.dbm.GetUserByID(ctx, "", uint64(r.ID))
-	if err != nil {
-		if err == sql.ErrNoRows {
-			st := status.New(codes.NotFound, "Not found.")
+	var user db.User
+	var err error
+
+	if user, err = getCacheUser(ctx, fmt.Sprintf("user_id_%d", r.ID), user); err != nil {
+		user, err = s.dbm.GetUserByID(ctx, "", uint64(r.ID))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				st := status.New(codes.NotFound, "Not found.")
+				return nil, st.Err()
+			}
+			st, _ := status.FromError(err)
 			return nil, st.Err()
 		}
-		st, _ := status.FromError(err)
-		return nil, st.Err()
+		err = setCacheUser(ctx, fmt.Sprintf("user_id_%d", r.ID), user)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
 	return user.ProtoUser(), nil
 }

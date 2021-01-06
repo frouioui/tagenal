@@ -12,11 +12,7 @@ message IDs {
     repeated ID IDs = 1;
 }
 
-message RequestID {
-    int64 ID = 1;
-}
-
-message RequestRegion {
+message Region {
     string Region = 1;
 }
 
@@ -55,19 +51,19 @@ message UserRead {
     string CommentDetails = 11;
 }
 
-message UserHomeRequest {
+message InformationRequest {
 
 }
 
-message UserHomeResponse {
+message InformationResponse {
     string IP = 1;
     string Host = 2;
 }
 
 service UserService {
-    rpc ServiceInformation(UserHomeRequest) returns (UserHomeResponse) {}
-    rpc GetSingleUser(RequestID) returns (User) {}
-    rpc GetRegionUsers(RequestRegion) returns (Users) {}
+    rpc ServiceInformation(InformationRequest) returns (InformationResponse) {}
+    rpc GetSingleUser(ID) returns (User) {}
+    rpc GetRegionUsers(Region) returns (Users) {}
     rpc NewUser(User) returns (ID) {}
     rpc NewUsers(Users) returns (IDs) {}
 }

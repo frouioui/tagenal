@@ -11,6 +11,9 @@ dockerbuild:
 build:
 	go build main.go
 
+clientproto:
+	cp ../api/articles/pb/*.pb.go ../api/users/pb/*.pb.go ./client/pb
+
 clean:
 	go clean
 

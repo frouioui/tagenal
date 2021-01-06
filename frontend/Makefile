@@ -12,7 +12,8 @@ build:
 	go build main.go
 
 clientproto:
-	cp ../api/articles/pb/*.pb.go ../api/users/pb/*.pb.go ./client/pb
+	cp ../api/articles/pb/*.pb.go ./client/pb/articles
+	cp ../api/users/pb/*.pb.go ./client/pb/users
 
 clean:
 	go clean

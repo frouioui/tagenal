@@ -33,7 +33,7 @@ func userIDHandler(c echo.Context) error {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())
 	}
-	user, err := client.UserFromID(c, ID)
+	user, err := client.UsersFromIDGRPC(c, ID)
 	if err != nil {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())

@@ -59,10 +59,21 @@ func (s *userServiceGRPC) GetSingleUser(ctx context.Context, r *pb.ID) (*pb.User
 }
 
 func (s *userServiceGRPC) GetRegionUsers(ctx context.Context, r *pb.Region) (*pb.Users, error) {
-	users, err := s.dbm.GetUsersOfRegion(ctx, "", r.Region)
-	if err != nil {
-		st, _ := status.FromError(err)
-		return nil, st.Err()
+	var err error
+	var users []db.User
+
+	if users, err = getCacheUsers(ctx, fmt.Sprintf("user_region_%s", r.Region), users); err != nil {
+		users, err = s.dbm.GetUsersOfRegion(ctx, "", r.Region)
+		if err != nil {
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
+		err = setCacheUsers(ctx, fmt.Sprintf("user_region_%s", r.Region), users)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
 	return db.UsersToProtoUsers(users), nil
 }

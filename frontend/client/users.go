@@ -117,6 +117,36 @@ func UserFromID(c echo.Context, ID int) (user *models.User, err error) {
 	return &response.User, nil
 }
 
+func UsersFromRegionGRPC(c echo.Context, region string) (users []models.User, err error) {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second)
+	defer cancel()
+	r, err := grpcUsersClient.GetRegionUsers(ctx, &pb.Region{Region: region})
+	if err != nil {
+		s := status.Convert(err)
+		log.Printf("Error: %s", s.Message())
+		return nil, err
+	}
+	for _, pbUser := range r.Users {
+		users = append(users, models.User{
+			ID:              pbUser.ID,
+			Timestamp:       pbUser.Timestamp,
+			UID:             pbUser.UID,
+			Name:            pbUser.Name,
+			Gender:          pbUser.Gender,
+			Email:           pbUser.Email,
+			Phone:           pbUser.Phone,
+			Dept:            pbUser.Dept,
+			Grade:           pbUser.Grade,
+			Language:        pbUser.Language,
+			Region:          pbUser.Region,
+			Role:            pbUser.Role,
+			PreferTags:      pbUser.PreferTags,
+			ObtainedCredits: pbUser.ObtainedCredits,
+		})
+	}
+	return users, nil
+}
+
 func UsersFromRegion(c echo.Context, region string) (users []models.User, err error) {
 	url := fmt.Sprintf("http://users-api:10000/region/%s", region)
 	method := "GET"

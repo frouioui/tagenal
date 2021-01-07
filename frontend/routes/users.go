@@ -15,7 +15,7 @@ func usersHandler(c echo.Context) error {
 
 func usersRegionHandler(c echo.Context) error {
 	region := c.Param("region")
-	users, err := client.UsersFromRegion(c, region)
+	users, err := client.UsersFromRegionGRPC(c, region)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}

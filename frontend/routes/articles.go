@@ -66,7 +66,7 @@ func articleIDHandler(c echo.Context) error {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())
 	}
-	art, err := client.ArticleFromID(c, ID)
+	art, err := client.ArticlesFromIDGRPC(c, ID)
 	if err != nil {
 		log.Println(err.Error())
 		return c.String(http.StatusOK, err.Error())

@@ -2,6 +2,6 @@ package client
 
 func InitGRPCClient() (err error) {
 	err = InitUsersGRPC()
-	// err = InitArticlesGRPC()
+	err = InitArticlesGRPC()
 	return err
 }

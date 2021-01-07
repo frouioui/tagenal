@@ -17,7 +17,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ArticleServiceClient interface {
-	ServiceInformation(ctx context.Context, in *ArticleHomeRequest, opts ...grpc.CallOption) (*ArticleHomeResponse, error)
+	ServiceInformation(ctx context.Context, in *InformationRequest, opts ...grpc.CallOption) (*InformationResponse, error)
 	GetSingleArticle(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Article, error)
 	GetCategoryArticles(ctx context.Context, in *Category, opts ...grpc.CallOption) (*Articles, error)
 	GetArticlesByRegion(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Articles, error)
@@ -33,8 +33,8 @@ func NewArticleServiceClient(cc grpc.ClientConnInterface) ArticleServiceClient {
 	return &articleServiceClient{cc}
 }
 
-func (c *articleServiceClient) ServiceInformation(ctx context.Context, in *ArticleHomeRequest, opts ...grpc.CallOption) (*ArticleHomeResponse, error) {
-	out := new(ArticleHomeResponse)
+func (c *articleServiceClient) ServiceInformation(ctx context.Context, in *InformationRequest, opts ...grpc.CallOption) (*InformationResponse, error) {
+	out := new(InformationResponse)
 	err := c.cc.Invoke(ctx, "/pb.ArticleService/ServiceInformation", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (c *articleServiceClient) NewArticles(ctx context.Context, in *Articles, op
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility
 type ArticleServiceServer interface {
-	ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error)
+	ServiceInformation(context.Context, *InformationRequest) (*InformationResponse, error)
 	GetSingleArticle(context.Context, *ID) (*Article, error)
 	GetCategoryArticles(context.Context, *Category) (*Articles, error)
 	GetArticlesByRegion(context.Context, *ID) (*Articles, error)
@@ -104,7 +104,7 @@ type ArticleServiceServer interface {
 type UnimplementedArticleServiceServer struct {
 }
 
-func (UnimplementedArticleServiceServer) ServiceInformation(context.Context, *ArticleHomeRequest) (*ArticleHomeResponse, error) {
+func (UnimplementedArticleServiceServer) ServiceInformation(context.Context, *InformationRequest) (*InformationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ServiceInformation not implemented")
 }
 func (UnimplementedArticleServiceServer) GetSingleArticle(context.Context, *ID) (*Article, error) {
@@ -136,7 +136,7 @@ func RegisterArticleServiceServer(s grpc.ServiceRegistrar, srv ArticleServiceSer
 }
 
 func _ArticleService_ServiceInformation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ArticleHomeRequest)
+	in := new(InformationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func _ArticleService_ServiceInformation_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/pb.ArticleService/ServiceInformation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArticleServiceServer).ServiceInformation(ctx, req.(*ArticleHomeRequest))
+		return srv.(ArticleServiceServer).ServiceInformation(ctx, req.(*InformationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

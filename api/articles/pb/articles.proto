@@ -39,17 +39,17 @@ message Articles {
     repeated Article Articles = 1;
 }
 
-message ArticleHomeRequest {
+message InformationRequest {
 
 }
 
-message ArticleHomeResponse {
+message InformationResponse {
     string IP = 1;
     string Host = 2;
 }
 
 service ArticleService {
-    rpc ServiceInformation(ArticleHomeRequest) returns (ArticleHomeResponse) {}
+    rpc ServiceInformation(InformationRequest) returns (InformationResponse) {}
     rpc GetSingleArticle(ID) returns (Article) {}
     rpc GetCategoryArticles(Category) returns (Articles) {}
     rpc GetArticlesByRegion(ID) returns (Articles) {}

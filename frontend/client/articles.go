@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	pb "github.com/frouioui/tagenal/frontend/client/pb/articles"
@@ -37,7 +38,7 @@ var grpcArticlesClient pb.ArticleServiceClient
 
 func InitArticlesGRPC() (err error) {
 	tracer := opentracing.GlobalTracer()
-	conn, err := grpc.Dial("articles-api:9090",
+	conn, err := grpc.Dial(os.Getenv("ARTICLES_API_SERVICE_HOST")+":"+os.Getenv("ARTICLES_API_SERVICE_PORT_GRPC"),
 		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(tracer)),
 		grpc.WithStreamInterceptor(otgrpc.OpenTracingStreamClientInterceptor(tracer)),
@@ -114,7 +115,24 @@ func ArticleFromID(c echo.Context, ID int) (article *models.Article, err error) 
 	return &response.Article, nil
 }
 
-func ArticleFromCategory(c echo.Context, category string) (articles []models.Article, err error) {
+func ArticlesFromCategoryGRPC(c echo.Context, category string) (articles []models.Article, err error) {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second)
+	defer cancel()
+	r, err := grpcArticlesClient.GetCategoryArticles(ctx, &pb.Category{Category: category})
+	if err != nil {
+		s := status.Convert(err)
+		switch s.Code() {
+		case codes.NotFound:
+			log.Printf("User not found: %s", s.Message())
+		default:
+			log.Printf("Error: %s", s.Message())
+		}
+		return nil, err
+	}
+	return models.TransformProtosToArticles(r), nil
+}
+
+func ArticlesFromCategory(c echo.Context, category string) (articles []models.Article, err error) {
 	url := fmt.Sprintf("http://articles-api:8080/category/%s", category)
 	method := "GET"
 
@@ -152,7 +170,24 @@ func ArticleFromCategory(c echo.Context, category string) (articles []models.Art
 	return response.Articles, nil
 }
 
-func ArticleFromRegion(c echo.Context, regionID int) (articles []models.Article, err error) {
+func ArticlesFromRegionGRPC(c echo.Context, regionID int) (articles []models.Article, err error) {
+	ctx, cancel := context.WithTimeout(c.Request().Context(), time.Second)
+	defer cancel()
+	r, err := grpcArticlesClient.GetArticlesByRegion(ctx, &pb.ID{ID: int64(regionID)})
+	if err != nil {
+		s := status.Convert(err)
+		switch s.Code() {
+		case codes.NotFound:
+			log.Printf("User not found: %s", s.Message())
+		default:
+			log.Printf("Error: %s", s.Message())
+		}
+		return nil, err
+	}
+	return models.TransformProtosToArticles(r), nil
+}
+
+func ArticlesFromRegion(c echo.Context, regionID int) (articles []models.Article, err error) {
 	url := fmt.Sprintf("http://articles-api:8080/region/id/%d", regionID)
 	method := "GET"
 

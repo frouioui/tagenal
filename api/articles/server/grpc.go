@@ -39,7 +39,7 @@ func (s *articleServiceGRPC) GetSingleArticle(ctx context.Context, r *pb.ID) (*p
 	var err error
 	article, err = getCacheArticle(ctx, fmt.Sprintf("article_id_%d", r.ID), article)
 	if err != nil {
-		article, err := s.dbm.GetArticleByID(ctx, "", uint64(r.ID))
+		article, err = s.dbm.GetArticleByID(ctx, "", uint64(r.ID))
 		if err != nil {
 			if err == sql.ErrNoRows {
 				st := status.New(codes.NotFound, "Not found.")
@@ -59,23 +59,43 @@ func (s *articleServiceGRPC) GetSingleArticle(ctx context.Context, r *pb.ID) (*p
 }
 
 func (s *articleServiceGRPC) GetCategoryArticles(ctx context.Context, r *pb.Category) (*pb.Articles, error) {
-	articles, err := s.dbm.GetArticlesOfCategory(ctx, "", r.Category)
+	var articles []db.Article
+	var err error
+	articles, err = getCacheArticles(ctx, fmt.Sprintf("article_category_%s", r.Category), articles)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		articles, err = s.dbm.GetArticlesOfCategory(ctx, "", r.Category)
+		if err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+		err = setCacheArticles(ctx, fmt.Sprintf("article_category_%s", r.Category), articles)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
-	resp := db.ArticlesToProtoArticles(articles)
-	return resp, nil
+	return db.ArticlesToProtoArticles(articles), nil
 }
 
 func (s *articleServiceGRPC) GetArticlesByRegion(ctx context.Context, r *pb.ID) (*pb.Articles, error) {
-	articles, err := s.dbm.GetArticlesFromRegion(ctx, "", int(r.ID))
+	var articles []db.Article
+	var err error
+	articles, err = getCacheArticles(ctx, fmt.Sprintf("article_region_%d", r.ID), articles)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		articles, err = s.dbm.GetArticlesFromRegion(ctx, "", int(r.ID))
+		if err != nil {
+			log.Println(err.Error())
+			return nil, err
+		}
+		err = setCacheArticles(ctx, fmt.Sprintf("article_region_%d", r.ID), articles)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
-	resp := db.ArticlesToProtoArticles(articles)
-	return resp, nil
+	return db.ArticlesToProtoArticles(articles), nil
 }
 
 func (s *articleServiceGRPC) NewArticle(ctx context.Context, r *pb.Article) (*pb.ID, error) {

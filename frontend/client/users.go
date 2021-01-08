@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -40,7 +41,7 @@ var grpcUsersClient pb.UserServiceClient
 
 func InitUsersGRPC() (err error) {
 	tracer := opentracing.GlobalTracer()
-	conn, err := grpc.Dial("users-api:9090",
+	conn, err := grpc.Dial(os.Getenv("USERS_API_SERVICE_HOST")+":"+os.Getenv("USERS_API_SERVICE_PORT_GRPC"),
 		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(tracer)),
 		grpc.WithStreamInterceptor(otgrpc.OpenTracingStreamClientInterceptor(tracer)),

@@ -16,7 +16,7 @@ func articlesHandler(c echo.Context) error {
 
 func articlesCategoryHandler(c echo.Context) error {
 	category := c.Param("category")
-	ars, err := client.ArticleFromCategory(c, category)
+	ars, err := client.ArticlesFromCategoryGRPC(c, category)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}
@@ -42,7 +42,7 @@ func articlesRegionHandler(c echo.Context) error {
 	} else if region == "hong kong" {
 		regionID = 2
 	}
-	ars, err := client.ArticleFromRegion(c, regionID)
+	ars, err := client.ArticlesFromRegionGRPC(c, regionID)
 	if err != nil {
 		return c.String(http.StatusOK, err.Error())
 	}

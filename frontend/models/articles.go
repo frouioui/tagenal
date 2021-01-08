@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	pb "github.com/frouioui/tagenal/frontend/client/pb/articles"
 )
 
 type Article struct {
@@ -20,6 +22,26 @@ type Article struct {
 	Text        string `json:"text"`
 	Image       string `json:"image"`
 	Video       string `json:"video"`
+}
+
+func TransformProtosToArticles(r *pb.Articles) (articles []Article) {
+	for _, pbArticle := range r.Articles {
+		articles = append(articles, Article{
+			ID:          pbArticle.ID,
+			Timestamp:   pbArticle.Timestamp,
+			AID:         pbArticle.AID,
+			Title:       pbArticle.Title,
+			Category:    pbArticle.Category,
+			Abstract:    pbArticle.Abstract,
+			ArticleTags: pbArticle.ArticleTags,
+			Authors:     pbArticle.Authors,
+			Language:    pbArticle.Language,
+			Text:        pbArticle.Text,
+			Image:       pbArticle.Image,
+			Video:       pbArticle.Video,
+		})
+	}
+	return articles
 }
 
 func (art *Article) GetAssetsInfo() ([]string, []string) {

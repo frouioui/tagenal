@@ -26,7 +26,7 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 	serverSpan := tracer.StartSpan("HTTP GET URL: /", ext.RPCServerOption(spanCtx))
 	defer serverSpan.Finish()
 
-	resp := &pb.UserHomeResponse{
+	resp := &pb.InformationResponse{
 		IP:   getHostIP(),
 		Host: getHostName(),
 	}

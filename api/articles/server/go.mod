@@ -14,6 +14,7 @@ require (
 	github.com/go-redis/redis/v8 v8.4.2
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gorilla/mux v1.8.0
+	github.com/opentracing-contrib/go-grpc v0.0.0-20180928155321-4b5a12d3ff02
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible

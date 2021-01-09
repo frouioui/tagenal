@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/frouioui/tagenal/frontend/client"
+
 	"github.com/frouioui/tagenal/frontend/routes"
 	"github.com/labstack/echo-contrib/jaegertracing"
 	"github.com/labstack/echo/v4"
@@ -52,6 +54,11 @@ func main() {
 
 	c := jaegertracing.New(e, nil)
 	defer c.Close()
+
+	err := client.InitGRPCClient()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 	e.Renderer = getTemplateEngine()
 	e.Use(middleware.Logger())

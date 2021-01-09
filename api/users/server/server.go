@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/frouioui/tagenal/api/users/pb"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -49,7 +51,11 @@ func (usersrv *UserServerAPI) setServerGRPC() (err error) {
 	if err != nil {
 		return err
 	}
-	usersrv.ServerGRPC = grpc.NewServer()
+	tracer := opentracing.GlobalTracer()
+	usersrv.ServerGRPC = grpc.NewServer(
+		grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(tracer)),
+		grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(tracer)),
+	)
 	pb.RegisterUserServiceServer(usersrv.ServerGRPC, &grpcService)
 	reflection.Register(usersrv.ServerGRPC)
 	return nil

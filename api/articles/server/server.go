@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/frouioui/tagenal/api/articles/pb"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -48,7 +50,11 @@ func (artsrv *ArticleServerAPI) setServerGRPC() (err error) {
 	if err != nil {
 		return err
 	}
-	artsrv.ServerGRPC = grpc.NewServer()
+	tracer := opentracing.GlobalTracer()
+	artsrv.ServerGRPC = grpc.NewServer(
+		grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(tracer)),
+		grpc.StreamInterceptor(otgrpc.OpenTracingStreamServerInterceptor(tracer)),
+	)
 	pb.RegisterArticleServiceServer(artsrv.ServerGRPC, &grpcService)
 	reflection.Register(artsrv.ServerGRPC)
 	return nil

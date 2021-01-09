@@ -2,7 +2,12 @@ package server
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/frouioui/tagenal/api/users/db"
 	"github.com/frouioui/tagenal/api/users/pb"
@@ -22,52 +27,76 @@ func newServiceGRPC() (grpcsrv userServiceGRPC, err error) {
 	return grpcsrv, nil
 }
 
-func (s *userServiceGRPC) ServiceInformation(cxt context.Context, r *pb.UserHomeRequest) (*pb.UserHomeResponse, error) {
-	resp := &pb.UserHomeResponse{}
+func (s *userServiceGRPC) ServiceInformation(ctx context.Context, r *pb.InformationRequest) (*pb.InformationResponse, error) {
+	resp := &pb.InformationResponse{}
 	resp.IP = getHostIP()
 	resp.Host = getHostName()
 	return resp, nil
 }
 
-func (s *userServiceGRPC) GetSingleUser(cxt context.Context, r *pb.RequestID) (*pb.User, error) {
-	user, err := s.dbm.GetUserByID(cxt, "", uint64(r.ID))
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+func (s *userServiceGRPC) GetSingleUser(ctx context.Context, r *pb.ID) (*pb.User, error) {
+	var user db.User
+	var err error
+
+	if user, err = getCacheUser(ctx, fmt.Sprintf("user_id_%d", r.ID), user); err != nil {
+		user, err = s.dbm.GetUserByID(ctx, "", uint64(r.ID))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				st := status.New(codes.NotFound, "Not found.")
+				return nil, st.Err()
+			}
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
+		err = setCacheUser(ctx, fmt.Sprintf("user_id_%d", r.ID), user)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
-	resp := user.ProtoUser()
-	return resp, nil
+	return user.ProtoUser(), nil
 }
 
-func (s *userServiceGRPC) GetRegionUsers(cxt context.Context, r *pb.RequestRegion) (*pb.Users, error) {
-	users, err := s.dbm.GetUsersOfRegion(cxt, "", r.Region)
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+func (s *userServiceGRPC) GetRegionUsers(ctx context.Context, r *pb.Region) (*pb.Users, error) {
+	var err error
+	var users []db.User
+
+	if users, err = getCacheUsers(ctx, fmt.Sprintf("user_region_%s", r.Region), users); err != nil {
+		users, err = s.dbm.GetUsersOfRegion(ctx, "", r.Region)
+		if err != nil {
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
+		err = setCacheUsers(ctx, fmt.Sprintf("user_region_%s", r.Region), users)
+		if err != nil {
+			log.Println(err.Error())
+			st, _ := status.FromError(err)
+			return nil, st.Err()
+		}
 	}
-	resp := db.UsersToProtoUsers(users)
-	return resp, nil
+	return db.UsersToProtoUsers(users), nil
 }
 
-func (s *userServiceGRPC) NewUser(cxt context.Context, r *pb.User) (*pb.ID, error) {
+func (s *userServiceGRPC) NewUser(ctx context.Context, r *pb.User) (*pb.ID, error) {
 	user := db.ProtoUserToUser(r)
 	id, err := s.dbm.InsertUser(user)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		st, _ := status.FromError(err)
+		return nil, st.Err()
 	}
 	pbid := &pb.ID{ID: int64(id)}
 	return pbid, nil
 }
 
-func (s *userServiceGRPC) NewUsers(cxt context.Context, r *pb.Users) (*pb.IDs, error) {
+func (s *userServiceGRPC) NewUsers(ctx context.Context, r *pb.Users) (*pb.IDs, error) {
 	ids := &pb.IDs{IDs: make([]*pb.ID, 0)}
 	for _, u := range r.Users {
 		user := db.ProtoUserToUser(u)
 		id, err := s.dbm.InsertUser(user)
 		if err != nil {
-			log.Println(err.Error())
-			return nil, err
+			st, _ := status.FromError(err)
+			return nil, st.Err()
 		}
 		ids.IDs = append(ids.IDs, &pb.ID{ID: int64(id)})
 	}

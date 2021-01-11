@@ -42,6 +42,31 @@ func (httpsrv *httpService) homeRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"status": "success", "code": 200, "data": %s}`, string(respJSON))
 }
 
+func (httpsrv *httpService) healthRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: "+r.RequestURI, ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
+	w.WriteHeader(200)
+	fmt.Fprint(w, `ok`)
+}
+
+func (httpsrv *httpService) readyRoute(w http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+	serverSpan := tracer.StartSpan("HTTP GET URL: "+r.RequestURI, ext.RPCServerOption(spanCtx))
+	defer serverSpan.Finish()
+
+	if ready == false {
+		w.WriteHeader(500)
+		fmt.Fprint(w, `ko`)
+		return
+	}
+	w.WriteHeader(200)
+	fmt.Fprint(w, `ok`)
+}
+
 func (httpsrv *httpService) getArticleByIDRoute(w http.ResponseWriter, r *http.Request) {
 	tracer := opentracing.GlobalTracer()
 	spanCtx, _ := tracer.Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
@@ -279,6 +304,8 @@ func (httpsrv *httpService) newArticlesRoute(w http.ResponseWriter, r *http.Requ
 
 func (httpsrv *httpService) assignRoutesToService() {
 	httpsrv.r.HandleFunc("/", httpsrv.homeRoute).Methods(http.MethodGet)
+	httpsrv.r.HandleFunc("/health", httpsrv.healthRoute).Methods(http.MethodGet)
+	httpsrv.r.HandleFunc("/ready", httpsrv.readyRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/id/{id}", httpsrv.getArticleByIDRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/category/{category}", httpsrv.getArticlesOfCategoryRoute).Methods(http.MethodGet)
 	httpsrv.r.HandleFunc("/region/id/{region_id}", httpsrv.getArticlesFromRegionRoute).Methods(http.MethodGet)

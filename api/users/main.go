@@ -26,6 +26,7 @@ func main() {
 		waiter <- err
 	}()
 
+	server.SetReady(true)
 	err = <-waiter
 	if err != nil {
 		log.Fatal(err.Error())

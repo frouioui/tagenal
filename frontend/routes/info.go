@@ -14,3 +14,11 @@ func servicesInfoHandler(c echo.Context) error {
 		"srvinfos": models.GetDefaultServicesInfos(),
 	})
 }
+
+func healthHandler(c echo.Context) error {
+	return c.JSON(200, `ok`)
+}
+
+func readyHandler(c echo.Context) error {
+	return c.JSON(200, `ok`)
+}

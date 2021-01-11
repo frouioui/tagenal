@@ -19,6 +19,10 @@ const (
 	httpPort = 8080
 )
 
+var (
+	ready bool
+)
+
 // ArticleServerAPI mainly servers as a configuration holder.
 // It contains two servers: http.Server and grpc.Server,
 // both servers can be automatically initialized using the
@@ -28,6 +32,10 @@ type ArticleServerAPI struct {
 	ServerGRPC *grpc.Server
 
 	tracingCloser io.Closer
+}
+
+func SetReady(readiness bool) {
+	ready = readiness
 }
 
 func (artsrv *ArticleServerAPI) setServerHTTP() (err error) {

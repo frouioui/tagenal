@@ -4,6 +4,8 @@ import "github.com/labstack/echo/v4"
 
 func DefineRouteHandlers(e *echo.Echo) {
 	e.GET("/", homeHandler)
+	e.GET("/health", healthHandler)
+	e.GET("/ready", readyHandler)
 	e.GET("/users/", usersHandler)
 	e.GET("/users/id/:id", userIDHandler)
 	e.GET("/users/region/:region", usersRegionHandler)

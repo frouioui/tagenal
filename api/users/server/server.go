@@ -19,6 +19,10 @@ const (
 	httpPort = 10000
 )
 
+var (
+	ready bool
+)
+
 // UserServerAPI contains the HTTP and GRPC servers which will
 // run the whole user api server.
 // This structure is mainly used as a configuration component
@@ -29,6 +33,10 @@ type UserServerAPI struct {
 	ServerGRPC *grpc.Server
 
 	tracingCloser io.Closer
+}
+
+func SetReady(readiness bool) {
+	ready = readiness
 }
 
 func (usersrv *UserServerAPI) setServerHTTP() (err error) {

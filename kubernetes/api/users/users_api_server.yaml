@@ -14,15 +14,44 @@ spec:
       app: users-api
       tier: backend
   replicas: 2
+  strategy:
+    rollingUpdate:
+      # Only a few replicas. Not a lot of resources will be used during
+      # rolling updates with a 50% surge.
+      maxSurge: 50%
+      maxUnavailable: 0
+    type: RollingUpdate
+  # Development environment, no need for a big history.
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 240
   template:
     metadata:
       labels:
         app: users-api
         tier: backend
+      annotations:
+        kubernetes.io/change-cause: "Addition of liveness and readiness probes"
     spec:
       containers:
         - name: users-api-server
           image: frouioui/tagenal-users-service:latest
+          livenessProbe:
+              httpGet:
+                path: /health
+                port: 10000
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              timeoutSeconds: 1
+              failureThreshold: 3
+          readinessProbe:
+              httpGet:
+                path: /ready
+                port: 10000
+              initialDelaySeconds: 1
+              periodSeconds: 1
+              timeoutSeconds: 1
+              failureThreshold: 3
+              successThreshold: 1
           resources:
             requests:
               cpu: 100m

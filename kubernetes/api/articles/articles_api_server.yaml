@@ -14,15 +14,43 @@ spec:
       app: articles-api
       tier: backend
   replicas: 2
+  strategy:
+    rollingUpdate:
+      # Surge 1/2 should not affect resources much, considering the replicas
+      # count is not supposed to increase by much.
+      maxSurge: 50%
+      maxUnavailable: 0
+    type: RollingUpdate
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 240
   template:
     metadata:
       labels:
         app: articles-api
         tier: backend
+      annotations:
+        kubernetes.io/change-cause: "Addition of liveness and readiness probes"
     spec:
       containers:
         - name: articles-api-server
           image: frouioui/tagenal-articles-service:latest
+          livenessProbe:
+              httpGet:
+                path: /health
+                port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              timeoutSeconds: 1
+              failureThreshold: 3
+          readinessProbe:
+              httpGet:
+                path: /ready
+                port: 8080
+              initialDelaySeconds: 1
+              periodSeconds: 1
+              timeoutSeconds: 1
+              failureThreshold: 3
+              successThreshold: 1
           resources:
             requests:
               cpu: 100m

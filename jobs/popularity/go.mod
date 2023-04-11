@@ -3,6 +3,6 @@ module github.com/frouioui/tagenal/jobs/popularity
 go 1.15
 
 require (
-	google.golang.org/grpc v1.34.0
-	vitess.io/vitess v0.7.0
+	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
+	vitess.io/vitess v0.16.1
 )
